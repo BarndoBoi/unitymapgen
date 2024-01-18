@@ -9,7 +9,7 @@ public class TerrainGenerator : MonoBehaviour
 
     public int depth = 20; //y-axis
 
-    public float scale = 35f;
+    public float scale = 35f; //this is just to get bigger/smaller map on the fly
 
     public float offsetX = 100f;
     public float offsetY = 100f;
@@ -19,27 +19,24 @@ public class TerrainGenerator : MonoBehaviour
 
     //Init map and prep noise for terrain layer
 
-    float noiseScale = 0.9f;
-    float noiseFrequency = 0.25f;
+    public float noiseScale = 0.9f;
+    public float noiseFrequency = 0.25f;
     int seed = 10;
 
     FastNoiseLite noise = new FastNoiseLite();
 
-    // gives us a random noise each time
+    // gives us a random noise each time we run
     private void Start()
     {
         offsetX = Random.Range(0f, 9999f);
         offsetY = Random.Range(0f, 9999f);
     }
     // Using Update() instead of Start() for testing
-    // can update scale in real-time
+    // so can update values in real-time
 
     private void Update()
     {
-
-        
-
-        Terrain terrain = GetComponent<Terrain>(); //so we can interact with the Terrain object
+        Terrain terrain = GetComponent<Terrain>(); //the Terrain object
         terrain.terrainData = GenerateTerrain(terrain.terrainData);
     }
 

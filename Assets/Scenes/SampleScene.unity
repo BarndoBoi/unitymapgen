@@ -343,9 +343,11 @@ MonoBehaviour:
   width: 256
   height: 256
   depth: 20
-  scale: 20
+  scale: 35
   offsetX: 100
   offsetY: 100
+  noiseScale: 0.9
+  noiseFrequency: 0.25
 --- !u!154 &1904438393
 TerrainCollider:
   m_ObjectHideFlags: 0
