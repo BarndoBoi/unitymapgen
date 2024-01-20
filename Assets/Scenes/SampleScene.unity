@@ -346,7 +346,7 @@ MonoBehaviour:
   scale: 35
   offsetX: 100
   offsetY: 100
-  noiseScale: 2
+  noiseScale: 1.2
   noiseFrequency: 0.25
 --- !u!154 &1904438393
 TerrainCollider:

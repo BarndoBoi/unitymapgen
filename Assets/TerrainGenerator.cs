@@ -20,7 +20,7 @@ public class TerrainGenerator : MonoBehaviour
 
     //Init map and prep noise for terrain layer
 
-    public float noiseScale = 2.0f;
+    public float noiseScale = 1.2f;
     public float noiseFrequency = 0.25f;
     int seed = 10;
 
@@ -69,7 +69,7 @@ public class TerrainGenerator : MonoBehaviour
                 // Sample the height at this location (note GetHeight expects int coordinates corresponding to locations in the heightmap array)
                 //float height = terrainData.GetHeight(Mathf.RoundToInt(y_01 * terrainData.heightmapHeight), Mathf.RoundToInt(x_01 * terrainData.heightmapWidth));
                 float height = terrainData.GetHeight(Mathf.RoundToInt(y_01 * terrainData.heightmapResolution), Mathf.RoundToInt(x_01 * terrainData.heightmapResolution));
-
+                
                 // Calculate the normal of the terrain (note this is in normalised coordinates relative to the overall terrain dimensions)
                 Vector3 normal = terrainData.GetInterpolatedNormal(y_01, x_01);
 
@@ -98,44 +98,36 @@ public class TerrainGenerator : MonoBehaviour
                 water   /
                 _______/
                       
+               
                 */
 
-                // Texture[0] has constant influence
-                // not using this right now, but if nothing had a score more than .5 then this would be selected 
-                // brown
-                splatWeights[0] = 0.5f;
+                splatWeights[0] = 0.0f;
+                splatWeights[1] = 0.0f;
+                splatWeights[2] = 0.0f;
+                splatWeights[3] = 0.0f;
+                       
+                // the percent of terrains max height that this area is
+                float hm_perc = (height / terrainData.heightmapResolution) *10f;
+
+                Biome(); //sets the biome
+
+                void Biome()
+                {
+                    // will need to tune further but this will work for the basics now. 
+                    // RedBlob had a better implementation of this that might be worth looking into
+                    if (hm_perc < 0.02) { splatWeights[2] = 1.0f; return; } //water
+                    if (hm_perc < 0.10) { splatWeights[0] = 1.0f; return; } //beach sand
+                    if (hm_perc < 0.45) { splatWeights[1] = 1.0f; return; } // grass
+                    if (hm_perc >= 0.45) { splatWeights[3] = 1.0f; return; } //snow
+
+                }
                 
-                
-                // Texture[1] is stronger at lower altitudes
-                // this happens to work because flat ground (water) will always have a higher weight, but needs to be fixed for better accuracy. 
-                //grass
-                splatWeights[1] = Mathf.Clamp01((terrainData.heightmapResolution - height));
-
-                // Texture[2] stronger on flatter terrain
-                // Note "steepness" is unbounded, so we "normalise" it by dividing by the extent of heightmap height and scale factor
-                // Subtract result from 1.0 to give greater weighting to flat surfaces
-                // not sure why we are dividing by 5 but go off queen I guess.
-                // this works for now but will probably need to be changed when we add sand beaches and go below sea level, which reminds me:
-                // TODO: set negative space so water has depth instead of being flat.
-                //water
-                splatWeights[2] = 1.0f - Mathf.Clamp01(steepness * steepness / (terrainData.heightmapResolution / 5.0f));
-
-                // Texture[3] increases with height but only on surfaces facing positive Z axis 
-                // TODO: when brain can math, make formula to do only if height is in top lets say 15% of heights on map
-                //snow
-                splatWeights[3] = height * Mathf.Clamp01(normal.z);
-
-                // god I fucking hate Unity
-                //Debug.Log("brown = " + splatWeights[0] + "|   " + "grass = " + splatWeights[1] + "|   "+ "water = " + splatWeights[2] + "|   " + "snow = " + splatWeights[3] + "|   ");
-
-
                 // Sum of all textures weights must add to 1, so calculate normalization factor from sum of weights
                 float z = splatWeights.Sum();
 
                 // Loop through each terrain texture
                 for (int i = 0; i < terrainData.alphamapLayers; i++)
                 {
-
                     // Normalize so that sum of all texture weights = 1
                     splatWeights[i] /= z;
 
@@ -149,6 +141,8 @@ public class TerrainGenerator : MonoBehaviour
         terrainData.SetAlphamaps(0, 0, splatmapData);
         return terrainData;
     }
+
+    
 
     float[,] GenerateHeights()
     {
