@@ -9,5 +9,7 @@ public class TerrainFromTilemap
     // Then I'll likely want to check my Pathfinding code and see if I can check for regions that arent reachable and start marking them.
     // It would be cool to add canals or valleys between the water regions so everything is accessable by boat. :3
     */
+    [SerializeField]
+
     public Map map = new Map();
 }

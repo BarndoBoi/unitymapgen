@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ProcGenTiles
 {
     public class Tile
