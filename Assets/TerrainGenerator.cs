@@ -22,22 +22,24 @@ public class TerrainGenerator : MonoBehaviour
 
     public float noiseScale = 1.2f;
     public float noiseFrequency = 0.25f;
+    [SerializeField]
     int seed = 10;
+
+    [SerializeField]
+    Terrain terrain;
 
     FastNoiseLite noise = new FastNoiseLite();
 
     // gives us a random noise each time we run
     private void Start()
     {
-        offsetX = Random.Range(0f, 9999f);
-        offsetY = Random.Range(0f, 9999f);
+        terrain = GetComponent<Terrain>(); //the Terrain object
     }
     // Using Update() instead of Start() for testing
     // so can update values in real-time
 
-    private void Update()
-    {
-        Terrain terrain = GetComponent<Terrain>(); //the Terrain object
+    public void OnGenerate()
+    { //Called by clicking a button in the editor
         terrain.terrainData = GenerateTerrain(terrain.terrainData);
     }
 
@@ -45,7 +47,7 @@ public class TerrainGenerator : MonoBehaviour
     {
         // sets initial Terrain data
         terrainData.heightmapResolution = width + 1;
-        terrainData.size = new Vector3(width, depth, height);
+        terrainData.size = new Vector3(width, height, depth);
 
         //sets heights with perlin
         terrainData.SetHeights(0, 0, GenerateHeights());
@@ -167,8 +169,8 @@ public class TerrainGenerator : MonoBehaviour
 
     float CalculateHeight(int x, int y)
     {
-        float xCoord = (float)x / width * scale + offsetX;
-        float yCoord = (float)y / height * scale + offsetY;
+        float xCoord = (float)x / width * scale * noiseScale;
+        float yCoord = (float)y / height * scale * noiseScale;
 
         float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale);
 
