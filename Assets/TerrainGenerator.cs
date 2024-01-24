@@ -5,8 +5,8 @@ using System.Linq; // used for Sum of array
 
 public class TerrainGenerator : MonoBehaviour
 {
-    public int width = 512; //x-axis of the terrain 256x256   512x512  1024x1024 reeeee
-    public int height = 512; //z-axis
+    public int width = 1024; //x-axis of the terrain 256x256   512x512  1024x1024 reeeee
+    public int height = 1024; //z-axis
 
     public int depth = 20; //y-axis
 
@@ -27,20 +27,20 @@ public class TerrainGenerator : MonoBehaviour
     private void Start()
     {
         terrain = GetComponent<Terrain>(); //the Terrain object
-        terrain.terrainData = GenerateTerrain(terrain.terrainData);
-    }
+            }
     // Using Update() instead of Start() for testing
     // so can update values in real-time
 
-    private void Update()
+    public void OnGenerate()
     {
-       
+        terrain.terrainData = GenerateTerrain(terrain.terrainData);
+
     }
 
     TerrainData GenerateTerrain(TerrainData terrainData)
     {
         // sets initial Terrain data
-        terrainData.heightmapResolution = width + 1;
+        terrainData.heightmapResolution = (width + 1);
         terrainData.size = new Vector3(width, depth, height);
 
         //sets heights with perlin
@@ -113,8 +113,8 @@ public class TerrainGenerator : MonoBehaviour
                     // RedBlob had a better implementation of this that might be worth looking into
                     if (hm_perc == 0.0) { splatWeights[2] = 1.0f; return; } //water
                     if (hm_perc < 0.10) { splatWeights[0] = 1.0f; return; } //beach sand
-                    if (hm_perc < 0.45) { splatWeights[1] = 1.0f; return; } // grass
-                    if (hm_perc >= 0.45) { splatWeights[3] = 1.0f; return; } //snow
+                    if (hm_perc < 0.60) { splatWeights[1] = 1.0f; return; } // grass
+                    if (hm_perc >= 0.60) { splatWeights[3] = 1.0f; return; } //snow
 
                 }
                 
@@ -167,11 +167,9 @@ public class TerrainGenerator : MonoBehaviour
         float yCoord = (float)y / height * scale;
 
         //TODO fix
-        float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale); // returns value between -1 and 1 
-                                                                                // value = value / 2.0f + 0.5f;    // This will rescale between 0 and 1
-                                                                                // Any negative values are being treated as zero ie. flat ground (water)
-                                                                                // Will need to mess with values to get working again
-
+        float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale);
+        //float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale) / 2f + .5f; // returns value between 0 and 1 
+                                                                              
         return value;
     }
 }

@@ -2,22 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fishing_boat : MonoBehaviour
+public class fishing_boat : MonoBehaviour
 {
 
-    private CharacterController characterController;
-    public float Speed = 5f;
+    public float speed = 5;
+    public float turning_radius = 10f;
+
+    
+
 
     // Start is called before the first frame update
     void Start()
     {
-        characterController = GetComponent<CharacterController>();
+       
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        characterController.Move(move * Time.deltaTime * Speed);
+        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"),0);
+
+        transform.position += transform.TransformDirection(Vector3.forward * speed * Time.deltaTime);
+        //transform.Translate(transform.localPosition.z * speed * Time.deltaTime);
+        transform.Rotate(Vector3.up, input.x * turning_radius);
+
+        
+
     }
 }
+
