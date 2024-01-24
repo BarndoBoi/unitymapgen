@@ -5,40 +5,36 @@ using System.Linq; // used for Sum of array
 
 public class TerrainGenerator : MonoBehaviour
 {
-    public int width = 256; //x-axis of the terrain
-    public int height = 256; //z-axis
+    public int width = 512; //x-axis of the terrain 256x256   512x512  1024x1024
+    public int height = 512; //z-axis
 
     public int depth = 20; //y-axis
 
     public float scale = 35f; //this is just to get bigger/smaller map on the fly
 
-    public float offsetX = 100f;
-    public float offsetY = 100f;
-
-    //offsetX = Random.Range(0f, 9999f);
-    //offsetY = Random.Range(0f, 9999f);
 
     //Init map and prep noise for terrain layer
-
     public float noiseScale = 1.2f;
     public float noiseFrequency = 0.25f;
-    int seed = 10;
+    public int seed = 10;
 
     FastNoiseLite noise = new FastNoiseLite();
+
+    Terrain terrain;
+
 
     // gives us a random noise each time we run
     private void Start()
     {
-        offsetX = Random.Range(0f, 9999f);
-        offsetY = Random.Range(0f, 9999f);
+        terrain = GetComponent<Terrain>(); //the Terrain object
+        terrain.terrainData = GenerateTerrain(terrain.terrainData);
     }
     // Using Update() instead of Start() for testing
     // so can update values in real-time
 
     private void Update()
     {
-        Terrain terrain = GetComponent<Terrain>(); //the Terrain object
-        terrain.terrainData = GenerateTerrain(terrain.terrainData);
+       
     }
 
     TerrainData GenerateTerrain(TerrainData terrainData)
@@ -115,7 +111,7 @@ public class TerrainGenerator : MonoBehaviour
                 {
                     // will need to tune further but this will work for the basics now. 
                     // RedBlob had a better implementation of this that might be worth looking into
-                    if (hm_perc < 0.02) { splatWeights[2] = 1.0f; return; } //water
+                    if (hm_perc == 0.0) { splatWeights[2] = 1.0f; return; } //water
                     if (hm_perc < 0.10) { splatWeights[0] = 1.0f; return; } //beach sand
                     if (hm_perc < 0.45) { splatWeights[1] = 1.0f; return; } // grass
                     if (hm_perc >= 0.45) { splatWeights[3] = 1.0f; return; } //snow
@@ -167,10 +163,14 @@ public class TerrainGenerator : MonoBehaviour
 
     float CalculateHeight(int x, int y)
     {
-        float xCoord = (float)x / width * scale + offsetX;
-        float yCoord = (float)y / height * scale + offsetY;
+        float xCoord = (float)x / width * scale;
+        float yCoord = (float)y / height * scale;
 
-        float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale);
+        //TODO fix
+        float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale); // returns value between -1 and 1 
+                                                                                // value = value / 2.0f + 0.5f;    // This will rescale between 0 and 1
+                                                                                // Any negative values are being treated as zero ie. flat ground (water)
+                                                                                // Will need to mess with values to get working again
 
         return value;
     }
