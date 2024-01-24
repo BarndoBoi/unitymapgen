@@ -5,7 +5,7 @@ using System.Linq; // used for Sum of array
 
 public class TerrainGenerator : MonoBehaviour
 {
-    public int width = 512; //x-axis of the terrain 256x256   512x512  1024x1024
+    public int width = 512; //x-axis of the terrain 256x256   512x512  1024x1024 reeeee
     public int height = 512; //z-axis
 
     public int depth = 20; //y-axis
