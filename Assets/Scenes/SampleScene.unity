@@ -207,9 +207,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1904438392}
-        m_TargetAssemblyTypeName: TerrainGenerator, Assembly-CSharp
-        m_MethodName: OnGenerate
+      - m_Target: {fileID: 1904438396}
+        m_TargetAssemblyTypeName: TerrainFromTilemap, Assembly-CSharp
+        m_MethodName: GenerateTerrain
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -562,14 +562,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.48469552, y: -0.019804848, z: -0.023856062, w: 0.8741333}
-  m_LocalPosition: {x: -369, y: 181, z: -280}
+  m_LocalRotation: {x: 0.48348102, y: 0, z: 0, w: 0.8753549}
+  m_LocalPosition: {x: -230.7, y: 290.9, z: -262.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 57.826, y: -6.226, z: -6.568}
+  m_LocalEulerAnglesHint: {x: 57.826, y: 0, z: 0}
 --- !u!1 &1543387806
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,8 +706,8 @@ Canvas:
   m_GameObject: {fileID: 1773357618}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 963194227}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -751,7 +751,7 @@ GameObject:
   - component: {fileID: 1904438395}
   - component: {fileID: 1904438394}
   - component: {fileID: 1904438393}
-  - component: {fileID: 1904438392}
+  - component: {fileID: 1904438396}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -759,28 +759,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
   m_IsActive: 1
---- !u!114 &1904438392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1904438391}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e15c0cf530a561743b90ebd5ac3e7d04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  width: 256
-  height: 256
-  depth: 20
-  scale: 35
-  offsetX: 100
-  offsetY: 100
-  noiseScale: 1.2
-  noiseFrequency: 0.25
-  seed: 10
-  terrain: {fileID: 0}
 --- !u!154 &1904438393
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -841,3 +819,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: -124.16, z: 0}
+--- !u!114 &1904438396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1904438391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8de5017b3ab53c4b973cb2ccf492a53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 512
+  height: 512
+  depth: 50
+  noiseScale: 0.25
+  noiseParams:
+    noiseType: 3
+    frequency: 0.015
+    seed: 10
+    fractalType: 2
+    fractalLacunarity: 2
+    fractalGain: 0.5
+    fractalOctaves: 5
+  terrain: {fileID: 1904438394}
