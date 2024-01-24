@@ -47,7 +47,7 @@ public class TerrainGenerator : MonoBehaviour
     {
         // sets initial Terrain data
         terrainData.heightmapResolution = width + 1;
-        terrainData.size = new Vector3(width, height, depth);
+        terrainData.size = new Vector3(width, depth, height);
 
         //sets heights with perlin
         terrainData.SetHeights(0, 0, GenerateHeights());
