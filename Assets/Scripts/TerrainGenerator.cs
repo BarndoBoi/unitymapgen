@@ -5,6 +5,7 @@ using System.Linq; // used for Sum of array
 
 public class TerrainGenerator : MonoBehaviour
 {
+    
     public int width = 1024; //x-axis of the terrain 256x256   512x512  1024x1024 reeeee
     public int height = 1024; //z-axis
 
@@ -15,8 +16,16 @@ public class TerrainGenerator : MonoBehaviour
 
     //Init map and prep noise for terrain layer
     public float noiseScale = 1.2f;
+
+    /*
     public float noiseFrequency = 0.25f;
     public int seed = 10;
+    public float fractalLacunarity = 2.0f;
+    public float fractalGain = 0.5f;
+    public int fractalOctaves = 5;
+    */
+    [SerializeField]
+    private FastNoiseLiteParams noiseParams = new FastNoiseLiteParams();
 
     FastNoiseLite noise = new FastNoiseLite();
 
@@ -39,6 +48,8 @@ public class TerrainGenerator : MonoBehaviour
 
     TerrainData GenerateTerrain(TerrainData terrainData)
     {
+        ReadNoiseParams();
+
         // sets initial Terrain data
         terrainData.heightmapResolution = (width + 1);
         terrainData.size = new Vector3(width, depth, height);
@@ -138,16 +149,28 @@ public class TerrainGenerator : MonoBehaviour
         return terrainData;
     }
 
-    
+    public void ReadNoiseParams()
+    {
+        if (noise == null)
+            noise = new FastNoiseLite();
+
+        noise.SetSeed(noiseParams.seed);
+        noise.SetNoiseType(noiseParams.noiseType);
+        noise.SetFractalType(noiseParams.fractalType);
+        noise.SetFractalGain(noiseParams.fractalGain);
+        noise.SetFractalLacunarity(noiseParams.fractalLacunarity);
+        noise.SetFractalOctaves(noiseParams.fractalOctaves);
+        noise.SetFrequency(noiseParams.frequency);
+    }
+
 
     float[,] GenerateHeights()
     {
 
         //TODO add more layers so we can do multiple passes for more variability in the Perlin noise
         //I think Sebastian talked about it a bit in one of his vids go find it
-        noise.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
-        noise.SetFrequency(noiseFrequency);
-        noise.SetSeed(seed);
+        //  noise.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
+        
 
         float[,] heights = new float[width, height];
         for (int x = 0; x < width; x++)
@@ -163,13 +186,15 @@ public class TerrainGenerator : MonoBehaviour
 
     float CalculateHeight(int x, int y)
     {
-        float xCoord = (float)x / width * scale;
-        float yCoord = (float)y / height * scale;
+        //float xCoord = (float)x / width * scale;
+        //float yCoord = (float)y / height * scale;
 
         //TODO fix
-        float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale);
+        float value = noise.GetNoise(x * noiseScale, y * noiseScale);
+        //float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale);
         //float value = noise.GetNoise(xCoord * noiseScale, yCoord * noiseScale) / 2f + .5f; // returns value between 0 and 1 
-                                                                              
+        value = Mathf.Lerp(-1, 1, value); //Normalize the returned noise
+                                          
         return value;
     }
 }
