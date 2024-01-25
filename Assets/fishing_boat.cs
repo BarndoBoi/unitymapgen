@@ -5,8 +5,8 @@ using UnityEngine;
 public class fishing_boat : MonoBehaviour
 {
 
-    public float speed = 5;
-    public float turning_radius = 10f;
+    public float speed = 25f;
+    public float turning_radius = .7f;
 
     
 
@@ -21,8 +21,8 @@ public class fishing_boat : MonoBehaviour
     void Update()
     {
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"),0);
-
-        transform.position += transform.TransformDirection(Vector3.forward * speed * Time.deltaTime);
+        Vector2 input2 = new Vector2(Input.GetAxisRaw("Vertical"), 0);
+        if (input2.x > 0) { transform.position += transform.TransformDirection(Vector3.forward * speed * Time.deltaTime); };
         //transform.Translate(transform.localPosition.z * speed * Time.deltaTime);
         transform.Rotate(Vector3.up, input.x * turning_radius);
 
