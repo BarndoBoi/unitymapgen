@@ -114,6 +114,7 @@ public class TerrainFromTilemap : MonoBehaviour
         noise.SetFractalLacunarity(noiseParams.fractalLacunarity);
         noise.SetFractalOctaves(noiseParams.fractalOctaves);
         noise.SetFrequency(noiseParams.frequency);
+        noise.SetFractalWeightedStrength(noiseParams.weightedStrength);
     }
 
     public float[,] GenerateHeightmap()

@@ -11,5 +11,6 @@ public struct FastNoiseLiteParams
     public FastNoiseLite.FractalType fractalType;
     public float fractalLacunarity;
     public float fractalGain;
+    public float weightedStrength;
     public int fractalOctaves;
 }
