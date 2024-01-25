@@ -17,6 +17,9 @@ public class TerrainGenerator : MonoBehaviour
     public float noiseScale = 1.2f;
     public float noiseFrequency = 0.25f;
     public int seed = 10;
+    public float fractalLacunarity = 2.0f;
+    public float fractalGain = 0.5f;
+    public int fractalOctaves = 5;
 
     FastNoiseLite noise = new FastNoiseLite();
 
@@ -148,6 +151,11 @@ public class TerrainGenerator : MonoBehaviour
         noise.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
         noise.SetFrequency(noiseFrequency);
         noise.SetSeed(seed);
+
+        noise.SetFractalType(FastNoiseLite.FractalType.Ridged);
+        noise.SetFractalGain(fractalGain);
+        noise.SetFractalLacunarity(fractalLacunarity);
+        noise.SetFractalOctaves(fractalOctaves);
 
         float[,] heights = new float[width, height];
         for (int x = 0; x < width; x++)
