@@ -8,11 +8,16 @@ public class fishing_boat : MonoBehaviour
 
     public float launchForce = 25f;
 
-    public GameObject cannon_tube;
-    public GameObject cannon_base;
-    public GameObject projectile;
-    public GameObject FirePoint;
+    private GameObject cannon_tube;
+    private GameObject cannon_base;
+    private GameObject projectile;
+    private GameObject FirePoint;
 
+    public GameObject MainCamera;
+    public GameObject OverviewCamera;
+    public GameObject FollowCamera;
+
+    public string currCamera;
 
 
     // Start is called before the first frame update
@@ -22,6 +27,14 @@ public class fishing_boat : MonoBehaviour
         cannon_base = GameObject.Find("cannon_base");
         projectile = GameObject.Find("projectile");
         FirePoint = GameObject.Find("FirePoint");
+
+        //MainCamera = GameObject.Find("MainCamera");
+        //OverviewCamera = GameObject.Find("OverviewCamera");
+        MainCamera.SetActive(true);
+        OverviewCamera.SetActive(false);
+        currCamera = "MainCamera";
+
+
     }
 
     // Update is called once per frame
@@ -44,6 +57,25 @@ public class fishing_boat : MonoBehaviour
         // fire cannon with F
         // it's firing multiple, need to only let it fire one 
         if (Input.GetKeyUp(KeyCode.F)) { FireCannon(); }
+
+        //swap between cameras
+        if (Input.GetKeyUp(KeyCode.C))
+        {
+            if (currCamera == "MainCamera")
+            {
+                MainCamera.SetActive(false);
+                OverviewCamera.SetActive(true);
+                currCamera = "OverviewCamera";
+            } 
+            else
+            {
+                MainCamera.SetActive(true);
+                OverviewCamera.SetActive(false);
+                currCamera = "MainCamera";
+            }
+        
+            
+        }
     }
 
     void FireCannon() //THIS CODE IS FUCKED, I'M WORKING ON IT 
