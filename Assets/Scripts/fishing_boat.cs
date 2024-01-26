@@ -14,8 +14,8 @@ public class fishing_boat : MonoBehaviour
     private GameObject FirePoint;
 
     public GameObject MainCamera;
-    public GameObject OverviewCamera;
-    public GameObject FollowCamera;
+    //public GameObject OverviewCamera;
+    //public GameObject FollowCamera;
 
     public string currCamera;
 
@@ -31,7 +31,7 @@ public class fishing_boat : MonoBehaviour
         //MainCamera = GameObject.Find("MainCamera");
         //OverviewCamera = GameObject.Find("OverviewCamera");
         MainCamera.SetActive(true);
-        OverviewCamera.SetActive(false);
+        //OverviewCamera.SetActive(false);
         currCamera = "MainCamera";
 
 
@@ -59,23 +59,23 @@ public class fishing_boat : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.F)) { FireCannon(); }
 
         //swap between cameras
-        if (Input.GetKeyUp(KeyCode.C))
-        {
-            if (currCamera == "MainCamera")
-            {
-                MainCamera.SetActive(false);
-                OverviewCamera.SetActive(true);
-                currCamera = "OverviewCamera";
-            } 
-            else
-            {
-                MainCamera.SetActive(true);
-                OverviewCamera.SetActive(false);
-                currCamera = "MainCamera";
-            }
+        //if (Input.GetKeyUp(KeyCode.C))
+        //{
+        //    if (currCamera == "MainCamera")
+        //    {
+        //        MainCamera.SetActive(false);
+        //        OverviewCamera.SetActive(true);
+        //        currCamera = "OverviewCamera";
+        //    } 
+        //    else
+        //    {
+        //        MainCamera.SetActive(true);
+        //        OverviewCamera.SetActive(false);
+        //        currCamera = "MainCamera";
+        //    }
         
             
-        }
+        //}
     }
 
     void FireCannon() //THIS CODE IS FUCKED, I'M WORKING ON IT 
