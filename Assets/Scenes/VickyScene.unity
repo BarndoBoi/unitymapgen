@@ -391,7 +391,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 754422875}
-  - component: {fileID: 754422876}
   m_Layer: 0
   m_Name: fishing_boat
   m_TagString: Untagged
@@ -435,20 +434,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &754422876
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 753928315}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 377723c20b485c34f948413bd651755c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 5
-  turning_radius: 1
 --- !u!4 &754422877
 Transform:
   m_ObjectHideFlags: 0
@@ -1015,7 +1000,7 @@ TerrainCollider:
   m_GameObject: {fileID: 1904438391}
   m_Material: {fileID: 0}
   m_Enabled: 1
-  m_TerrainData: {fileID: 15600000, guid: 38e4b2ca2a91ec64a8b4e6cdcb25c98b, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 0bd4f49dc1307e6439cff579efce630a, type: 2}
   m_EnableTreeColliders: 1
 --- !u!218 &1904438394
 Terrain:
@@ -1026,7 +1011,7 @@ Terrain:
   m_GameObject: {fileID: 1904438391}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: 38e4b2ca2a91ec64a8b4e6cdcb25c98b, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 0bd4f49dc1307e6439cff579efce630a, type: 2}
   m_TreeDistance: 5000
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
@@ -1081,13 +1066,13 @@ MonoBehaviour:
   width: 1024
   height: 1024
   depth: 64
-  noiseScale: 0.75
+  noiseScale: 0.25
   noiseParams:
     noiseType: 3
     frequency: 0.015
     seed: 10
-    fractalType: 0
-    fractalLacunarity: 1.5
+    fractalType: 2
+    fractalLacunarity: 2
     fractalGain: 0.5
     weightedStrength: 0.5
     fractalOctaves: 3
