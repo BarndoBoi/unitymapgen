@@ -3,6 +3,29 @@ using System.Collections;
 using System.Linq; // used for Sum of array
 
 
+
+
+/* TODO:
+
+    scroll back from main boat follow camera
+    
+    ECS entity component system
+        split into moving mode --> aiming mode --> fire mode
+
+    camera.LookAt(projectile) <--- for following projectile after launch
+
+    on overhead view, make objects more exaggerated so they're easier to see
+
+    Look into UI options
+        power 
+        height angle
+        compass angle
+        
+
+    
+
+*/
+
 public class TerrainGenerator : MonoBehaviour
 {
     
