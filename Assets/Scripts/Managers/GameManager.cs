@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
 
     public GameState State;
 
-    public static event Action<GameState> OnGameStateChanged;
+    public event Action<GameState> OnGameStateChanged;
 
     private void Awake()
     {
@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     {
         //TODO Change to MenuScreen once menu is made 
         // for now just on move state
-        UpdateGameState(GameState.Move);
+        UpdateGameState(GameState.MenuScreen);
     }
 
     public void UpdateGameState(GameState newState)
@@ -48,7 +48,10 @@ public class GameManager : MonoBehaviour
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
 
+        //notify the new state to anything that is subscribed to event
+        // ? only invokes function if something is subscribed
         OnGameStateChanged?.Invoke(newState);
+
     }
 
     private void HandleMenuScreen()

@@ -1,14 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
+
 
 public class MenuManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] private GameObject MainMenuPanel;
+
+
+
     void Start()
     {
-        
+        // subscribe to game state changes event
+        GameManager.Instance.OnGameStateChanged += GameManagerOnGameStateChanged;
     }
+
+    private void OnDestroy()
+    {
+        //unsubscribe
+        GameManager.Instance.OnGameStateChanged -= GameManagerOnGameStateChanged;
+    }
+
+    private void GameManagerOnGameStateChanged(GameState state)
+    {
+        MainMenuPanel.SetActive(state == GameState.MenuScreen);
+    }
+
 
     // Update is called once per frame
     void Update()
