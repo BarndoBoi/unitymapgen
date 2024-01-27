@@ -31,5 +31,9 @@ namespace ProcGenTiles
 			return null; //If it isn't a valid tile return null
 		}
 		
+		public Tile GetTile(int x, int y)
+		{
+			return GetTile((x, y));
+		}
 	}
 }

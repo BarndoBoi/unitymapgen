@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using ProcGenTiles;
 using System.Linq;
+using UnityEngine.InputSystem;
 
 public class TerrainFromTilemap : MonoBehaviour
 {
@@ -27,12 +28,32 @@ public class TerrainFromTilemap : MonoBehaviour
     [SerializeField]
     private Terrain terrain;
 
+    //Test field for now, needs to be removed
+    [SerializeField]
+    Transform BoatPos;
+
     public void Start()
     {
         map = new Map(width, height);
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
         GenerateTerrain();
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (BoatPos.position.x <= width && BoatPos.position.x >=0 && BoatPos.position.z <= height && BoatPos.position.z >= 0)
+            {
+                Tile t = map.GetTile((int)BoatPos.position.x, (int)BoatPos.position.z);
+                Debug.Log("Testing coords at: " + ((int)BoatPos.position.x, (int)BoatPos.position.z).ToString() + " with height: " + t.ValuesHere[LayersEnum.Elevation]);
+            }
+            else
+            {
+                Debug.Log("Boat is outside of the map array!");
+            }
+        }
     }
 
     public void GenerateTerrain()
@@ -78,10 +99,10 @@ public class TerrainFromTilemap : MonoBehaviour
                 {
                     // will need to tune further but this will work for the basics now. 
                     // RedBlob had a better implementation of this that might be worth looking into
-                    if (hm_perc < 0.02) { splatWeights[2] = 1.0f; return; } //water
-                    if (hm_perc < 0.10) { splatWeights[0] = 1.0f; return; } //beach sand
-                    if (hm_perc < 0.45) { splatWeights[1] = 1.0f; return; } // grass
-                    if (hm_perc >= 0.45) { splatWeights[3] = 1.0f; return; } //snow
+                    if (hm_perc < 0.45) { splatWeights[2] = 1.0f; return; } //water
+                    if (hm_perc < 0.55) { splatWeights[0] = 1.0f; return; } //beach sand
+                    if (hm_perc < 0.85) { splatWeights[1] = 1.0f; return; } // grass
+                    if (hm_perc >= 0.85) { splatWeights[3] = 1.0f; return; } //snow
 
                 }
 
@@ -130,8 +151,8 @@ public class TerrainFromTilemap : MonoBehaviour
             for (int j = 0; j < width; j++)
             { //Inner for loop does most of the heavy lifting
                 Tile t = map.Tiles[i, j]; //Get the tile at the location
-                float v = noise.GetNoise(i * noiseScale, j * noiseScale); //Grab the value
-                v = Mathf.Lerp(-1, 1, v); //Normalize the returned noise
+                float v = noise.GetNoise(i * noiseScale, j * noiseScale) / 2 + 0.5f; //Grab the value
+                //v = Mathf.InverseLerp(-1, 1, v); //Normalize the returned noise
                 //Set the elevation to the normalized value by checking if we've already set elevation data
                 if (t.ValuesHere.ContainsKey(LayersEnum.Elevation))
                     t.ValuesHere[LayersEnum.Elevation] = v;

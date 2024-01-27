@@ -34,7 +34,7 @@ public class BoatSteer : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, rayLength))
         { //Do steering away from the cross product of the ray and the vector
-            
+            //Flatten vector3 to do dot product? Might need to just do whisker steering instead
         }*/
     }
 

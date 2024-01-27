@@ -381,7 +381,7 @@ MonoBehaviour:
   speed: 0.5
   turnRate: 0.7
   rayLength: 5
-  minimumInput: 0.1
+  minimumInput: 0
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,7 +503,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -591.59283, y: 322}
+  m_AnchoredPosition: {x: -591.59283, y: 299.5}
   m_SizeDelta: {x: 101.8143, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1002749927
@@ -1010,3 +1010,4 @@ MonoBehaviour:
     weightedStrength: 0.5
     fractalOctaves: 3
   terrain: {fileID: 1904438394}
+  BoatPos: {fileID: 754422875}
