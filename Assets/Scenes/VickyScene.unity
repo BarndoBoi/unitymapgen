@@ -996,18 +996,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8de5017b3ab53c4b973cb2ccf492a53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 1024
-  height: 1024
+  width: 513
+  height: 513
   depth: 64
-  noiseScale: 0.25
+  noiseScale: 0.15
   noiseParams:
     noiseType: 3
     frequency: 0.015
     seed: 10
-    fractalType: 2
+    fractalType: 0
     fractalLacunarity: 2
-    fractalGain: 0.5
-    weightedStrength: 0.5
-    fractalOctaves: 3
+    fractalGain: 1
+    weightedStrength: 0
+    fractalOctaves: 4
   terrain: {fileID: 1904438394}
   BoatPos: {fileID: 754422875}

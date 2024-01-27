@@ -46,8 +46,8 @@ public class TerrainFromTilemap : MonoBehaviour
         {
             if (BoatPos.position.x <= width && BoatPos.position.x >=0 && BoatPos.position.z <= height && BoatPos.position.z >= 0)
             {
-                Tile t = map.GetTile((int)BoatPos.position.x, (int)BoatPos.position.z);
-                Debug.Log("Testing coords at: " + ((int)BoatPos.position.x, (int)BoatPos.position.z).ToString() + " with height: " + t.ValuesHere[LayersEnum.Elevation]);
+                Tile t = map.GetTile((int)BoatPos.position.z, (int)BoatPos.position.x);
+                Debug.Log("Testing coords at: " + ((int)BoatPos.position.z, (int)BoatPos.position.x).ToString() + " with height: " + t.ValuesHere[LayersEnum.Elevation]);
             }
             else
             {
