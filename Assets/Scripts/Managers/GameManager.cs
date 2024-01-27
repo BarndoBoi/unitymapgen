@@ -44,9 +44,11 @@ public class GameManager : MonoBehaviour
             case GameState.Fire:
                 HandleFire();
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
 
-        OnGameStateChanged(newState);
+        OnGameStateChanged?.Invoke(newState);
     }
 
     private void HandleMenuScreen()
