@@ -4,5 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
-  m_configObjects: {}
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/LexiMainMenuScene.unity
+    guid: d341290b633e7b64fa77efd2ec3b54ce
+  - enabled: 1
+    path: Assets/Scenes/LexiScene.unity
+    guid: 4cd6a8334f1b3934287f45f061c2048c
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: 9c25c50d3f7cd584e80d4be1e6cfaf89, type: 2}
