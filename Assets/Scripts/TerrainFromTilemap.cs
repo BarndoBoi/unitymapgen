@@ -19,6 +19,8 @@ public class TerrainFromTilemap : MonoBehaviour
     [SerializeField]
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better
 
+    [SerializeField]
+    private MapLayers mapLayers;
     private Map map;
     [SerializeField]
     private FastNoiseLite noise;
@@ -29,14 +31,24 @@ public class TerrainFromTilemap : MonoBehaviour
 
     public void Start()
     {
+        mapLayers = new MapLayers(width, height);
         map = new Map(width, height);
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
         GenerateTerrain();
     }
 
+    public void GenerateTerrainLayers()
+    {
+        for (int i = 0; i < mapLayers.Layers.Count; i++) 
+        {
+            GenerateTerrain(); //Change this to accept the map layer instead
+        }
+    }
+
     public void GenerateTerrain()
     {
+        //Need to swap the read params into reading from the map layer
         ReadNoiseParams(); //Init the fastnoise class with the serialized struct values
         float[,] heights = GenerateHeightmap(); //Seed the tiles with a set of elevation noise
         CreateTerrainFromHeightmap(heights, terrain.terrainData);
