@@ -998,18 +998,18 @@ MonoBehaviour:
   width: 513
   height: 513
   depth: 40
-  noiseScale: 0.3
+  noiseScale: 0.1
   mapLayers:
     NoisePairs:
     - NoiseParams:
         noiseType: 3
         frequency: 0.04
         seed: 10
-        fractalType: 0
-        fractalLacunarity: 0
-        fractalGain: 0
-        weightedStrength: 0
-        fractalOctaves: 0
+        fractalType: 2
+        fractalLacunarity: 2
+        fractalGain: 0.5
+        weightedStrength: 1
+        fractalOctaves: 2
         raisedPower: 3
     - NoiseParams:
         noiseType: 3
@@ -1020,5 +1020,5 @@ MonoBehaviour:
         fractalGain: 0.5
         weightedStrength: 1
         fractalOctaves: 4
-        raisedPower: 3
+        raisedPower: 4
   terrain: {fileID: 1904438394}
