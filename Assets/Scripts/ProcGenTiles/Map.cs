@@ -35,5 +35,26 @@ namespace ProcGenTiles
 		{
 			return GetTile((x, y));
 		}
+
+		public float[,] FetchFloatValues(string layer)
+		{
+			float[,] array = new float[Width, Height];
+			for (int i = 0; i < Width; i++)
+			{
+				for (int j = 0; j < Height; j++)
+				{
+					Tile tile = GetTile(i, j);
+					if (!tile.ValuesHere.ContainsKey(layer))
+					{
+						throw new System.ArgumentException("No such layer is present on the tile to fetch!"); //This should crash the function and alert the editor.
+					}
+					else
+					{
+						array[i, j] = tile.ValuesHere[layer];
+					}
+				}
+			}
+			return array;
+		}
 	}
 }

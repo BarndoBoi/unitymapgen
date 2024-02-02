@@ -4,8 +4,8 @@ using UnityEngine;
 
 public static class Helpers
 {
-    public static int ManhattanDistance(Vector2 point1, Vector2 point2)
+    public static int ManhattanDistance(int x1, int x2, int y1, int y2)
     {
-        return Mathf.Abs((int)point2.x - (int)point1.x) + Mathf.Abs((int)point2.y - (int)point1.y);
+        return Mathf.Abs(x1 - x2) + Mathf.Abs(y1 - y2);
     }
 }

@@ -92,10 +92,10 @@
                 {
                     "name": "",
                     "id": "b8b5a98b-5a15-48cb-9292-30ebfe7de42d",
-                    "path": "",
+                    "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "KeyboardMouse",
                     "action": "Fire",
                     "isComposite": false,
                     "isPartOfComposite": false
