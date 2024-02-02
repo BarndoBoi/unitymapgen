@@ -16,7 +16,7 @@ public class TerrainFromTilemap : MonoBehaviour
     [SerializeField]
     private int height;
     [SerializeField]
-    private int depth;
+    private int depth; //height of Terrain object
     [SerializeField]
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better
 
@@ -24,9 +24,12 @@ public class TerrainFromTilemap : MonoBehaviour
     [SerializeField]
     private FastNoiseLite noise;
     [SerializeField]
-    private FastNoiseLiteParams noiseParams = new FastNoiseLiteParams();
+    private NoiseParams noiseParams = new NoiseParams();
     [SerializeField]
     private Terrain terrain;
+
+    [SerializeField]
+    private bool terrainPics = false;
 
     //Test field for now, needs to be removed
     [SerializeField]
@@ -34,6 +37,18 @@ public class TerrainFromTilemap : MonoBehaviour
 
     public void Start()
     {
+        if (terrainPics == true)
+        {
+            makeTerrainPics();
+
+            //take pic
+            //load next value
+            //take pic, splice to prev. pic
+            //load next value
+            //take pic, splice to prev. pic
+            //etc.
+        };
+
         map = new Map(width, height);
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
@@ -42,9 +57,11 @@ public class TerrainFromTilemap : MonoBehaviour
 
     private void Update()
     {
+
+
         if (Input.GetMouseButtonDown(0))
         {
-            if (BoatPos.position.x <= width && BoatPos.position.x >=0 && BoatPos.position.z <= height && BoatPos.position.z >= 0)
+            if (BoatPos.position.x <= width && BoatPos.position.x >= 0 && BoatPos.position.z <= height && BoatPos.position.z >= 0)
             {
                 Tile t = map.GetTile((int)BoatPos.position.z, (int)BoatPos.position.x);
                 Debug.Log("Testing coords at: " + ((int)BoatPos.position.z, (int)BoatPos.position.x).ToString() + " with height: " + t.ValuesHere[LayersEnum.Elevation]);
@@ -78,7 +95,7 @@ public class TerrainFromTilemap : MonoBehaviour
                 float x_01 = (float)x / (float)terrainData.alphamapWidth;
 
                 float height = terrainData.GetHeight(Mathf.RoundToInt(y_01 * terrainData.heightmapResolution),
-                    Mathf.RoundToInt(x_01 * terrainData.heightmapResolution));
+                Mathf.RoundToInt(x_01 * terrainData.heightmapResolution));
                 Vector3 normal = terrainData.GetInterpolatedNormal(y_01, x_01);
                 float steepness = terrainData.GetSteepness(y_01, x_01);
 
@@ -99,8 +116,8 @@ public class TerrainFromTilemap : MonoBehaviour
                 {
                     // will need to tune further but this will work for the basics now. 
                     // RedBlob had a better implementation of this that might be worth looking into
-                    if (hm_perc < 0.45) { splatWeights[2] = 1.0f; return; } //water
-                    if (hm_perc < 0.55) { splatWeights[0] = 1.0f; return; } //beach sand
+                    if (hm_perc < 0.1) { splatWeights[2] = 1.0f; return; } //water
+                    if (hm_perc < 0.15) { splatWeights[0] = 1.0f; return; } //beach sand
                     if (hm_perc < 0.85) { splatWeights[1] = 1.0f; return; } // grass
                     if (hm_perc >= 0.85) { splatWeights[3] = 1.0f; return; } //snow
 
@@ -146,23 +163,50 @@ public class TerrainFromTilemap : MonoBehaviour
             map = new Map(width, height);
         }
         float[,] heightmap = new float[width, height];
+
+
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
             { //Inner for loop does most of the heavy lifting
-                Tile t = map.Tiles[i, j]; //Get the tile at the location
-                float v = noise.GetNoise(i * noiseScale, j * noiseScale) / 2 + 0.5f; //Grab the value
+                Tile tile = map.Tiles[i, j]; //Get the tile at the location
+                float noiseValue = noise.GetNoise(i * noiseScale, j * noiseScale) / 2 + 0.5f; //Grab the value
                 //v = Mathf.InverseLerp(-1, 1, v); //Normalize the returned noise
                 //Set the elevation to the normalized value by checking if we've already set elevation data
-                if (t.ValuesHere.ContainsKey(LayersEnum.Elevation))
-                    t.ValuesHere[LayersEnum.Elevation] = v;
+                if (tile.ValuesHere.ContainsKey(LayersEnum.Elevation))
+                    tile.ValuesHere[LayersEnum.Elevation] = noiseValue;
                 else
-                    t.ValuesHere.Add(LayersEnum.Elevation, v);
+                    tile.ValuesHere.Add(LayersEnum.Elevation, noiseValue);
 
-                heightmap[i, j] = v; //Place in 2d float array as well.
+                //heightmap[i, j] = v; //Place in 2d float array as well.
+                heightmap[i, j] = Mathf.Pow(noiseValue, noiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
             }
         }
+
         return heightmap;
+    }
+
+
+
+    /* so the idea is to take new values for terrain gen
+     * and create a strip of pics
+     * so that we can compare different values side by side
+     * 
+     * 
+     */
+    void makeTerrainPics()
+    {
+
+
+        //for amount of pics
+        //Take pic
+        //edit pic with value settings
+        //add to strip of pics
+
+
+        Debug.Log("pics taken! :D");
+        //ScreenCapture.CaptureScreenshot("SomeLevel.png");
+
     }
 
 }
