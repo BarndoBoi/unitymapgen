@@ -11,8 +11,6 @@ public class BoatSteer : MonoBehaviour
     [SerializeField]
     float turnRate = 0.7f;
     [SerializeField]
-    float rayLength = 5f;
-    [SerializeField]
     float minimumInput = 0.01f; //Can't go slower than this
 
     private Vector2 steerInput;
