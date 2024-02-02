@@ -4,7 +4,7 @@ using ProcGenTiles;
 [System.Serializable]
 public class MapLayers
 {
-    public int Width, Height;
+    int Width, Height;
     public List<MapNoisePair> NoisePairs = new List<MapNoisePair>();
 
     public MapLayers(int width, int height)
