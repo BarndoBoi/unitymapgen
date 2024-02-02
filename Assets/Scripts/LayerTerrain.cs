@@ -27,6 +27,8 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private Terrain terrain;
 
+    private Map finalMap; //This is where all of the layers get combined into
+
     public void Start()
     {
         if (terrain == null)
@@ -37,6 +39,7 @@ public class LayerTerrain : MonoBehaviour
     public void GenerateTerrain()
     {
         float[,] finals = new float[width, height];
+        finalMap = new Map(width, height);
         for (int i = 0; i < mapLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = mapLayers.NoisePairs[i];
@@ -147,6 +150,15 @@ public class LayerTerrain : MonoBehaviour
                 
                 heightmap[i, j] = noiseValue;
                 final[i, j] += noiseValue; //Add the layers values to the final heightmap array
+                Tile finalTile = finalMap.Tiles[i, j];
+                if (finalTile.ValuesHere.ContainsKey(LayersEnum.Elevation))
+                { //If the value exist increment the final tile by the amount of the noise
+                    finalTile.ValuesHere[LayersEnum.Elevation] += noiseValue;
+                }
+                else
+                { //Otherwise we add it with the value from the first layer
+                    finalTile.ValuesHere.Add(LayersEnum.Elevation, noiseValue); //Create the entry and assign the first layer's value
+                }
             }
         }
         return heightmap;
