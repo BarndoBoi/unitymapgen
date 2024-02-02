@@ -426,7 +426,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0.5
   turnRate: 0.7
-  rayLength: 5
   minimumInput: 0.01
 --- !u!4 &754422877
 Transform:
@@ -1089,15 +1088,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 512
   height: 512
-  depth: 64
-  noiseScale: 0.25
+  depth: 60
+  noiseScale: 0.3
   noiseParams:
     noiseType: 3
-    frequency: 0.015
+    frequency: 0.04
     seed: 10
-    fractalType: 2
+    fractalType: 3
     fractalLacunarity: 2
     fractalGain: 0.5
-    weightedStrength: 0
-    fractalOctaves: 3
+    weightedStrength: 1
+    fractalOctaves: 4
+    raisedPower: 3
+    minValue: 0.17
   terrain: {fileID: 1904438394}
+  terrainPics: 0
+  BoatPos: {fileID: 754422875}
