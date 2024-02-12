@@ -20,7 +20,7 @@ public class CannonSteer : MonoBehaviour
     public GameObject cannon_tube;
     public GameObject cannon_base;
     public GameObject projectile;
-    public Rigidbody projectile_rb;
+    //Rigidbody projectile_rb; <-- was using this for mass
     //public GameObject FirePoint;
 
     // Line Render
@@ -56,10 +56,8 @@ public class CannonSteer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        cannon_tube = GameObject.Find("cannon_tube");
-        cannon_base = GameObject.Find("cannon_base");
-        projectile = GameObject.Find("projectile");
-        projectile_rb = projectile.GetComponent<Rigidbody>();
+        
+        
         //FirePoint = GameObject.Find("FirePoint");
 
         // Number of points to represent the trajectory
@@ -89,9 +87,9 @@ public class CannonSteer : MonoBehaviour
         GameObject projectile_copy = Instantiate(projectile, FirePoint.transform.position, FirePoint.transform.rotation);
 
         //apply force
-        Rigidbody rb = projectile_copy.GetComponent<Rigidbody>();
+        Rigidbody projectile_rb = projectile_copy.GetComponent<Rigidbody>();
 
-        rb.AddForce(cannon_tube.transform.forward * launchForce, ForceMode.Impulse);
+        projectile_rb.AddForce(cannon_tube.transform.forward * launchForce, ForceMode.Impulse);
 
         
     }
@@ -105,9 +103,11 @@ public class CannonSteer : MonoBehaviour
     private void SimulateTrajectory()
     {
         LineRenderer.positionCount = Mathf.CeilToInt(LinePoints / TimeBetweenPoints) + 1;
-        Vector3 startPosition = FirePoint.localPosition; //this is wrong somehow :(
+        //LineRenderer.positionCount = LinePoints;
+       
+        Vector3 startPosition = FirePoint.position; //this is wrong somehow :(
         //Debug.Log(startPosition);
-        Vector3 startVelocity = launchForce * cannon_tube.transform.forward / projectile_rb.mass;
+        Vector3 startVelocity = launchForce * FirePoint.forward;
 
         int i = 0;
         LineRenderer.SetPosition(i, startPosition);
