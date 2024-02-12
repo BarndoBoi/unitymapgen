@@ -25,7 +25,8 @@ public class BoatSteer : MonoBehaviour
     {
         float turnAngle = steerInput.x * turnRate;
         transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
-        transform.position += transform.forward * Mathf.Clamp(steerInput.y, minimumInput, float.MaxValue) * speed; //Can't sit still
+        //transform.position += transform.forward * Mathf.Clamp(steerInput.y, minimumInput, float.MaxValue) * speed; //Can't sit still
+        transform.position += transform.forward * Mathf.Clamp(steerInput.y, 0, float.MaxValue) * speed; //Can't sit still
 
         /*Ray ray = new Ray(transform.position, transform.InverseTransformDirection(Vector3.forward) * rayLength);
         RaycastHit hit;
