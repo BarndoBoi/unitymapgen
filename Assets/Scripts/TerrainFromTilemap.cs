@@ -120,7 +120,7 @@ public class TerrainFromTilemap : MonoBehaviour
                     // will need to tune further but this will work for the basics now. 
                     // RedBlob had a better implementation of this that might be worth looking into
                     if (hm_perc < 0.01) { splatWeights[2] = 1.0f; return; } //water
-                    if (hm_perc < 0.1) { splatWeights[0] = 1.0f; return; } //beach sand
+                    if (hm_perc < 0.04) { splatWeights[0] = 1.0f; return; } //beach sand
                     if (hm_perc < 0.85) { splatWeights[1] = 1.0f; return; } // grass
                     if (hm_perc >= 0.85) { splatWeights[3] = 1.0f; return; } //snow
 
