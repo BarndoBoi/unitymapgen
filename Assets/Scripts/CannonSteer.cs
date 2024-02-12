@@ -23,6 +23,8 @@ public class CannonSteer : MonoBehaviour
     public GameObject projectile;
     public GameObject FirePoint;
 
+    public LineRenderer trajectoryRenderer;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +32,9 @@ public class CannonSteer : MonoBehaviour
         cannon_base = GameObject.Find("cannon_base");
         projectile = GameObject.Find("projectile");
         FirePoint = GameObject.Find("FirePoint");
+        
+        // Number of points to represent the trajectory
+        trajectoryRenderer.positionCount = 100;   
     }
 
     // Update is called once per frame
@@ -40,18 +45,8 @@ public class CannonSteer : MonoBehaviour
         
         cannon_base.transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
         cannon_tube.transform.Rotate(Vector3.left, fireAngle);
-        //transform.position += transform.forward * Mathf.Clamp(steerInput.y, minimumInput, float.MaxValue) * speed; //Can't sit still
 
-        /*Ray ray = new Ray(transform.position, transform.InverseTransformDirection(Vector3.forward) * rayLength);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, rayLength))
-        { //Do steering away from the cross product of the ray and the vector
-
-            
-
-            //Flatten vector3 to do dot product? Might need to just do whisker steering instead
-
-        }*/
+        SimulateTrajectory();
     }
 
     void OnCannonMove(InputValue value)
@@ -73,5 +68,26 @@ public class CannonSteer : MonoBehaviour
     void OnChangeCamera(InputValue value)
     {
 
+    }
+
+
+    void SimulateTrajectory()
+    {
+        Vector3[] trajectoryPoints = new Vector3[100]; // Array to store trajectory points
+        float g = Physics.gravity.magnitude; // Magnitude of gravity
+
+        float angle = cannon_tube.transform.rotation.x;
+        float mass = 1f;
+
+        for (int i = 0; i < trajectoryPoints.Length; i++)
+        {
+            float time = i * 0.1f; // Time interval for trajectory calculation
+            float x = launchForce * time * Mathf.Cos(angle * Mathf.Deg2Rad);
+            //float y = launchForce * time * Mathf.Sin(angle * Mathf.Deg2Rad) - 0.5f * g * time * time;
+            float y = (launchForce * time * Mathf.Sin(angle * Mathf.Deg2Rad)) - 0.5f * (mass * g * time * time); //TODO get mass of rigidbody instead of setting manually
+            trajectoryPoints[i] = new Vector3(x, y, 0f); // Store the calculated point
+        }
+
+        trajectoryRenderer.SetPositions(trajectoryPoints); // Update the Line Renderer positions
     }
 }
