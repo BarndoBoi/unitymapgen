@@ -163,4 +163,9 @@ public class LayerTerrain : MonoBehaviour
         return heightmap;
     }
 
+    public void UpdateTerrainRegion(int xBase, int yBase, float[,] heightmap)
+    {
+        terrain.terrainData.SetHeights(xBase, yBase, heightmap);
+    }
+
 }
