@@ -10,9 +10,9 @@ public class LayerTerrain : MonoBehaviour
     // It would be cool to add canals or valleys between the water regions so everything is accessable by boat. :3
     */
     [SerializeField]
-    private int width;
+    private int X;
     [SerializeField]
-    private int height;
+    private int Y;
     [SerializeField]
     private int depth;
     [SerializeField]
@@ -36,8 +36,8 @@ public class LayerTerrain : MonoBehaviour
 
     public void GenerateTerrain()
     {
-        float[,] finals = new float[width, height];
-        finalMap = new Map(width, height);
+        float[,] finals = new float[X, Y];
+        finalMap = new Map(X, Y);
         for (int i = 0; i < mapLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = mapLayers.NoisePairs[i];
@@ -51,18 +51,18 @@ public class LayerTerrain : MonoBehaviour
     public void CreateTerrainFromHeightmap(float[,] heights)
     {
         TerrainData terrainData = terrain.terrainData;
-        terrainData.size = new Vector3(width, depth, height);
-        terrainData.heightmapResolution = width + 1;
+        terrainData.size = new Vector3(X, depth, Y);
+        terrainData.heightmapResolution = X + 1;
         terrainData.SetHeights(0, 0, heights);
         float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers];
 
-        for (int y = 0; y < terrainData.alphamapHeight; y++)
+        for (int y = 0; y < terrainData.alphamapWidth; y++)
         {
-            for (int x = 0; x < terrainData.alphamapWidth; x++)
+            for (int x = 0; x < terrainData.alphamapHeight; x++)
             {
 
-                float y_01 = (float)y / (float)terrainData.alphamapHeight;
-                float x_01 = (float)x / (float)terrainData.alphamapWidth;
+                float y_01 = (float)y / (float)terrainData.alphamapWidth;
+                float x_01 = (float)x / (float)terrainData.alphamapHeight;
 
                 float height = terrainData.GetHeight(Mathf.RoundToInt(x_01 * terrainData.heightmapResolution),
                 Mathf.RoundToInt(y_01 * terrainData.heightmapResolution));
@@ -79,8 +79,8 @@ public class LayerTerrain : MonoBehaviour
                 splatWeights[2] = 0.0f;
                 splatWeights[3] = 0.0f;
 
-                // the percent of terrains max height that this area is
-                //Debug.Log(height + "   " + terrainData.heightmapResolution);
+                // the percent of terrains max Y that this area is
+                //Debug.Log(Y + "   " + terrainData.heightmapResolution);
                 float hm_perc = (height / terrainData.heightmapResolution) * 10f;
 
                 Biome(); //sets the biome
@@ -130,14 +130,14 @@ public class LayerTerrain : MonoBehaviour
 
     public float[,] GenerateHeightmap(MapNoisePair noisePair, float[,] final)
     {
-        noisePair.Map = new Map(width, height);
-        float[,] heightmap = new float[width, height];
-        for (int i = 0; i < width; i++)
+        noisePair.Map = new Map(X, Y);
+        float[,] heightmap = new float[X, Y];
+        for (int x = 0; x < X; x++)
         {
-            for (int j = 0; j < height; j++)
+            for (int y = 0; y < Y; y++)
             { //Inner for loop does most of the heavy lifting
-                Tile tile = noisePair.Map.Tiles[i, j]; //Get the tile at the location
-                float noiseValue = noise.GetNoise(i * noiseScale, j * noiseScale) / 2 + 0.5f; //Grab the value
+                Tile tile = noisePair.Map.Tiles[x, y]; //Get the tile at the location
+                float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale) / 2 + 0.5f; //Grab the value
                 noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
                 //v = Mathf.InverseLerp(-1, 1, v); //Normalize the returned noise
                 //Set the elevation to the normalized value by checking if we've already set elevation data
@@ -147,9 +147,9 @@ public class LayerTerrain : MonoBehaviour
                     tile.ValuesHere.Add(LayersEnum.Elevation, noiseValue);
 
                 
-                heightmap[i, j] = noiseValue;
-                final[i, j] += noiseValue; //Add the layers values to the final heightmap array
-                Tile finalTile = finalMap.Tiles[i, j];
+                heightmap[x, y] = noiseValue;
+                final[x, y] += noiseValue; //Add the layers values to the final heightmap array
+                Tile finalTile = finalMap.Tiles[x, y];
                 if (finalTile.ValuesHere.ContainsKey(LayersEnum.Elevation))
                 { //If the value exist increment the final tile by the amount of the noise
                     finalTile.ValuesHere[LayersEnum.Elevation] += noiseValue;

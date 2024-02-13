@@ -62,15 +62,15 @@ namespace ProcGenTiles
 		public float[,] FetchFloatValuesSlice(string layer, int minY, int maxY, int minX, int maxX)
 		{
 			float[,] array = new float[maxY - minY, maxX - minX];
-			for (int i = 0; i < maxY - minY; i++)
+			for (int y = 0; y < maxY - minY; y++)
 			{
-				for (int j = 0; j < maxX - minX; j++)
+				for (int x = 0; x < maxX - minX; x++)
 				{
-					Tile tile = GetTile(j + minX, i + minY); //Offset the lookup by the minimum coords
+					Tile tile = GetTile(x + minX, y + minY); //Offset the lookup by the minimum coords
 					if (!tile.ValuesHere.ContainsKey(layer))
 						throw new System.ArgumentException("No such layer is present on the tile to fetch!"); //Crash the function and alert the editor.
 					else
-						array[i, j] = tile.ValuesHere[layer];
+						array[x, y] = tile.ValuesHere[layer];
 				}
 			}
 

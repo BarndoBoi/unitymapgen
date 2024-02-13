@@ -16,7 +16,7 @@ public class TerrainFromTilemap : MonoBehaviour
     [SerializeField]
     private int height;
     [SerializeField]
-    private int depth; //height of Terrain object
+    private int depth; //Y of Terrain object
     [SerializeField]
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better
 
@@ -107,7 +107,7 @@ public class TerrainFromTilemap : MonoBehaviour
                 splatWeights[2] = 0.0f;
                 splatWeights[3] = 0.0f;
 
-                // the percent of terrains max height that this area is
+                // the percent of terrains max Y that this area is
                 float hm_perc = (height / terrainData.heightmapResolution) * 10f;
 
                 Biome(); //sets the biome

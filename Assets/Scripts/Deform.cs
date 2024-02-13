@@ -6,9 +6,9 @@ using UnityEngine.InputSystem;
 
 public class Deform : MonoBehaviour
 {
-    /* Contains information on how large the height deformation will be
+    /* Contains information on how large the Y deformation will be
     // Stores the radius of terrain that will be affected
-    // Use Manhattan distance to calculate amount of falloff on the height to get craters
+    // Use Manhattan distance to calculate amount of falloff on the Y to get craters
     // Update Elevation layer and signal that the Terrain needs to be redrawn
     // A bit of pre-emptive optimizing since larger meshes may take a long time to recalculate (TEST TEST TEST!!)
     */
@@ -27,7 +27,7 @@ public class Deform : MonoBehaviour
     { //Fire action was pressed, find the transform of this since it's on the boat and pass in the serialized values to the deform settings
         map = terrain.finalMap;
         Debug.Log("Deforming terrain");
-        DeformTerrain(new Vector2(transform.position.x, transform.position.z), LayersEnum.Elevation);
+        DeformTerrain(new Vector2(transform.position.z, transform.position.x), LayersEnum.Elevation);
     }
 
     public void SetDeformSettings(int radius, float change)
@@ -42,34 +42,38 @@ public class Deform : MonoBehaviour
         int sourceY = Mathf.RoundToInt(coords.y);
 
         // Run through a square of radius checking if the coords are inside the circle
-        for (int i = sourceY - Radius; i <= sourceY + Radius; i++)
+        for (int y = sourceY - Radius; y <= sourceY + Radius; y++)
         {
-            for (int j = sourceX - Radius; j <= sourceX + Radius; j++)
+            for (int x = sourceX - Radius; x <= sourceX + Radius; x++)
             {
                 // Calculate distance from current tile to center coordinates
-                int distanceX = Mathf.Abs(sourceX - j);
-                int distanceY = Mathf.Abs(sourceY - i);
-                int distance = Mathf.Max(distanceX, distanceY);
+                int distanceX = Mathf.Abs(sourceX - x);
+                int distanceY = Mathf.Abs(sourceY - y);
+                float distance = Mathf.Sqrt(distanceX * distanceX + distanceY * distanceY);
 
-                // Check if the distance is within the circle radius
-                if (Helpers.IsWithinCircle(sourceX, sourceY, j, i, Radius) && map.IsValidTilePosition(i, j))
+                // Skip tiles outside the circular radius
+                if (distance > Radius || !map.IsValidTilePosition(x, y))
                 {
-                    // This tile is within the circle and on the map
-                    Tile tile = map.GetTile(i, j); // Fetch the tile from the map array
-
-                    // Calculate falloff using smoothstep interpolation
-                    float falloff = Mathf.SmoothStep(0f, Radius, (float)distance);
-
-                    // Adjust the height of the tile by adding the change.
-                    // Negative numbers decrease height, positive increases
-                    tile.ValuesHere[layer] += Change * falloff;
+                    continue;
                 }
+
+                // This tile is within the circle and on the map
+                Tile tile = map.GetTile(x, y); // Fetch the tile from the map array
+
+                // Calculate falloff using smoothstep interpolation
+                float falloff = Mathf.SmoothStep(1f, 0f, distance / Radius); // Invert the order to apply change strongest at the center
+
+                // Adjust the Y of the tile by adding the change.
+                // Negative numbers decrease Y, positive increases
+                tile.ValuesHere[layer] += Change * falloff;
             }
         }
 
         // Now fetch float[,] array from map to update LayerTerrain
         float[,] heights = map.FetchFloatValuesSlice(layer, sourceY - Radius, sourceY + Radius, sourceX - Radius, sourceX + Radius);
         Debug.Log("Heights has dimensions of " + heights.GetLength(0) + " " + heights.GetLength(1));
+        //float[,] heights = map.FetchFloatValues(layer);
+        //terrain.CreateTerrainFromHeightmap(heights);
 
         // Now send this to LayerTerrain
         terrain.UpdateTerrainRegion(sourceX - Radius, sourceY - Radius, heights); //Pass the modified values to the terrain and adjust heights
@@ -85,17 +89,17 @@ public class Deform : MonoBehaviour
         int sourceY = Mathf.RoundToInt(coords.sourceY);
 
         //Run through a square of radius checking if the manhattan distance is greater than the radius
-        for (int i = Radius * -1; i <= Radius; i++)
+        for (int y = Radius * -1; y <= Radius; y++)
         {
-            for (int j = Radius * -1; j <= Radius; j++)
+            for (int x = Radius * -1; x <= Radius; x++)
             {
-                int distance = Helpers.ManhattanDistance(sourceX + i, sourceX, sourceY + j, sourceY);
-                if (distance <= Radius && map.IsValidTilePosition(sourceX + i, sourceY + j))
+                int distance = Helpers.ManhattanDistance(sourceX + y, sourceX, sourceY + x, sourceY);
+                if (distance <= Radius && map.IsValidTilePosition(sourceX + y, sourceY + x))
                 { //This tile is within the diamond grid we want to deform and on the map
-                    Tile tile = map.GetTile(sourceX + i, sourceY + j); //Fetch the tile from the map array
+                    Tile tile = map.GetTile(sourceX + y, sourceY + x); //Fetch the tile from the map array
                     float falloff = HeightFalloff * distance;
                     float change = Change / falloff; //Height change is strongest when falloff is 1 and grows the further the distance is
-                    tile.ValuesHere[layer] += change; //Adjust the height of the tile by adding the change. Negative numbers decrease height, positive increases
+                    tile.ValuesHere[layer] += change; //Adjust the Y of the tile by adding the change. Negative numbers decrease Y, positive increases
                 }
             }
         }
