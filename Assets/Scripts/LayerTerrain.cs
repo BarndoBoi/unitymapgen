@@ -53,7 +53,8 @@ public class LayerTerrain : MonoBehaviour
         TerrainData terrainData = terrain.terrainData;
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.heightmapResolution = X + 1;
-        terrainData.SetHeights(0, 0, heights);
+        float[,] testHeights = finalMap.FetchFloatValuesSlice(LayersEnum.Elevation, 0, Y, 0, X);
+        terrainData.SetHeights(0, 0, testHeights);
         float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers];
 
         for (int y = 0; y < terrainData.alphamapWidth; y++)
