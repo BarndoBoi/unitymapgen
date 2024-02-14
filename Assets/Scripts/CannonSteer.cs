@@ -46,8 +46,19 @@ public class CannonSteer : MonoBehaviour
     [Range(0.01f, 0.25f)]
     private float timeIntervalInPoints = 0.1f;
 
- 
-    // Start is called before the first frame update
+    private LayerMask ProjectileCollisionMask;
+
+    private void Awake()
+    {
+        int grenadeLayer = projectile.gameObject.layer;
+        for (int i = 0; i < 32; i++)
+        {
+            if (!Physics.GetIgnoreLayerCollision(grenadeLayer, i))
+            {
+                ProjectileCollisionMask |= 1 << i; // magic
+            }
+        }
+    }
     void Start()
     {
  
@@ -98,11 +109,21 @@ public class CannonSteer : MonoBehaviour
             point.y = startPosition.y + startVelocity.y * time + (Physics.gravity.y / 2f * time * time);
 
             LineRenderer.SetPosition(i, point);
+
+            // Raycast to stop trajectory calc when it hits the terrain
+            Vector3 lastPosition = LineRenderer.GetPosition(i - 1);
+
+            if (Physics.Raycast(lastPosition,
+                (point - lastPosition).normalized,
+                out RaycastHit hit,
+                (point - lastPosition).magnitude,
+                ProjectileCollisionMask))
+            {
+                LineRenderer.SetPosition(i, hit.point);
+                LineRenderer.positionCount = i + 1;
+                return;
+            }
         }
     }
-
-
-
-
 }
 
