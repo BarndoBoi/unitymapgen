@@ -44,11 +44,11 @@ public class CannonSteer : MonoBehaviour
     [Header("Line Render controls UwU")]
     [SerializeField]
     [Range(10, 100)]
-    private int LinePoints = 25;
+    private int LinePoints = 175;
 
     [SerializeField]
     [Range(0.01f, 0.25f)]
-    private float TimeBetweenPoints = 0.1f;
+    private float timeIntervalInPoints = 0.1f;
 
  
 
@@ -102,24 +102,45 @@ public class CannonSteer : MonoBehaviour
 
     private void SimulateTrajectory()
     {
-        LineRenderer.positionCount = Mathf.CeilToInt(LinePoints / TimeBetweenPoints) + 1;
-        //LineRenderer.positionCount = LinePoints;
-       
-        Vector3 startPosition = FirePoint.position; //this is wrong somehow :(
-        //Debug.Log(startPosition);
-        Vector3 startVelocity = launchForce * FirePoint.forward;
-
-        int i = 0;
-        LineRenderer.SetPosition(i, startPosition);
-        for (float time = 0; time < LinePoints; time += TimeBetweenPoints)
+        Vector3 origin = FirePoint.position;
+        //Vector3 startVelocity = launchForce * launchPoint.up; //original
+        Vector3 startVelocity = launchForce * FirePoint.forward;  //edited
+        LineRenderer.positionCount = LinePoints;
+        float time = 0;
+        for (int i = 0; i < LinePoints; i++)
         {
-            i++;
-            Vector3 point = startPosition + time * startVelocity;
-            point.y = startPosition.y + startVelocity.y * time + (Physics.gravity.y / 2f * time * time);
-
-            LineRenderer.SetPosition(i, point);
+            // s = u*t + 1/2*g*t*t
+            var x = (startVelocity.x * time) + (Physics.gravity.x / 2 * time * time);
+            var y = (startVelocity.y * time) + (Physics.gravity.y / 2 * time * time);
+            Vector3 point = new Vector3(x, y, 0);
+            LineRenderer.SetPosition(i, origin + point);
+            time += timeIntervalInPoints;
         }
     }
+
+
+
+
+    //    private void SimulateTrajectory2()
+    //{
+    //    //LineRenderer.positionCount = Mathf.CeilToInt(LinePoints / TimeBetweenPoints) + 1;
+    //    //LineRenderer.positionCount = LinePoints;
+       
+    //    Vector3 startPosition = FirePoint.position; //this is wrong somehow :(
+    //    //Debug.Log(startPosition);
+    //    Vector3 startVelocity = launchForce * FirePoint.forward;
+
+    //    int i = 0;
+    //    LineRenderer.SetPosition(i, startPosition);
+    //    for (float time = 0; time < LinePoints; time += TimeBetweenPoints)
+    //    {
+    //        i++;
+    //        Vector3 point = startPosition + time * startVelocity;
+    //        point.y = startPosition.y + startVelocity.y * time + (Physics.gravity.y / 2f * time * time);
+
+    //        LineRenderer.SetPosition(i, point);
+    //    }
+    //}
 
 
 

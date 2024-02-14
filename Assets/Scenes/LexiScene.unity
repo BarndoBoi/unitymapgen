@@ -128,6 +128,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1342552572199001238, guid: 2331964ae00d62c4aa1973b0a6f624b4, type: 3}
   m_PrefabInstance: {fileID: 1342552572580453770}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &449085725 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1342552572199001239, guid: 2331964ae00d62c4aa1973b0a6f624b4, type: 3}
+  m_PrefabInstance: {fileID: 1342552572580453770}
+  m_PrefabAsset: {fileID: 0}
 --- !u!120 &449085726
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -148,7 +153,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: e5956131eed006648b90633633f64aa7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1126,6 +1131,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 754422875}
     m_Modifications:
     - target: {fileID: 1342552572112314731, guid: 2331964ae00d62c4aa1973b0a6f624b4, type: 3}
+      propertyPath: FirePoint
+      value: 
+      objectReference: {fileID: 449085725}
+    - target: {fileID: 1342552572112314731, guid: 2331964ae00d62c4aa1973b0a6f624b4, type: 3}
+      propertyPath: LinePoints
+      value: 175
+      objectReference: {fileID: 0}
+    - target: {fileID: 1342552572112314731, guid: 2331964ae00d62c4aa1973b0a6f624b4, type: 3}
+      propertyPath: projectile
+      value: 
+      objectReference: {fileID: 241221087600015630, guid: f66e3319244f7564eb06da48a97c7211, type: 3}
+    - target: {fileID: 1342552572112314731, guid: 2331964ae00d62c4aa1973b0a6f624b4, type: 3}
       propertyPath: cannon_base
       value: 
       objectReference: {fileID: 8608930341016601622}
@@ -1133,6 +1150,10 @@ PrefabInstance:
       propertyPath: cannon_tube
       value: 
       objectReference: {fileID: 8608930341016584764}
+    - target: {fileID: 1342552572112314731, guid: 2331964ae00d62c4aa1973b0a6f624b4, type: 3}
+      propertyPath: LineRenderer
+      value: 
+      objectReference: {fileID: 449085726}
     - target: {fileID: 7338796994578746628, guid: 2331964ae00d62c4aa1973b0a6f624b4, type: 3}
       propertyPath: m_Name
       value: cannon
