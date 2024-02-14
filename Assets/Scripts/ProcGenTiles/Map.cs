@@ -1,3 +1,5 @@
+using Unity.VisualScripting;
+
 namespace ProcGenTiles
 {
 	public class Map
@@ -54,6 +56,29 @@ namespace ProcGenTiles
 					}
 				}
 			}
+			return array;
+		}
+
+		public float[,] FetchFloatValuesSlice(string layer, int minY, int maxY, int minX, int maxX)
+		{
+			float[,] array = new float[maxX - minX, maxY - minY];
+
+			for (int x = 0; x < maxX - minX; x++)
+			{
+				for (int y = 0; y < maxY - minY; y++)
+				{
+					Tile tile = GetTile(x + minX, y + minY);
+                    if (!tile.ValuesHere.ContainsKey(layer))
+                    {
+                        throw new System.ArgumentException("No such layer is present on the tile to fetch!"); //This should crash the function and alert the editor.
+                    }
+                    else
+                    {
+                        array[x, y] = tile.ValuesHere[layer];
+                    }
+                }
+			}
+
 			return array;
 		}
 	}

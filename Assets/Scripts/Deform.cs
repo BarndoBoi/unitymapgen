@@ -6,70 +6,82 @@ using UnityEngine.InputSystem;
 
 public class Deform : MonoBehaviour
 {
-    /* Contains information on how large the height deformation will be
+    /* Contains information on the deformation for the terrain
     // Stores the radius of terrain that will be affected
-    // Use Manhattan distance to calculate amount of falloff on the height to get craters
+    // Use circular distance to make the crater the size of the Radius times 2
     // Update Elevation layer and signal that the Terrain needs to be redrawn
-    // A bit of pre-emptive optimizing since larger meshes may take a long time to recalculate (TEST TEST TEST!!)
+    // Currently has to redraw the entire Terrain mesh in order to properly deform the terrain
+    // Change should be negative for craters, and positive for hills
+    //
+    // Future TODO: Create an object that more precisely controls the curves and area affected e.g. diamond/square patterns, sharper falloffs on craters,
+    //   and a way to mark the terrain as dirty in case we need to apply multiple deforms before updating the Terrain mesh
     */
 
     [SerializeField]
-    LayerTerrain terrain;
+    LayerTerrain terrain; //Does not support using TerrainFromTilemap, so don't try it Lexi
 
-    Map map;
+    Map map; //Fetched out of the terrain, but it would be wise to have a delegate this can listen for when the LayerTerrain has finished making the map (or move assignment to DeformTerrain)
 
     [SerializeField]
-    int Radius; //This is how many tiles (in a diamond) the deform will affect
+    int Radius; //This is how many tiles (in a circle) the deform will affect
     [SerializeField]
-    float HeightChange; //Change this many units from the source square and then use HeightChange divided by falloff to get other tiles' heights
-    [SerializeField]
-    float HeightFalloff; //Divide the height by the number times its absolute manhattan distance from the source tile
-
-    private void Start()
-    {
-        
-    }
+    float Change; //Change the layer's float value by this amount (use negative numbers to subtract from the layer, positive to add)
 
     void OnFire()
     { //Fire action was pressed, find the transform of this since it's on the boat and pass in the serialized values to the deform settings
-        map = terrain.finalMap;
+        //Needs to be removed in the future and called from the projectile
+
+        map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
+        Debug.Log("Deforming terrain"); //Keeping this for now even though it isn't entirely needed :P
         DeformTerrain(new Vector2(transform.position.z, transform.position.x), LayersEnum.Elevation);
     }
 
-    public void SetDeformSettings(int radius, float heightChange,  float heightFalloff)
+    public void SetDeformSettings(int radius, float change)
     { //Used for later when we need to read these values off of the projectile instead of setting them manually
+        //Future TODO: Take in an object that defines the Deform's shape and curves (if any)
         Radius = radius;
-        HeightChange = heightChange;
-        HeightFalloff = heightFalloff;
+        Change = change;
     }
 
     public void DeformTerrain(Vector2 coords, string layer)
     {
-        //Fetch the tile from the coords from the map
-        //Apply HeightChange to the layer specified by multiplying HeightFalloff by the ManhattanDistance
-        //Step through each tile adding the resulting HeightChange to each tile within Radius
-        int x = Mathf.RoundToInt(coords.x);
-        int y = Mathf.RoundToInt(coords.y);
+        //Store the impact coordinates so we know how far it is
+        int sourceX = Mathf.RoundToInt(coords.x);
+        int sourceY = Mathf.RoundToInt(coords.y);
 
-        //Run through a square of radius checking if the manhattan distance is greater than the radius
-        for (int i = Radius * -1; i <= Radius; i++)
+        // Run through a square of radius checking if the coords are inside the circle
+        for (int y = sourceY - Radius; y <= sourceY + Radius; y++)
         {
-            for (int j = Radius * -1; j <= Radius; j++)
+            for (int x = sourceX - Radius; x <= sourceX + Radius; x++)
             {
-                int distance = Helpers.ManhattanDistance(x + i, x, y + j, y);
-                if (distance <= Radius && map.IsValidTilePosition(x + i, y + j))
-                { //This tile is within the diamond grid we want to deform and on the map
-                    Tile tile = map.GetTile(x + i, y + j); //Fetch the tile from the map array
-                    float falloff = HeightFalloff * distance;
-                    float change = HeightChange / falloff; //Height change is strongest when falloff is 1 and grows the further the distance is
-                    tile.ValuesHere[layer] += change; //Adjust the height of the tile by adding the change. Negative numbers decrease height, positive increases
+                // Calculate distance from current tile to center coordinates
+                int distanceX = Mathf.Abs(sourceX - x);
+                int distanceY = Mathf.Abs(sourceY - y);
+                float distance = Mathf.Sqrt(distanceX * distanceX + distanceY * distanceY); //May want to simplify this to avoid the expensive square root operation. Profile it later
+
+                // Skip tiles outside the circular radius
+                if (distance > Radius || !map.IsValidTilePosition(x, y))
+                {
+                    continue;
                 }
+
+                // This tile is within the circle and on the map
+                Tile tile = map.GetTile(x, y); // Fetch the tile from the map array
+
+                // Calculate falloff using smoothstep interpolation
+                //Falloff is highest at the center and then reduces towards the edges of the circle
+                float falloff = Mathf.SmoothStep(1f, 0f, distance / Radius); // Invert the order to apply change strongest at the center
+
+                // Adjust the layer's value of the tile by adding the change.
+                // Negative numbers decrease change, positive increases
+                tile.ValuesHere[layer] += Change * falloff;
+                //Debug.Log($"Start value: {start} final value: {tile.ValuesHere[layer]} change: {Change * falloff} coords: {x},{y} falloff: {falloff}"); //Not needed right now
             }
         }
-        //Now fetch float[,] array from map to update LayerTerrain
-        float[,] heights = map.FetchFloatValues(layer);
-        //Now send this to LayerTerrain
-        terrain.CreateTerrainFromHeightmap(heights);
-    }
 
+        //This stays for now, but if slices of the terrain can't be grabbed this should instead use map.FetchFloatValues
+        //If there is a chance that multiple deforms can happen this needs to instead mark the LayerTerrain as dirty and wait until all operations are complete before updating the Terrain
+        float[,] heights = map.FetchFloatValuesSlice(layer, 0, map.Width, 0, map.Height);
+        terrain.UpdateTerrainHeightmap(0,0,heights);
+    }
 }
