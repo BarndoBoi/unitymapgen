@@ -47,4 +47,7 @@ public class NoiseParams
     // This is the power for the noise to be raised to, in order to get flat valleys.
     // Set to 1 for no change.
     public float raisedPower = 3f;
+
+    //Minimum height value so that we can set into ground to get flat ocean.
+    public float minValue = .5f;
 }

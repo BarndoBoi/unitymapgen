@@ -113,11 +113,14 @@ public class TerrainFromTilemap : MonoBehaviour
                 Biome(); //sets the biome
 
                 void Biome()
-                {
+                {   
+                    //TODO if beach is too steep, it is rocks instead.
+
+
                     // will need to tune further but this will work for the basics now. 
                     // RedBlob had a better implementation of this that might be worth looking into
-                    if (hm_perc < 0.1) { splatWeights[2] = 1.0f; return; } //water
-                    if (hm_perc < 0.15) { splatWeights[0] = 1.0f; return; } //beach sand
+                    if (hm_perc < 0.01) { splatWeights[2] = 1.0f; return; } //water
+                    if (hm_perc < 0.04) { splatWeights[0] = 1.0f; return; } //beach sand
                     if (hm_perc < 0.85) { splatWeights[1] = 1.0f; return; } // grass
                     if (hm_perc >= 0.85) { splatWeights[3] = 1.0f; return; } //snow
 
@@ -171,6 +174,9 @@ public class TerrainFromTilemap : MonoBehaviour
             { //Inner for loop does most of the heavy lifting
                 Tile tile = map.Tiles[i, j]; //Get the tile at the location
                 float noiseValue = noise.GetNoise(i * noiseScale, j * noiseScale) / 2 + 0.5f; //Grab the value
+                noiseValue = Mathf.Max(0, noiseValue - noiseParams.minValue); //min height value testing for pushing into floor
+                heightmap[i, j] = Mathf.Pow(noiseValue, noiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
+
                 //v = Mathf.InverseLerp(-1, 1, v); //Normalize the returned noise
                 //Set the elevation to the normalized value by checking if we've already set elevation data
                 if (tile.ValuesHere.ContainsKey(LayersEnum.Elevation))
@@ -179,7 +185,7 @@ public class TerrainFromTilemap : MonoBehaviour
                     tile.ValuesHere.Add(LayersEnum.Elevation, noiseValue);
 
                 //heightmap[i, j] = v; //Place in 2d float array as well.
-                heightmap[i, j] = Mathf.Pow(noiseValue, noiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
+               
             }
         }
 

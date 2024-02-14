@@ -1,8 +1,6 @@
 using UnityEngine;
-using System.Collections;
 using ProcGenTiles;
 using System.Linq;
-using UnityEngine.InputSystem;
 
 public class LayerTerrain : MonoBehaviour
 {
@@ -27,6 +25,8 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private Terrain terrain;
 
+    public Map finalMap { get; private set; } //This is where all of the layers get combined into
+
     public void Start()
     {
         if (terrain == null)
@@ -37,6 +37,7 @@ public class LayerTerrain : MonoBehaviour
     public void GenerateTerrain()
     {
         float[,] finals = new float[width, height];
+        finalMap = new Map(width, height);
         for (int i = 0; i < mapLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = mapLayers.NoisePairs[i];
@@ -44,11 +45,12 @@ public class LayerTerrain : MonoBehaviour
             float[,] heights = GenerateHeightmap(pair, finals);
 
         }
-        CreateTerrainFromHeightmap(finals, terrain.terrainData);
+        CreateTerrainFromHeightmap(finals);
     }
 
-    public void CreateTerrainFromHeightmap(float[,] heights, TerrainData terrainData)
+    public void CreateTerrainFromHeightmap(float[,] heights)
     {
+        TerrainData terrainData = terrain.terrainData;
         terrainData.size = new Vector3(width, depth, height);
         terrainData.heightmapResolution = width + 1;
         terrainData.SetHeights(0, 0, heights);
@@ -62,8 +64,8 @@ public class LayerTerrain : MonoBehaviour
                 float y_01 = (float)y / (float)terrainData.alphamapHeight;
                 float x_01 = (float)x / (float)terrainData.alphamapWidth;
 
-                float height = terrainData.GetHeight(Mathf.RoundToInt(y_01 * terrainData.heightmapResolution),
-                Mathf.RoundToInt(x_01 * terrainData.heightmapResolution));
+                float height = terrainData.GetHeight(Mathf.RoundToInt(x_01 * terrainData.heightmapResolution),
+                Mathf.RoundToInt(y_01 * terrainData.heightmapResolution));
 
                 // not using these right now
                 // Vector3 normal = terrainData.GetInterpolatedNormal(y_01, x_01);
@@ -104,7 +106,7 @@ public class LayerTerrain : MonoBehaviour
                     splatWeights[i] /= z;
 
                     // Assign this point to the splatmap array
-                    splatmapData[x, y, i] = splatWeights[i];
+                    splatmapData[y, x, i] = splatWeights[i];
                 }
             }
         }
@@ -130,9 +132,9 @@ public class LayerTerrain : MonoBehaviour
     {
         noisePair.Map = new Map(width, height);
         float[,] heightmap = new float[width, height];
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < width; i++)
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < height; j++)
             { //Inner for loop does most of the heavy lifting
                 Tile tile = noisePair.Map.Tiles[i, j]; //Get the tile at the location
                 float noiseValue = noise.GetNoise(i * noiseScale, j * noiseScale) / 2 + 0.5f; //Grab the value
@@ -147,6 +149,15 @@ public class LayerTerrain : MonoBehaviour
                 
                 heightmap[i, j] = noiseValue;
                 final[i, j] += noiseValue; //Add the layers values to the final heightmap array
+                Tile finalTile = finalMap.Tiles[i, j];
+                if (finalTile.ValuesHere.ContainsKey(LayersEnum.Elevation))
+                { //If the value exist increment the final tile by the amount of the noise
+                    finalTile.ValuesHere[LayersEnum.Elevation] += noiseValue;
+                }
+                else
+                { //Otherwise we add it with the value from the first layer
+                    finalTile.ValuesHere.Add(LayersEnum.Elevation, noiseValue); //Create the entry and assign the first layer's value
+                }
             }
         }
         return heightmap;

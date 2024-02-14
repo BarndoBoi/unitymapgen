@@ -279,6 +279,7 @@ GameObject:
   - component: {fileID: 754422875}
   - component: {fileID: 754422876}
   - component: {fileID: 754422878}
+  - component: {fileID: 754422879}
   m_Layer: 0
   m_Name: fishing_boat
   m_TagString: Untagged
@@ -381,6 +382,22 @@ MonoBehaviour:
   speed: 0.5
   turnRate: 0.7
   minimumInput: 0
+--- !u!114 &754422879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753928315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b88aac586625cb47bca96f70145b7bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terrain: {fileID: 1904438396}
+  Radius: 10
+  HeightChange: -2
+  HeightFalloff: 0.5
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
