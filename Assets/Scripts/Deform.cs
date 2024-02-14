@@ -6,38 +6,46 @@ using UnityEngine.InputSystem;
 
 public class Deform : MonoBehaviour
 {
-    /* Contains information on how large the Y deformation will be
+    /* Contains information on the deformation for the terrain
     // Stores the radius of terrain that will be affected
-    // Use Manhattan distance to calculate amount of falloff on the Y to get craters
+    // Use circular distance to make the crater the size of the Radius times 2
     // Update Elevation layer and signal that the Terrain needs to be redrawn
-    // A bit of pre-emptive optimizing since larger meshes may take a long time to recalculate (TEST TEST TEST!!)
+    // Currently has to redraw the entire Terrain mesh in order to properly deform the terrain
+    // Change should be negative for craters, and positive for hills
+    //
+    // Future TODO: Create an object that more precisely controls the curves and area affected e.g. diamond/square patterns, sharper falloffs on craters,
+    //   and a way to mark the terrain as dirty in case we need to apply multiple deforms before updating the Terrain mesh
     */
 
     [SerializeField]
-    LayerTerrain terrain;
+    LayerTerrain terrain; //Does not support using TerrainFromTilemap, so don't try it Lexi
 
-    Map map;
+    Map map; //Fetched out of the terrain, but it would be wise to have a delegate this can listen for when the LayerTerrain has finished making the map (or move assignment to DeformTerrain)
 
     [SerializeField]
     int Radius; //This is how many tiles (in a circle) the deform will affect
     [SerializeField]
-    float Change; //Change the layer's float value by this amount (use negative numbers to subtract from the layer
+    float Change; //Change the layer's float value by this amount (use negative numbers to subtract from the layer, positive to add)
 
     void OnFire()
     { //Fire action was pressed, find the transform of this since it's on the boat and pass in the serialized values to the deform settings
-        map = terrain.finalMap;
-        Debug.Log("Deforming terrain");
+        //Needs to be removed in the future and called from the projectile
+
+        map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
+        Debug.Log("Deforming terrain"); //Keeping this for now even though it isn't entirely needed :P
         DeformTerrain(new Vector2(transform.position.z, transform.position.x), LayersEnum.Elevation);
     }
 
     public void SetDeformSettings(int radius, float change)
     { //Used for later when we need to read these values off of the projectile instead of setting them manually
+        //Future TODO: Take in an object that defines the Deform's shape and curves (if any)
         Radius = radius;
         Change = change;
     }
 
     public void DeformTerrain(Vector2 coords, string layer)
     {
+        //Store the impact coordinates so we know how far it is
         int sourceX = Mathf.RoundToInt(coords.x);
         int sourceY = Mathf.RoundToInt(coords.y);
 
@@ -49,9 +57,7 @@ public class Deform : MonoBehaviour
                 // Calculate distance from current tile to center coordinates
                 int distanceX = Mathf.Abs(sourceX - x);
                 int distanceY = Mathf.Abs(sourceY - y);
-                float distance = Mathf.Sqrt(distanceX * distanceX + distanceY * distanceY);
-
-                //Debug.Log($"xIndex is: {xIndex} yIndex is: {yIndex}");
+                float distance = Mathf.Sqrt(distanceX * distanceX + distanceY * distanceY); //May want to simplify this to avoid the expensive square root operation. Profile it later
 
                 // Skip tiles outside the circular radius
                 if (distance > Radius || !map.IsValidTilePosition(x, y))
@@ -63,28 +69,19 @@ public class Deform : MonoBehaviour
                 Tile tile = map.GetTile(x, y); // Fetch the tile from the map array
 
                 // Calculate falloff using smoothstep interpolation
+                //Falloff is highest at the center and then reduces towards the edges of the circle
                 float falloff = Mathf.SmoothStep(1f, 0f, distance / Radius); // Invert the order to apply change strongest at the center
-                float start = tile.ValuesHere[layer];
 
-
-                // Adjust the Y of the tile by adding the change.
-                // Negative numbers decrease Y, positive increases
+                // Adjust the layer's value of the tile by adding the change.
+                // Negative numbers decrease change, positive increases
                 tile.ValuesHere[layer] += Change * falloff;
-                Debug.Log($"Start value: {start} final value: {tile.ValuesHere[layer]} change: {Change * falloff} coords: {x},{y} falloff: {falloff}");
+                //Debug.Log($"Start value: {start} final value: {tile.ValuesHere[layer]} change: {Change * falloff} coords: {x},{y} falloff: {falloff}"); //Not needed right now
             }
         }
 
-        // 
-        //float[,] heights = map.FetchFloatValuesSlice(layer, sourceY - Radius, sourceY + Radius, sourceX - Radius, sourceX + Radius);
-        //terrain.UpdateTerrainRegion(sourceX - Radius, sourceY - Radius, heights); //Pass the modified values to the terrain and adjust heights
-
-        //This works for some reason, but trying to update only a small slice of the area doesn't work at all, and switching around the values makes it work even more wonky
-        //I'm hella confused yo
+        //This stays for now, but if slices of the terrain can't be grabbed this should instead use map.FetchFloatValues
+        //If there is a chance that multiple deforms can happen this needs to instead mark the LayerTerrain as dirty and wait until all operations are complete before updating the Terrain
         float[,] heights = map.FetchFloatValuesSlice(layer, 0, map.Width, 0, map.Height);
-        terrain.UpdateTerrainRegion(0,0,heights);
-        //terrain.CreateTerrainFromHeightmap(heights);
-
-
+        terrain.UpdateTerrainHeightmap(0,0,heights);
     }
-
 }
