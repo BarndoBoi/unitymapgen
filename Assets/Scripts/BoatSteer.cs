@@ -24,19 +24,11 @@ public class BoatSteer : MonoBehaviour
     void Update()
     {
         float turnAngle = steerInput.x * turnRate;
-        transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
-        transform.position += transform.forward * Mathf.Clamp(steerInput.y, minimumInput, float.MaxValue) * speed; //Can't sit still
+        transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received 
+        //transform.position += transform.forward * Mathf.Clamp(steerInput.y, minimumInput, float.MaxValue) * speed; //Can't sit still
+        transform.position += transform.forward * Mathf.Clamp(steerInput.y, 0, float.MaxValue) * speed; //Can't sit still
 
-        /*Ray ray = new Ray(transform.position, transform.InverseTransformDirection(Vector3.forward) * rayLength);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, rayLength))
-        { //Do steering away from the cross product of the ray and the vector
-
-            
-
-            //Flatten vector3 to do dot product? Might need to just do whisker steering instead
-
-        }*/
+       
     }
 
     void OnMove(InputValue value)
