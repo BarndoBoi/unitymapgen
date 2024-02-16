@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -9,9 +7,6 @@ using UnityEngine;
 // main article 
 // https://www.redblobgames.com/maps/terrain-from-noise/
 public class NoiseParams
-
-
-
 {
     public FastNoiseLite.NoiseType noiseType = FastNoiseLite.NoiseType.Perlin;
 
@@ -50,4 +45,9 @@ public class NoiseParams
 
     //Minimum height value so that we can set into ground to get flat ocean.
     public float minValue = .5f;
+
+    public string SerializeParamsToJson()
+    {
+        return JsonUtility.ToJson(this, true); //Always export with prettyprint
+    }
 }
