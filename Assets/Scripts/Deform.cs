@@ -21,19 +21,30 @@ public class Deform : MonoBehaviour
     LayerTerrain terrain; //Does not support using TerrainFromTilemap, so don't try it Lexi
 
     Map map; //Fetched out of the terrain, but it would be wise to have a delegate this can listen for when the LayerTerrain has finished making the map (or move assignment to DeformTerrain)
-
+    
     [SerializeField]
     int Radius; //This is how many tiles (in a circle) the deform will affect
     [SerializeField]
     float Change; //Change the layer's float value by this amount (use negative numbers to subtract from the layer, positive to add)
 
+    private void Awake()
+    {
+        
+    }
+
+    private void Start()
+    {
+        map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
+
+    }
+
     void OnFire()
     { //Fire action was pressed, find the transform of this since it's on the boat and pass in the serialized values to the deform settings
         //Needs to be removed in the future and called from the projectile
 
-        map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
-        Debug.Log("Deforming terrain"); //Keeping this for now even though it isn't entirely needed :P
-        DeformTerrain(new Vector2(transform.position.z, transform.position.x), LayersEnum.Elevation);
+        //map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
+        //Debug.Log("Deforming terrain"); //Keeping this for now even though it isn't entirely needed :P
+        //DeformTerrain(new Vector2(transform.position.z, transform.position.x), LayersEnum.Elevation);
     }
 
     public void SetDeformSettings(int radius, float change)
@@ -45,6 +56,8 @@ public class Deform : MonoBehaviour
 
     public void DeformTerrain(Vector2 coords, string layer)
     {
+        
+
         //Store the impact coordinates so we know how far it is
         int sourceX = Mathf.RoundToInt(coords.x);
         int sourceY = Mathf.RoundToInt(coords.y);

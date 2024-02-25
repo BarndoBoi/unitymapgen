@@ -31,7 +31,7 @@ public class LayerTerrain : MonoBehaviour
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
 
-    public void Start()
+    public void Awake()
     {
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
