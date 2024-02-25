@@ -2,6 +2,7 @@ using UnityEngine;
 using ProcGenTiles;
 using System.Linq;
 using System.IO;
+using System.Collections.Generic;
 
 public class LayerTerrain : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class LayerTerrain : MonoBehaviour
     // Then I'll likely want to check my Pathfinding code and see if I can check for regions that arent reachable and start marking them.
     // It would be cool to add canals or valleys between the water regions so everything is accessable by boat. :3
     */
+
+    [SerializeField]
+    private Biomes allBiomes;
 
     //Future TODO: Standardize these naming conventions between the ProcGenTiles library and our codebase
     [SerializeField]
@@ -23,7 +27,10 @@ public class LayerTerrain : MonoBehaviour
 
     //Assign layers from the inspector. In the future I either want ScriptableObjects that can be dragged in or JSON serialization so these don't get lost on a reset
     [SerializeField]
-    private MapLayers mapLayers;
+    private MapLayers elevationLayers;
+    [SerializeField]
+    private MapLayers moistureLayers;
+
     [SerializeField]
     private FastNoiseLite noise;
     [SerializeField]
@@ -31,11 +38,35 @@ public class LayerTerrain : MonoBehaviour
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
 
+
+    private Dictionary<string,MapLayers> layersDict = new Dictionary<string, MapLayers>();
+
     public void Awake()
     {
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
+        
+        layersDict.Add(LayersEnum.Elevation, elevationLayers);
+        layersDict.Add(LayersEnum.Moisture, moistureLayers);
+
         GenerateTerrain();
+    }
+
+    public void doBiomeStuff()
+    {   
+        //finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
+        for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
+        {
+            MapNoisePair pair = moistureLayers.NoisePairs[i];
+            if (pair.UseJsonFile)
+            {
+                pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
+            }
+            ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
+            GenerateHeightmap(pair, LayersEnum.Moisture); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
+        }
+        NormalizeFinalMap(LayersEnum.Moisture); //Make the final map only span from 0 to 1
+        //CreateTerrainFromHeightmap();
     }
 
     public void GenerateTerrain()
@@ -43,9 +74,9 @@ public class LayerTerrain : MonoBehaviour
         //Finals array likely doesn't need to exist here since we have the finalMap field
         float[,] finals = new float[X, Y];
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
-        for (int i = 0; i < mapLayers.NoisePairs.Count; i++)
+        for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
-            MapNoisePair pair = mapLayers.NoisePairs[i];
+            MapNoisePair pair = elevationLayers.NoisePairs[i];
             if (pair.UseJsonFile)
             {
                 pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
@@ -53,18 +84,20 @@ public class LayerTerrain : MonoBehaviour
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
         }
-        NormalizeFinalMap(); //Make the final map only span from 0 to 1
-        CreateTerrainFromHeightmap(finals);
+        NormalizeFinalMap(LayersEnum.Elevation); //Make the final map only span from 0 to 1
+        doBiomeStuff();
+        CreateTerrainFromHeightmap();
     }
 
-    public void CreateTerrainFromHeightmap(float[,] heights)
+    public void CreateTerrainFromHeightmap()
     {
         TerrainData terrainData = terrain.terrainData;
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.heightmapResolution = X + 1;
-        //This needs to be changed to use FetchFloatValues instead since we can't update a region of the Terrain
-        float[,] testHeights = finalMap.FetchFloatValuesSlice(LayersEnum.Elevation, 0, Y, 0, X);
-        terrainData.SetHeights(0, 0, testHeights); //SetHeights, I hate you so much >_<
+        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+
+
+
         float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
 
         for (int y = 0; y < terrainData.alphamapWidth; y++)
@@ -90,7 +123,18 @@ public class LayerTerrain : MonoBehaviour
 
                 float hm_perc = (height / terrainData.heightmapResolution) * 10f; //Offsetting by ten to get a percentage? Double check this in testing
 
-                Biome(); //sets the biome
+                biome(hm_perc, finalMap.GetTile(x,y).ValuesHere[LayersEnum.Moisture]); //sets the biome
+
+                void biome(float elevation, float moisture)
+                {
+                    
+
+                    for (int x = 0; x < allBiomes.AllBiomes.Count; x++)
+                    {
+                        if (hm_perc < allBiomes.AllBiomes[x].value) { splatWeights[allBiomes.AllBiomes[x].index] = 1.0f; return; };
+                    }
+
+                }
 
                 void Biome() //This needs to be refactored badly
                 {
@@ -157,7 +201,9 @@ public class LayerTerrain : MonoBehaviour
                 
                 heightmap[x, y] = noiseValue;
                 //No need to carry around a final array since we can simply call FetchFloatValues on finalMap
-                Tile finalTile = finalMap.Tiles[x, y];
+                //Tile finalTile = finalMap.Tiles[x, y];
+                Tile finalTile = finalMap.GetTile(x, y);
+
                 if (finalTile.ValuesHere.ContainsKey(layer))
                 { //If the value exist increment the final tile by the amount of the noise
                     finalTile.ValuesHere[layer] += noiseValue;
@@ -173,22 +219,25 @@ public class LayerTerrain : MonoBehaviour
 
     void NormalizeFinalMap(string layer)
     {
-        float range = mapLayers.SumOfNoiseLayers();
+        float range = layersDict[layer].SumOfNoiseLayers();
         float lowest = 100;
         float highest = -100;
         for (int x = 0; x < X; x++)
         {
             for (int y = 0; y < Y; y++)
             {
+
+                Debug.Log($"x = {x} , y = {y}");
                 Tile finalTile = finalMap.GetTile(x, y);
-                if (finalTile.ValuesHere[layer] < lowest)
+                Debug.Log(finalTile.ValuesHere.Keys.ToString());
+                /*if (finalTile.ValuesHere[layer] < lowest)
                     lowest = finalTile.ValuesHere[layer];
                 if (finalTile.ValuesHere[layer] > highest)
-                    highest = finalTile.ValuesHere[layer];
+                    highest = finalTile.ValuesHere[layer];*/
                 finalTile.ValuesHere[layer] = Mathf.InverseLerp(range * -1, range, finalTile.ValuesHere[layer]);
             }
         }
-        Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest}");
+        //Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
     }
 
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap)
@@ -198,9 +247,9 @@ public class LayerTerrain : MonoBehaviour
 
     public void SerializeNoiseParamsToJson()
     { //For each NoiseParam in our layers we serialize them with the naming convention of layer + index in list
-        for (int i = 0; i < mapLayers.NoisePairs.Count; i++)
+        for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
-            MapNoisePair pair = mapLayers.NoisePairs[i];
+            MapNoisePair pair = elevationLayers.NoisePairs[i];
             string json = pair.NoiseParams.SerializeParamsToJson(); // Get the JSON string
 
             // Define the path for the JSON file in the JSON folder inside the Assets folder
