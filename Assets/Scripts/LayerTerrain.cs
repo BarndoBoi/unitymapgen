@@ -51,7 +51,7 @@ public class LayerTerrain : MonoBehaviour
                 pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
             }
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
-            GenerateHeightmap(pair, finals); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
+            GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
         }
         NormalizeFinalMap(); //Make the final map only span from 0 to 1
         CreateTerrainFromHeightmap(finals);
@@ -136,7 +136,7 @@ public class LayerTerrain : MonoBehaviour
         noise.SetFractalWeightedStrength(noiseParams.weightedStrength);
     }
 
-    public float[,] GenerateHeightmap(MapNoisePair noisePair, float[,] final)
+    public float[,] GenerateHeightmap(MapNoisePair noisePair, string layer)
     {
         noisePair.Map = new Map(X, Y); //The map isn't being generated in the inspector, so it must be created here
         float[,] heightmap = new float[X, Y];
@@ -149,40 +149,46 @@ public class LayerTerrain : MonoBehaviour
                 noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
                 //noiseValue = Mathf.InverseLerp(Mathf.Pow(-1, noisePair.NoiseParams.raisedPower), Mathf.Pow(1, noisePair.NoiseParams.raisedPower), noiseValue);
                 //Set the elevation to the normalized value by checking if we've already set elevation data
-                if (tile.ValuesHere.ContainsKey(LayersEnum.Elevation))
-                    tile.ValuesHere[LayersEnum.Elevation] = noiseValue;
+                if (tile.ValuesHere.ContainsKey(layer))
+                    tile.ValuesHere[layer] = noiseValue;
                 else
-                    tile.ValuesHere.Add(LayersEnum.Elevation, noiseValue);
+                    tile.ValuesHere.Add(layer, noiseValue);
 
                 
                 heightmap[x, y] = noiseValue;
                 //No need to carry around a final array since we can simply call FetchFloatValues on finalMap
-                final[x, y] += noiseValue; //Add the layers values to the final heightmap array
                 Tile finalTile = finalMap.Tiles[x, y];
-                if (finalTile.ValuesHere.ContainsKey(LayersEnum.Elevation))
+                if (finalTile.ValuesHere.ContainsKey(layer))
                 { //If the value exist increment the final tile by the amount of the noise
-                    finalTile.ValuesHere[LayersEnum.Elevation] += noiseValue;
+                    finalTile.ValuesHere[layer] += noiseValue;
                 }
                 else
                 { //Otherwise we add it with the value from the first layer
-                    finalTile.ValuesHere.Add(LayersEnum.Elevation, noiseValue); //Create the entry and assign the first layer's value
+                    finalTile.ValuesHere.Add(layer, noiseValue); //Create the entry and assign the first layer's value
                 }
             }
         }
         return heightmap;
     }
 
-    void NormalizeFinalMap()
+    void NormalizeFinalMap(string layer)
     {
         float range = mapLayers.SumOfNoiseLayers();
+        float lowest = 100;
+        float highest = -100;
         for (int x = 0; x < X; x++)
         {
             for (int y = 0; y < Y; y++)
             {
                 Tile finalTile = finalMap.GetTile(x, y);
-                finalTile.ValuesHere[LayersEnum.Elevation] = Mathf.InverseLerp(range * -1, range, finalTile.ValuesHere[LayersEnum.Elevation]);
+                if (finalTile.ValuesHere[layer] < lowest)
+                    lowest = finalTile.ValuesHere[layer];
+                if (finalTile.ValuesHere[layer] > highest)
+                    highest = finalTile.ValuesHere[layer];
+                finalTile.ValuesHere[layer] = Mathf.InverseLerp(range * -1, range, finalTile.ValuesHere[layer]);
             }
         }
+        Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest}");
     }
 
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap)
