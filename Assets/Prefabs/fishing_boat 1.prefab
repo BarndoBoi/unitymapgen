@@ -25,7 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2072175655045077504}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 3.9, z: -21.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -613,10 +613,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9ec03213a112f04b8d85951db1a631e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deform: {fileID: 7762174202953124182}
   speed: 0.5
   turnRate: 0.7
-  minimumInput: 0.01
   cannon_tube: {fileID: 7762174202953388103}
   cannon_base: {fileID: 7762174202953340525}
   projectile: {fileID: 241221087600015630, guid: f66e3319244f7564eb06da48a97c7211, type: 3}
@@ -626,6 +624,9 @@ MonoBehaviour:
   ExplosionDelay: 5
   LinePoints: 175
   timeIntervalInPoints: 0.1
+  ProjectileCollisionMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &7762174202953124182
 MonoBehaviour:
   m_ObjectHideFlags: 0
