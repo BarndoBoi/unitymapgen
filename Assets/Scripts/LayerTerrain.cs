@@ -52,8 +52,8 @@ public class LayerTerrain : MonoBehaviour
             }
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
             GenerateHeightmap(pair, finals); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
-
         }
+        NormalizeFinalMap(); //Make the final map only span from 0 to 1
         CreateTerrainFromHeightmap(finals);
     }
 
@@ -96,8 +96,8 @@ public class LayerTerrain : MonoBehaviour
                 {
                     // will need to tune further but this will work for the basics now. 
                     // RedBlob had a better implementation of this that might be worth looking into
-                    if (hm_perc < 0.1) { splatWeights[2] = 1.0f; return; } //water
-                    if (hm_perc < 0.15) { splatWeights[0] = 1.0f; return; } //beach sand
+                    if (hm_perc < 0.3) { splatWeights[2] = 1.0f; return; } //water
+                    if (hm_perc < 0.5) { splatWeights[0] = 1.0f; return; } //beach sand
                     if (hm_perc < 0.65) { splatWeights[1] = 1.0f; return; } // grass
                     if (hm_perc >= 0.65) { splatWeights[3] = 1.0f; return; } //snow
 
@@ -145,8 +145,9 @@ public class LayerTerrain : MonoBehaviour
             for (int y = 0; y < Y; y++)
             { //Inner for loop does most of the heavy lifting
                 Tile tile = noisePair.Map.Tiles[x, y]; //Get the tile at the location
-                float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale) / 2 + 0.5f; //Grab the value
+                float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale); //Grab the value
                 noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
+                //noiseValue = Mathf.InverseLerp(Mathf.Pow(-1, noisePair.NoiseParams.raisedPower), Mathf.Pow(1, noisePair.NoiseParams.raisedPower), noiseValue);
                 //Set the elevation to the normalized value by checking if we've already set elevation data
                 if (tile.ValuesHere.ContainsKey(LayersEnum.Elevation))
                     tile.ValuesHere[LayersEnum.Elevation] = noiseValue;
@@ -169,6 +170,19 @@ public class LayerTerrain : MonoBehaviour
             }
         }
         return heightmap;
+    }
+
+    void NormalizeFinalMap()
+    {
+        float range = mapLayers.SumOfNoiseLayers();
+        for (int x = 0; x < X; x++)
+        {
+            for (int y = 0; y < Y; y++)
+            {
+                Tile finalTile = finalMap.GetTile(x, y);
+                finalTile.ValuesHere[LayersEnum.Elevation] = Mathf.InverseLerp(range * -1, range, finalTile.ValuesHere[LayersEnum.Elevation]);
+            }
+        }
     }
 
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap)

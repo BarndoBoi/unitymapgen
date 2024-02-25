@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ProcGenTiles;
+using UnityEngine;
 
 [System.Serializable]
 public class MapLayers
@@ -30,8 +31,13 @@ public class MapLayers
 
     public float SumOfNoiseLayers()
     {
-        //Noise ranges from 0-1, so add one per layer of the map
-        //Subject to change later so don't get attached to this
-        return NoisePairs.Count;
+        //Noise ranges from -1 to 1 on each noiseParam, which is then multiplied by a power
+        //Noise is additive with other layers, so maximum noise range is all noise ranges summed together
+        float sum = 0;
+        foreach(var pair in NoisePairs)
+        {
+            sum += Mathf.Pow(1, pair.NoiseParams.raisedPower);
+        }
+        return sum; //This is the highest sum that could be added together for this map
     }
 }
