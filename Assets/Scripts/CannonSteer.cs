@@ -1,7 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
+
+
+/*
+ 
+on CannonSteer.OnFire()
+    Vector2 HitPoint = hit.point (this is vec3 created when raycast hits terrain)
+    Deform.DeformTerrain(HitPoint, "Elevation")
+    OnCollisionEnter: (projectile hits terrain)
+        make particle effects:
+            TerrainData.SetHeight()
+
+
+
+*/
+
 
 public class CannonSteer : MonoBehaviour
 {
@@ -20,7 +34,7 @@ public class CannonSteer : MonoBehaviour
     public GameObject projectile;
 
     // Line Render
-    
+
     [SerializeField]
     public LineRenderer LineRenderer;
     [SerializeField]
@@ -46,14 +60,16 @@ public class CannonSteer : MonoBehaviour
     [Range(0.01f, 0.25f)]
     private float timeIntervalInPoints = 0.1f;
 
+    [SerializeField]
     private LayerMask ProjectileCollisionMask;
 
+    private Deform Deform;
     private void Awake()
     {
-        int grenadeLayer = projectile.gameObject.layer;
+        int projectileLayer = projectile.gameObject.layer;
         for (int i = 0; i < 32; i++)
         {
-            if (!Physics.GetIgnoreLayerCollision(grenadeLayer, i))
+            if (!Physics.GetIgnoreLayerCollision(projectileLayer, i))
             {
                 ProjectileCollisionMask |= 1 << i; // magic
             }
@@ -61,7 +77,7 @@ public class CannonSteer : MonoBehaviour
     }
     void Start()
     {
- 
+        
     }
 
     // Update is called once per frame
@@ -69,7 +85,7 @@ public class CannonSteer : MonoBehaviour
     {
         float turnAngle = steerInput.x * turnRate;
         float fireAngle = steerInput.y * turnRate;
-        
+
         cannon_base.transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
         cannon_tube.transform.Rotate(Vector3.left, fireAngle);
 
@@ -83,6 +99,19 @@ public class CannonSteer : MonoBehaviour
 
     void OnFire()
     {
+        /*
+ 
+on CannonSteer.OnFire()
+    Vector2 HitPoint = hit.point (this is vec3 created when raycast hits terrain)
+    Deform.DeformTerrain(HitPoint, "Elevation")
+    OnCollisionEnter: (projectile hits terrain)
+        make particle effects:
+            TerrainData.SetHeight()
+
+
+
+*/
+
         // init a new cannonball
         GameObject projectile_copy = Instantiate(projectile, FirePoint.transform.position, FirePoint.transform.rotation);
 
@@ -90,16 +119,20 @@ public class CannonSteer : MonoBehaviour
         Rigidbody projectile_rb = projectile_copy.GetComponent<Rigidbody>();
 
         projectile_rb.AddForce(FirePoint.transform.forward * launchForce, ForceMode.Impulse);
+
+        SimulateTrajectory(true);
     }
 
-    
-    //make sure that FirePoint is set to use world space in the editor or this won't work
-    private void SimulateTrajectory()
-    {
-        LineRenderer.positionCount = Mathf.CeilToInt(LinePoints / timeIntervalInPoints) + 1;
-        Vector3 startPosition = FirePoint.position; 
-        Vector3 startVelocity = launchForce * FirePoint.forward;
 
+    //make sure that FirePoint is set to use world space in the editor or this won't work
+    private void SimulateTrajectory(bool shotFired = false)
+    {
+        //https://github.com/llamacademy/projectile-trajectory/blob/main/Assets/Scripts/GrenadeThrower.cs
+
+        LineRenderer.positionCount = Mathf.CeilToInt(LinePoints / timeIntervalInPoints) + 1;
+        Vector3 startPosition = FirePoint.position;
+        Vector3 startVelocity = launchForce * FirePoint.forward;
+        Vector3 HitPoint;
         int i = 0;
         LineRenderer.SetPosition(i, startPosition);
         for (float time = 0; time < LinePoints; time += timeIntervalInPoints)
@@ -113,17 +146,38 @@ public class CannonSteer : MonoBehaviour
             // Raycast to stop trajectory calc when it hits the terrain
             Vector3 lastPosition = LineRenderer.GetPosition(i - 1);
 
-            if (Physics.Raycast(lastPosition,
-                (point - lastPosition).normalized,
-                out RaycastHit hit,
-                (point - lastPosition).magnitude,
-                ProjectileCollisionMask))
+            if (Physics.Raycast(lastPosition, (point - lastPosition).normalized, out RaycastHit hit, (point - lastPosition).magnitude, ProjectileCollisionMask))
             {
-                LineRenderer.SetPosition(i, hit.point);
-                LineRenderer.positionCount = i + 1;
+                //LineRenderer.SetPosition(i, hit.point);
+                //LineRenderer.positionCount = i + 1;
+                //HitPoint = hit.point;
+                //HitPoint = this.transform.TransformPoint(hit.point);
+
+                /*if (shotFired)
+                {
+                    // NullReferenceException: Object reference not set to an instance of an object
+
+                    // Deform MyDeform; <-- top of script
+                    // MyDeform = ???;  <-- dis da part im confused about,
+                    //                      setting that to an object from the actual Deform script
+                    //                      
+
+                    deform.DeformTerrain(new Vector2(HitPoint.z, HitPoint.x), LayersEnum.Elevation);
+                    Debug.Log($"ran DeformTerrain at {HitPoint.ToString()}!!!");
+
+                }*/
                 return;
             }
+
         }
+
+
+        
+        
     }
+
 }
+        
+   
+
 
