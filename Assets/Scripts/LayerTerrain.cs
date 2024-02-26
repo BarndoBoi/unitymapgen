@@ -38,8 +38,19 @@ public class LayerTerrain : MonoBehaviour
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
 
-
     private Dictionary<string,MapLayers> layersDict = new Dictionary<string, MapLayers>();
+
+    float highest_e = -100;
+    float lowest_e = 100;
+
+    // ----------------- DEBUG STUFF
+    bool print_debug = true;
+    int printed = 0;
+    int timesToPrint = 5;
+    float debug_initialNoiseValue;
+    float debug_SumofNoiseLayers;
+
+    
 
     public void Awake()
     {
@@ -105,26 +116,37 @@ public class LayerTerrain : MonoBehaviour
             for (int x = 0; x < terrainData.alphamapHeight; x++)
             {           
                 float height = finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
+                float biomeHeight = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture];
                 if (height > maxH) { maxH = height; };
                 if (height < minH) { minH = height; };
 
                 // Setup an array to record the mix of texture weights at this point
                 float[] splatWeights = new float[terrainData.alphamapLayers];
-
-                //All of the biome code needs to be removed from here and put into a serizlizable data object
-                splatWeights[0] = 0.0f; //They all are already initialized to zero, these assignments are pointless
-                splatWeights[1] = 0.0f;
-                splatWeights[2] = 0.0f;
-                splatWeights[3] = 0.0f;
                 
                 biome(); //sets the biome
 
+                // this works well if you're just doing texturing based on elevation.
+                // it starts to fall apart as soon as you're trying to implement
+                // const levels, and variable moisture amounts
                 void biome()
                 {
                     for (int x = 0; x < allBiomes.AllBiomes.Count; x++)
                     {
                         if (height < allBiomes.AllBiomes[x].value) { splatWeights[allBiomes.AllBiomes[x].index] = 1.0f; return; };
                     }
+                }
+
+                // Work in progress don't @ me
+                // Adding another texture or two so I can mess with blending different textures on the same elevation band
+                void biome2()
+                {   
+                    if (height < allBiomes.AllBiomes[0].value) { splatWeights[allBiomes.AllBiomes[0].index] = 1.0f; return; }; //water (constant)
+                    if (height < allBiomes.AllBiomes[1].value) { splatWeights[allBiomes.AllBiomes[1].index] = 1.0f; return; }; //beach sand (constant)
+
+                    if (height < allBiomes.AllBiomes[2].value) { splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; }; //grass
+
+                    if (height < allBiomes.AllBiomes[3].value) { splatWeights[allBiomes.AllBiomes[3].index] = 1.0f; return; }; //snow
+
 
                 }
 
@@ -143,10 +165,6 @@ public class LayerTerrain : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log($"max height: {maxH}");
-        Debug.Log($"max height: {minH}");
-
         terrainData.SetAlphamaps(0, 0, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
     }
 
@@ -166,28 +184,27 @@ public class LayerTerrain : MonoBehaviour
         noise.SetFractalWeightedStrength(noiseParams.weightedStrength);
     }
 
-    public float[,] GenerateHeightmap(MapNoisePair noisePair, string layer)
+    public void GenerateHeightmap(MapNoisePair noisePair, string layer)
     {
+        highest_e = -100;
+        lowest_e = 100;
         noisePair.Map = new Map(X, Y); //The map isn't being generated in the inspector, so it must be created here
-        float[,] heightmap = new float[X, Y];
         for (int x = 0; x < X; x++)
         {
             for (int y = 0; y < Y; y++)
             { //Inner for loop does most of the heavy lifting
                 Tile tile = noisePair.Map.Tiles[x, y]; //Get the tile at the location
-                float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale); //Grab the value
+                float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale); //Grab the value between -1 and 1
+                noiseValue = Mathf.InverseLerp(-1, 1, noiseValue); //set to 0  and 1 scale
+                noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); // TODO: do this AFTER the normalization
 
-                //noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
-                //noiseValue = Mathf.InverseLerp(Mathf.Pow(-1, noisePair.NoiseParams.raisedPower), Mathf.Pow(1, noisePair.NoiseParams.raisedPower), noiseValue);
+
                 //Set the elevation to the normalized value by checking if we've already set elevation data
                 if (tile.ValuesHere.ContainsKey(layer))
                     tile.ValuesHere[layer] = noiseValue;
                 else
                     tile.ValuesHere.Add(layer, noiseValue);
  
-                heightmap[x, y] = noiseValue;
-                //No need to carry around a final array since we can simply call FetchFloatValues on finalMap
-                //Tile finalTile = finalMap.Tiles[x, y];
                 Tile finalTile = finalMap.GetTile(x, y);
 
                 if (finalTile.ValuesHere.ContainsKey(layer))
@@ -198,9 +215,12 @@ public class LayerTerrain : MonoBehaviour
                 { //Otherwise we add it with the value from the first layer
                     finalTile.ValuesHere.Add(layer, noiseValue); //Create the entry and assign the first layer's value
                 }
+
+                //track highest lowest values for later
+                if (finalTile.ValuesHere[layer] < lowest_e) { lowest_e = finalTile.ValuesHere[layer]; };
+                if (finalTile.ValuesHere[layer] > highest_e) { highest_e = finalTile.ValuesHere[layer]; };
             }
         }
-        return heightmap;
     }
 
     void NormalizeFinalMap(string layer)
@@ -208,27 +228,42 @@ public class LayerTerrain : MonoBehaviour
         float range = layersDict[layer].SumOfNoiseLayers();
         float lowest = 100;
         float highest = -100;
+
+        float lowest_after = 100;
+        float highest_after = -100;
+
         for (int x = 0; x < X; x++)
         {
             for (int y = 0; y < Y; y++)
             {
-
-                //Debug.Log($"x = {x} , y = {y}");
                 Tile finalTile = finalMap.GetTile(x, y);
-                //Debug.Log(finalTile.ValuesHere.Keys.ToString());
-                /*if (finalTile.ValuesHere[layer] < lowest)
-                    lowest = finalTile.ValuesHere[layer];
-                if (finalTile.ValuesHere[layer] > highest)
-                    highest = finalTile.ValuesHere[layer];*/
-                finalTile.ValuesHere[layer] = Mathf.InverseLerp(range * -1, range, finalTile.ValuesHere[layer]);
+                
+                // just for debug
+                if (finalTile.ValuesHere[layer] < lowest) lowest = finalTile.ValuesHere[layer];
+                if (finalTile.ValuesHere[layer] > highest) highest = finalTile.ValuesHere[layer];
+
+                finalTile.ValuesHere[layer] = Mathf.InverseLerp(lowest_e, highest_e, finalTile.ValuesHere[layer]);
+                // TODO: do power stuff here not in GenTerrain()
+
+                // just for debug
+                if (finalTile.ValuesHere[layer] < lowest_after) lowest_after = finalTile.ValuesHere[layer];
+                if (finalTile.ValuesHere[layer] > highest_after) highest_after = finalTile.ValuesHere[layer];
+
             }
         }
-        //Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
+        // uncomment for testing
+        if (print_debug)
+        {
+            Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
+            Debug.Log($"Lowest value after normalizing was {lowest_after} and highest was {highest_after} on {layer} layer ");
+        }
     }
 
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap)
     { //This might need work to instead mark the terrain as dirty until all deform operations are done, and THEN we set the heights
         terrain.terrainData.SetHeights(xBase, yBase, heightmap); //Fuck you SetHeights, why do you pretend like I can update regions with the xBase and yBase when you actually suck?
+                                                                 
+                                                                 //Because fuck you, that's why! >:)
     }
 
     public void SerializeNoiseParamsToJson()
