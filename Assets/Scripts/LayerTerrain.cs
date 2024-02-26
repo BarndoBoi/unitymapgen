@@ -71,8 +71,6 @@ public class LayerTerrain : MonoBehaviour
 
     public void GenerateTerrain()
     {
-        //Finals array likely doesn't need to exist here since we have the finalMap field
-        float[,] finals = new float[X, Y];
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
@@ -212,18 +210,15 @@ public class LayerTerrain : MonoBehaviour
         {
             for (int y = 0; y < Y; y++)
             {
-
-                //Debug.Log($"x = {x} , y = {y}");
                 Tile finalTile = finalMap.GetTile(x, y);
-                //Debug.Log(finalTile.ValuesHere.Keys.ToString());
-                /*if (finalTile.ValuesHere[layer] < lowest)
+                if (finalTile.ValuesHere[layer] < lowest)
                     lowest = finalTile.ValuesHere[layer];
                 if (finalTile.ValuesHere[layer] > highest)
-                    highest = finalTile.ValuesHere[layer];*/
+                    highest = finalTile.ValuesHere[layer];
                 finalTile.ValuesHere[layer] = Mathf.InverseLerp(range * -1, range, finalTile.ValuesHere[layer]);
             }
         }
-        //Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
+        Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
     }
 
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap)
@@ -252,6 +247,18 @@ public class LayerTerrain : MonoBehaviour
             File.WriteAllText(filePath, json);
 
             Debug.Log($"JSON file saved to: {filePath}");
+        }
+    }
+
+    public void LoadNoiseParamsFromJson()
+    {
+        for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
+        {
+            MapNoisePair pair = elevationLayers.NoisePairs[i];
+            if (pair.UseJsonFile && pair.JSON.text != string.Empty)
+            { //Only load if the bool is on and the json asset is assigned
+                pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
+            }
         }
     }
 }
