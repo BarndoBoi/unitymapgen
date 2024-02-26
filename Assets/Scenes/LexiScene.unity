@@ -306,8 +306,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: TerrainFromTilemap, Assembly-CSharp
+      - m_Target: {fileID: 1904438397}
+        m_TargetAssemblyTypeName: LayerTerrain, Assembly-CSharp
         m_MethodName: GenerateTerrain
         m_Mode: 1
         m_Arguments:
@@ -754,14 +754,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allBiomes: {fileID: 1904438398}
-  X: 513
-  Y: 513
+  X: 512
+  Y: 512
   depth: 60
-  noiseScale: 0.1
+  noiseScale: 0.7
   elevationLayers:
-    NoisePairs: []
+    NoisePairs:
+    - NoiseParams:
+        noiseType: 3
+        frequency: 0.3
+        seed: 10
+        fractalType: 3
+        fractalLacunarity: 2
+        fractalGain: 0.5
+        weightedStrength: 1
+        fractalOctaves: 4
+        raisedPower: 4
+        minValue: 0
+      JSON: {fileID: 4900000, guid: 57fabebd13caa70489cf0ab5a1e234ee, type: 3}
+      UseJsonFile: 0
   moistureLayers:
-    NoisePairs: []
+    NoisePairs:
+    - NoiseParams:
+        noiseType: 3
+        frequency: 0.3
+        seed: 10
+        fractalType: 3
+        fractalLacunarity: 2
+        fractalGain: 0.5
+        weightedStrength: 1
+        fractalOctaves: 4
+        raisedPower: 4
+        minValue: 0
+      JSON: {fileID: 4900000, guid: 57fabebd13caa70489cf0ab5a1e234ee, type: 3}
+      UseJsonFile: 0
   terrain: {fileID: 1904438394}
 --- !u!114 &1904438398
 MonoBehaviour:
@@ -780,7 +806,7 @@ MonoBehaviour:
     value: 0.3
     index: 0
   - name: Beach Sand
-    value: 0.5
+    value: 0.51
     index: 1
   - name: Grass
     value: 0.65
@@ -805,7 +831,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2072175655044974112, guid: 534c157e29fe0614c8510386e335d9d7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 27.6
+      value: 63.12
       objectReference: {fileID: 0}
     - target: {fileID: 2072175655044974112, guid: 534c157e29fe0614c8510386e335d9d7, type: 3}
       propertyPath: m_LocalPosition.z
