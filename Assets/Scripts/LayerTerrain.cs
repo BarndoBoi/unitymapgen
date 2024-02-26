@@ -96,56 +96,38 @@ public class LayerTerrain : MonoBehaviour
         terrainData.heightmapResolution = X + 1;
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
 
-
-
         float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
 
+        float maxH = 0; //for printing later
+        float minH = .99f; 
         for (int y = 0; y < terrainData.alphamapWidth; y++)
         {
             for (int x = 0; x < terrainData.alphamapHeight; x++)
-            {
-
-                float y_01 = (float)y / (float)terrainData.alphamapWidth;
-                float x_01 = (float)x / (float)terrainData.alphamapHeight;
-
-                float height = terrainData.GetHeight(Mathf.RoundToInt(x_01 * terrainData.heightmapResolution),
-                Mathf.RoundToInt(y_01 * terrainData.heightmapResolution));
+            {           
+                float height = finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
+                if (height > maxH) { maxH = height; };
+                if (height < minH) { minH = height; };
 
                 // Setup an array to record the mix of texture weights at this point
                 float[] splatWeights = new float[terrainData.alphamapLayers];
 
                 //All of the biome code needs to be removed from here and put into a serizlizable data object
-
                 splatWeights[0] = 0.0f; //They all are already initialized to zero, these assignments are pointless
                 splatWeights[1] = 0.0f;
                 splatWeights[2] = 0.0f;
                 splatWeights[3] = 0.0f;
+                
+                biome(); //sets the biome
 
-                float hm_perc = (height / terrainData.heightmapResolution) * 10f; //Offsetting by ten to get a percentage? Double check this in testing
-
-                biome(hm_perc, finalMap.GetTile(x,y).ValuesHere[LayersEnum.Moisture]); //sets the biome
-
-                void biome(float elevation, float moisture)
+                void biome()
                 {
-                    
-
                     for (int x = 0; x < allBiomes.AllBiomes.Count; x++)
                     {
-                        if (hm_perc < allBiomes.AllBiomes[x].value) { splatWeights[allBiomes.AllBiomes[x].index] = 1.0f; return; };
+                        if (height < allBiomes.AllBiomes[x].value) { splatWeights[allBiomes.AllBiomes[x].index] = 1.0f; return; };
                     }
 
                 }
 
-                void Biome() //This needs to be refactored badly
-                {
-                    // will need to tune further but this will work for the basics now. 
-                    // RedBlob had a better implementation of this that might be worth looking into
-                    if (hm_perc < 0.3) { splatWeights[2] = 1.0f; return; } //water
-                    if (hm_perc < 0.5) { splatWeights[0] = 1.0f; return; } //beach sand
-                    if (hm_perc < 0.65) { splatWeights[1] = 1.0f; return; } // grass
-                    if (hm_perc >= 0.65) { splatWeights[3] = 1.0f; return; } //snow
-
-                }
 
                 // Sum of all textures weights must add to 1, so calculate normalization factor from sum of weights
                 float z = splatWeights.Sum();
@@ -157,10 +139,14 @@ public class LayerTerrain : MonoBehaviour
                     splatWeights[i] /= z;
 
                     // Assign this point to the splatmap array
-                    splatmapData[y, x, i] = splatWeights[i];
+                    splatmapData[x, y, i] = splatWeights[i]; 
                 }
             }
         }
+
+        Debug.Log($"max height: {maxH}");
+        Debug.Log($"max height: {minH}");
+
         terrainData.SetAlphamaps(0, 0, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
     }
 
@@ -190,15 +176,15 @@ public class LayerTerrain : MonoBehaviour
             { //Inner for loop does most of the heavy lifting
                 Tile tile = noisePair.Map.Tiles[x, y]; //Get the tile at the location
                 float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale); //Grab the value
-                noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
+
+                //noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); //raising to power to give us flat valleys for ocean floor
                 //noiseValue = Mathf.InverseLerp(Mathf.Pow(-1, noisePair.NoiseParams.raisedPower), Mathf.Pow(1, noisePair.NoiseParams.raisedPower), noiseValue);
                 //Set the elevation to the normalized value by checking if we've already set elevation data
                 if (tile.ValuesHere.ContainsKey(layer))
                     tile.ValuesHere[layer] = noiseValue;
                 else
                     tile.ValuesHere.Add(layer, noiseValue);
-
-                
+ 
                 heightmap[x, y] = noiseValue;
                 //No need to carry around a final array since we can simply call FetchFloatValues on finalMap
                 //Tile finalTile = finalMap.Tiles[x, y];
@@ -227,9 +213,9 @@ public class LayerTerrain : MonoBehaviour
             for (int y = 0; y < Y; y++)
             {
 
-                Debug.Log($"x = {x} , y = {y}");
+                //Debug.Log($"x = {x} , y = {y}");
                 Tile finalTile = finalMap.GetTile(x, y);
-                Debug.Log(finalTile.ValuesHere.Keys.ToString());
+                //Debug.Log(finalTile.ValuesHere.Keys.ToString());
                 /*if (finalTile.ValuesHere[layer] < lowest)
                     lowest = finalTile.ValuesHere[layer];
                 if (finalTile.ValuesHere[layer] > highest)
