@@ -45,10 +45,7 @@ public class LayerTerrain : MonoBehaviour
 
     // ----------------- DEBUG STUFF
     bool print_debug = true;
-    int printed = 0;
-    int timesToPrint = 5;
-    float debug_initialNoiseValue;
-    float debug_SumofNoiseLayers;
+    
 
     
 
@@ -76,7 +73,7 @@ public class LayerTerrain : MonoBehaviour
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
             GenerateHeightmap(pair, LayersEnum.Moisture); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
         }
-        NormalizeFinalMap(LayersEnum.Moisture); //Make the final map only span from 0 to 1
+        NormalizeFinalMap(LayersEnum.Moisture, 0, 0); //Make the final map only span from 0 to 1
         //CreateTerrainFromHeightmap();
     }
 
@@ -85,6 +82,8 @@ public class LayerTerrain : MonoBehaviour
         //Finals array likely doesn't need to exist here since we have the finalMap field
         float[,] finals = new float[X, Y];
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
+        float minValue = 0;
+        float raisedPower = 0;
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -93,9 +92,12 @@ public class LayerTerrain : MonoBehaviour
                 pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
             }
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
+
+            if (i == 0) { minValue = pair.NoiseParams.minValue; raisedPower = pair.NoiseParams.raisedPower; };
+
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
         }
-        NormalizeFinalMap(LayersEnum.Elevation); //Make the final map only span from 0 to 1
+        NormalizeFinalMap(LayersEnum.Elevation, minValue, raisedPower); //Make the final map only span from 0 to 1
         doBiomeStuff();
         CreateTerrainFromHeightmap();
     }
@@ -132,7 +134,7 @@ public class LayerTerrain : MonoBehaviour
                 {
                     for (int x = 0; x < allBiomes.AllBiomes.Count; x++)
                     {
-                        if (height < allBiomes.AllBiomes[x].value) { splatWeights[allBiomes.AllBiomes[x].index] = 1.0f; return; };
+                        if (height <= allBiomes.AllBiomes[x].value) { splatWeights[allBiomes.AllBiomes[x].index] = 1.0f; return; };
                     }
                 }
 
@@ -140,7 +142,7 @@ public class LayerTerrain : MonoBehaviour
                 // Adding another texture or two so I can mess with blending different textures on the same elevation band
                 void biome2()
                 {   
-                    if (height < allBiomes.AllBiomes[0].value) { splatWeights[allBiomes.AllBiomes[0].index] = 1.0f; return; }; //water (constant)
+                    if (height <= allBiomes.AllBiomes[0].value) { splatWeights[allBiomes.AllBiomes[0].index] = 1.0f; return; }; //water (constant)
                     if (height < allBiomes.AllBiomes[1].value) { splatWeights[allBiomes.AllBiomes[1].index] = 1.0f; return; }; //beach sand (constant)
 
                     if (height < allBiomes.AllBiomes[2].value) { splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; }; //grass
@@ -196,7 +198,7 @@ public class LayerTerrain : MonoBehaviour
                 Tile tile = noisePair.Map.Tiles[x, y]; //Get the tile at the location
                 float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale); //Grab the value between -1 and 1
                 noiseValue = Mathf.InverseLerp(-1, 1, noiseValue); //set to 0  and 1 scale
-                noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); // TODO: do this AFTER the normalization
+                //noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); // TODO: do this AFTER the normalization
 
 
                 //Set the elevation to the normalized value by checking if we've already set elevation data
@@ -223,8 +225,9 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    void NormalizeFinalMap(string layer)
+    void NormalizeFinalMap(string layer, float minValue, float raisedPower)
     {
+        Debug.Log("min is: "+minValue+"power is " + raisedPower);
         float range = layersDict[layer].SumOfNoiseLayers();
         float lowest = 100;
         float highest = -100;
@@ -243,7 +246,15 @@ public class LayerTerrain : MonoBehaviour
                 if (finalTile.ValuesHere[layer] > highest) highest = finalTile.ValuesHere[layer];
 
                 finalTile.ValuesHere[layer] = Mathf.InverseLerp(lowest_e, highest_e, finalTile.ValuesHere[layer]);
-                // TODO: do power stuff here not in GenTerrain()
+                if (layer == LayersEnum.Elevation)
+                {
+                    // TODO: do power stuff here not in GenTerrain()
+                    finalTile.ValuesHere[layer] = Mathf.Pow(finalTile.ValuesHere[layer], raisedPower);
+
+                    // TODO: do min-height stuff here, set anything below water level texture to water level.
+                    //if (finalTile.ValuesHere[layer] < minValue) finalTile.ValuesHere[layer] = minValue;
+                    finalTile.ValuesHere[layer] = Mathf.Max(0, finalTile.ValuesHere[layer] - minValue);
+                }
 
                 // just for debug
                 if (finalTile.ValuesHere[layer] < lowest_after) lowest_after = finalTile.ValuesHere[layer];
