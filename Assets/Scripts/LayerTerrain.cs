@@ -44,7 +44,7 @@ public class LayerTerrain : MonoBehaviour
     float lowest_e = 100;
 
     // ----------------- DEBUG STUFF
-    bool print_debug = true;
+    bool print_debug = false;
     
 
     
@@ -73,7 +73,7 @@ public class LayerTerrain : MonoBehaviour
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
             GenerateHeightmap(pair, LayersEnum.Moisture); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
         }
-        NormalizeFinalMap(LayersEnum.Moisture, 0, 0); //Make the final map only span from 0 to 1
+        NormalizeFinalMap(LayersEnum.Moisture, 0, 1); //Make the final map only span from 0 to 1
         //CreateTerrainFromHeightmap();
     }
 
@@ -119,13 +119,13 @@ public class LayerTerrain : MonoBehaviour
             {           
                 float height = finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
                 float biomeHeight = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture];
-                if (height > maxH) { maxH = height; };
-                if (height < minH) { minH = height; };
+                //if (height > maxH) { maxH = height; };
+                //if (height < minH) { minH = height; };
 
                 // Setup an array to record the mix of texture weights at this point
                 float[] splatWeights = new float[terrainData.alphamapLayers];
                 
-                biome(); //sets the biome
+                biome2(); //sets the biome
 
                 // this works well if you're just doing texturing based on elevation.
                 // it starts to fall apart as soon as you're trying to implement
@@ -134,6 +134,7 @@ public class LayerTerrain : MonoBehaviour
                 {
                     for (int x = 0; x < allBiomes.AllBiomes.Count; x++)
                     {
+                        
                         if (height <= allBiomes.AllBiomes[x].value) { splatWeights[allBiomes.AllBiomes[x].index] = 1.0f; return; };
                     }
                 }
@@ -142,10 +143,18 @@ public class LayerTerrain : MonoBehaviour
                 // Adding another texture or two so I can mess with blending different textures on the same elevation band
                 void biome2()
                 {   
-                    if (height <= allBiomes.AllBiomes[0].value) { splatWeights[allBiomes.AllBiomes[0].index] = 1.0f; return; }; //water (constant)
-                    if (height < allBiomes.AllBiomes[1].value) { splatWeights[allBiomes.AllBiomes[1].index] = 1.0f; return; }; //beach sand (constant)
+                    if (height <= allBiomes.AllBiomes[0].value) { splatWeights[allBiomes.AllBiomes[0].index] = 1.0f; return; }; // set water (constant)
+                    if (height < allBiomes.AllBiomes[1].value) { splatWeights[allBiomes.AllBiomes[1].index] = 1.0f; return; }; // set beach sand (constant)
 
-                    if (height < allBiomes.AllBiomes[2].value) { splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; }; //grass
+                    if (height < allBiomes.AllBiomes[2].value) //if in grass band
+                    {
+                        if (biomeHeight < .25f) //set to dirt
+                        {
+                            splatWeights[allBiomes.AllBiomes[4].index] = 1.0f; return;
+                        }
+
+                        splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; // else set to grass
+                    };
 
                     if (height < allBiomes.AllBiomes[3].value) { splatWeights[allBiomes.AllBiomes[3].index] = 1.0f; return; }; //snow
 
@@ -227,7 +236,6 @@ public class LayerTerrain : MonoBehaviour
 
     void NormalizeFinalMap(string layer, float minValue, float raisedPower)
     {
-        Debug.Log("min is: "+minValue+"power is " + raisedPower);
         float range = layersDict[layer].SumOfNoiseLayers();
         float lowest = 100;
         float highest = -100;

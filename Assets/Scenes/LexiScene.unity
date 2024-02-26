@@ -762,15 +762,15 @@ MonoBehaviour:
     NoisePairs:
     - NoiseParams:
         noiseType: 3
-        frequency: 0.01
+        frequency: 0.005
         seed: 10
         fractalType: 3
         fractalLacunarity: 2
         fractalGain: 0.5
         weightedStrength: 1
-        fractalOctaves: 4
-        raisedPower: 15
-        minValue: 0
+        fractalOctaves: 5
+        raisedPower: 4
+        minValue: 0.1
       JSON: {fileID: 4900000, guid: 57fabebd13caa70489cf0ab5a1e234ee, type: 3}
       UseJsonFile: 0
   moistureLayers:
@@ -784,7 +784,7 @@ MonoBehaviour:
         fractalGain: 0.5
         weightedStrength: 1
         fractalOctaves: 4
-        raisedPower: 15
+        raisedPower: 1
         minValue: 0
       JSON: {fileID: 4900000, guid: 57fabebd13caa70489cf0ab5a1e234ee, type: 3}
       UseJsonFile: 0
@@ -803,17 +803,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AllBiomes:
   - name: Water
-    value: 0.4
+    value: 0
     index: 0
   - name: Beach Sand
-    value: 0.5
+    value: 0.02
     index: 1
   - name: Grass
-    value: 0.7
+    value: 0.6
     index: 2
   - name: Snow
     value: 1
     index: 3
+  - name: Dirt
+    value: 1
+    index: 4
 --- !u!1001 &2072175655660589691
 PrefabInstance:
   m_ObjectHideFlags: 0
