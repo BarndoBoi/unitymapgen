@@ -80,7 +80,6 @@ public class LayerTerrain : MonoBehaviour
     public void GenerateTerrain()
     {
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
-
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -108,8 +107,6 @@ public class LayerTerrain : MonoBehaviour
 
         float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
 
-        float maxH = 0; //for printing later
-        float minH = .99f; 
         for (int y = 0; y < terrainData.alphamapWidth; y++)
         {
             for (int x = 0; x < terrainData.alphamapHeight; x++)
@@ -122,23 +119,10 @@ public class LayerTerrain : MonoBehaviour
                 // Setup an array to record the mix of texture weights at this point
                 float[] splatWeights = new float[terrainData.alphamapLayers];
                 
-                biome2(); //sets the biome
-
-                // this works well if you're just doing texturing based on elevation.
-                // it starts to fall apart as soon as you're trying to implement
-                // const levels, and variable moisture amounts
-                void biome()
-                {
-                    for (int x = 0; x < allBiomes.AllBiomes.Count; x++)
-                    {
-                        
-                        if (height <= allBiomes.AllBiomes[x].value) { splatWeights[allBiomes.AllBiomes[x].index] = 1.0f; return; };
-                    }
-                }
+                biome(); //sets the biome
 
                 // Work in progress don't @ me
-                // Adding another texture or two so I can mess with blending different textures on the same elevation band
-                void biome2()
+                void biome()
                 {   
                     if (height <= allBiomes.AllBiomes[0].value) { splatWeights[allBiomes.AllBiomes[0].index] = 1.0f; return; }; // set water (constant)
                     if (height < allBiomes.AllBiomes[1].value) { splatWeights[allBiomes.AllBiomes[1].index] = 1.0f; return; }; // set beach sand (constant)
@@ -152,14 +136,11 @@ public class LayerTerrain : MonoBehaviour
 
                         splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; // else set to grass
                     };
-
                     if (height < allBiomes.AllBiomes[3].value) { splatWeights[allBiomes.AllBiomes[3].index] = 1.0f; return; }; //snow
-
-
                 }
 
 
-                // Sum of all textures weights must add to 1, so calculate normalization factor from sum of weights
+                /*// Sum of all textures weights must add to 1, so calculate normalization factor from sum of weights
                 float z = splatWeights.Sum();
 
                 // Loop through each terrain texture
@@ -170,7 +151,7 @@ public class LayerTerrain : MonoBehaviour
 
                     // Assign this point to the splatmap array
                     splatmapData[x, y, i] = splatWeights[i]; 
-                }
+                }*/
             }
         }
         terrainData.SetAlphamaps(0, 0, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
@@ -303,6 +284,18 @@ public class LayerTerrain : MonoBehaviour
             File.WriteAllText(filePath, json);
 
             Debug.Log($"JSON file saved to: {filePath}");
+        }
+    }
+
+    public void LoadNoiseParamsFromJson()
+    {
+        for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
+        {
+            MapNoisePair pair = elevationLayers.NoisePairs[i];
+            if (pair.UseJsonFile && pair.JSON.text != string.Empty)
+            { //Only load if the bool is on and the json asset is assigned
+                pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
+            }
         }
     }
 }
