@@ -993,6 +993,7 @@ GameObject:
   - component: {fileID: 1904438394}
   - component: {fileID: 1904438393}
   - component: {fileID: 1904438396}
+  - component: {fileID: 1904438397}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -1072,36 +1073,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1dd484041c424e469aa93e35a0bd60f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allBiomes: {fileID: 1904438397}
   X: 513
   Y: 513
   depth: 40
   noiseScale: 0.1
-  mapLayers:
+  elevationLayers:
     NoisePairs:
     - NoiseParams:
-        noiseType: 3
-        frequency: 0.04
-        seed: 10
-        fractalType: 2
-        fractalLacunarity: 2
-        fractalGain: 0.5
-        weightedStrength: 1
-        fractalOctaves: 2
-        raisedPower: 3
-        minValue: 0.5
-      JSON: {fileID: 0}
-      UseJsonFile: 0
+        noiseType: 0
+        frequency: 0
+        seed: 0
+        fractalType: 0
+        fractalLacunarity: 0
+        fractalGain: 0
+        weightedStrength: 0
+        fractalOctaves: 0
+        raisedPower: 0
+        minValue: 0
+      JSON: {fileID: 4900000, guid: b2049fa6a92ff5544b122ad1f13f38b4, type: 3}
+      UseJsonFile: 1
     - NoiseParams:
-        noiseType: 3
-        frequency: 0.08
-        seed: 10
-        fractalType: 3
-        fractalLacunarity: 2
-        fractalGain: 0.5
-        weightedStrength: 1
-        fractalOctaves: 4
-        raisedPower: 4
-        minValue: 0.5
-      JSON: {fileID: 0}
-      UseJsonFile: 0
+        noiseType: 0
+        frequency: 0
+        seed: 0
+        fractalType: 0
+        fractalLacunarity: 0
+        fractalGain: 0
+        weightedStrength: 0
+        fractalOctaves: 0
+        raisedPower: 0
+        minValue: 0
+      JSON: {fileID: 4900000, guid: 1af2f460c64201845ad39de8a368d877, type: 3}
+      UseJsonFile: 1
+  moistureLayers:
+    NoisePairs: []
   terrain: {fileID: 1904438394}
+--- !u!114 &1904438397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1904438391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 326352f9fa29adc45926374a532a02cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AllBiomes:
+    values: []
+  JsonFile: {fileID: 4900000, guid: b60802b4b6df85a44aef82859e4dbb54, type: 3}
