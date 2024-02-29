@@ -123,22 +123,22 @@ public class LayerTerrain : MonoBehaviour
                 // Work in progress don't @ me
                 void biome()
                 {   
-                    if (height <= allBiomes.AllBiomes[0].value) { splatWeights[allBiomes.AllBiomes[0].index] = 1.0f; return; }; // set water (constant)
-                    if (height < allBiomes.AllBiomes[1].value) { splatWeights[allBiomes.AllBiomes[1].index] = 1.0f; return; }; // set beach sand (constant)
+                    if (height <= allBiomes.AllBiomes.values[0].value) { splatWeights[allBiomes.AllBiomes.values[0].index] = 1.0f; return; }; // set water (constant)
+                    if (height < allBiomes.AllBiomes.values[1].value) { splatWeights[allBiomes.AllBiomes.values[1].index] = 1.0f; return; }; // set beach sand (constant)
 
-                    if (height < allBiomes.AllBiomes[2].value) //if in grass band
+                    if (height < allBiomes.AllBiomes.values[2].value) //if in grass band
                     {
                         if (biomeHeight < .25f) //set to dirt
                         {
-                            splatWeights[allBiomes.AllBiomes[4].index] = 1.0f; return;
+                            splatWeights[allBiomes.AllBiomes.values[4].index] = 1.0f; return;
                         }
 
-                        splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; // else set to grass
+                        splatWeights[allBiomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
                     };
 
-                    if (height < allBiomes.AllBiomes[3].value) { splatWeights[allBiomes.AllBiomes[3].index] = 1.0f; return; }; //snow
+                    if (height < allBiomes.AllBiomes.values[3].value) { splatWeights[allBiomes.AllBiomes.values[3].index] = 1.0f; return; }; //snow
 
-                    splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; // else set to grass
+                    splatWeights[allBiomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
 
                 }
 
