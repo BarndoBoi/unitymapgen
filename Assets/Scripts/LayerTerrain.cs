@@ -105,40 +105,45 @@ public class LayerTerrain : MonoBehaviour
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.heightmapResolution = X + 1;
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        ApplyTextures(0,0,terrainData.alphamapHeight, terrainData.alphamapWidth, false);
+    }
 
-        float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
+    public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
+    {
+        TerrainData terrainData = terrain.terrainData;
+        float[,,] splatmapData = new float[end_x-start_x, end_y-start_y, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
 
-        for (int y = 0; y < terrainData.alphamapWidth; y++)
+        for (int y = start_y; y < end_y; y++)
         {
-            for (int x = 0; x < terrainData.alphamapHeight; x++)
-            {           
-                float height = finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
-                float biomeHeight = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture];
+            for (int x = start_x; x < end_x; x++)
+            {
+                float elevation = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Elevation];
+                float moisture = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture]; 
 
                 // Setup an array to record the mix of texture weights at this point
                 float[] splatWeights = new float[terrainData.alphamapLayers];
-                
+
                 biome(); //sets the biome
 
                 // Work in progress don't @ me
                 void biome()
-                {   
-                    if (height <= allBiomes.AllBiomes.values[0].value) { splatWeights[allBiomes.AllBiomes.values[0].index] = 1.0f; return; }; // set water (constant)
-                    if (height < allBiomes.AllBiomes.values[1].value) { splatWeights[allBiomes.AllBiomes.values[1].index] = 1.0f; return; }; // set beach sand (constant)
+                {
+                    if (deform) Debug.Log($"Elevation: {elevation}");
+                    if (elevation <= allBiomes.AllBiomes.values[0].value) { splatWeights[allBiomes.AllBiomes.values[0].index] = 1.0f; if (deform) Debug.Log("elevation is water"); return; }; // set water (constant)
+                    if (elevation < allBiomes.AllBiomes.values[1].value) { splatWeights[allBiomes.AllBiomes.values[1].index] = 1.0f; return; }; // set beach sand (constant)
 
-                    if (height < allBiomes.AllBiomes.values[2].value) //if in grass band
+                    if (elevation < allBiomes.AllBiomes.values[2].value) //if in grass band
                     {
-                        if (biomeHeight < .25f) //set to dirt
+                        if (moisture < .25f) //set to dirt
                         {
+                            if (deform) Debug.Log($"should be dirt");
                             splatWeights[allBiomes.AllBiomes.values[4].index] = 1.0f; return;
                         }
-
+                        if (deform) Debug.Log($"should be grass");
                         splatWeights[allBiomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
                     };
 
-                    if (height < allBiomes.AllBiomes.values[3].value) { splatWeights[allBiomes.AllBiomes.values[3].index] = 1.0f; return; }; //snow
-
-                    splatWeights[allBiomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
+                    if (elevation < allBiomes.AllBiomes.values[3].value) { splatWeights[allBiomes.AllBiomes.values[3].index] = 1.0f; return; }; //snow
 
                 }
 
@@ -146,13 +151,13 @@ public class LayerTerrain : MonoBehaviour
                 for (int i = 0; i < terrainData.alphamapLayers; i++)
                 {
                     // Assign this point to the splatmap array
-                    splatmapData[x, y, i] = splatWeights[i]; 
+                    splatmapData[x-start_x, y-start_y, i] = splatWeights[i];
                 }
             }
         }
-        terrainData.SetAlphamaps(0, 0, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
+        terrainData.SetAlphamaps(start_y, start_x, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
     }
-
+       
     public void ReadNoiseParams(NoiseParams noiseParams)
     {
         //Read the noise info from the MapLayer and set all of the FastNoiseLite fields here
