@@ -14,12 +14,19 @@ namespace ProcGenTiles
 			Map = map;
 		}
 
-		public void LandWaterFloodfill((int x, int y) start)
+		public void LandWaterFloodfill(int x, int y, Biomes biomes)
+		{
+			LandWaterFloodfill((x, y), biomes);
+		}
+
+		public void LandWaterFloodfill((int x, int y) start, Biomes biomes)
 		{
 			queue.Clear();
 			queue.Enqueue(start);
 			visited.Clear();
 			visited.Add(start);
+
+			float waterElevation = biomes.GetWaterLayer().value; //Find the layer marked as water height and use it in the floodfill
 
 			while (queue.Count > 0)
 			{
@@ -32,7 +39,7 @@ namespace ProcGenTiles
 					throw new InvalidOperationException("Cannot floodfill without elevation data");
 				}
 
-				if (tile.ValuesHere["Elevation"] >= 0)
+				if (tile.ValuesHere["Elevation"] >= waterElevation)
 					tile.ValuesHere.Add("Land", 1); //Heck this only takes floats so we'll use positive 1 for true and 0 for false
 				else
 					tile.ValuesHere.Add("Land", 0);

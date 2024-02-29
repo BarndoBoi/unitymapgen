@@ -1,0 +1,34 @@
+{
+    "values": [
+        {
+            "name": "Water",
+            "value": 0.0,
+            "index": 0,
+            "isWaterLayer": true
+        },
+        {
+            "name": "Beach Sand",
+            "value": 0.20000000298023225,
+            "index": 1,
+            "isWaterLayer": false
+        },
+        {
+            "name": "Grass",
+            "value": 0.6000000238418579,
+            "index": 2,
+            "isWaterLayer": false
+        },
+        {
+            "name": "Snow",
+            "value": 1.0,
+            "index": 3,
+            "isWaterLayer": false
+        },
+        {
+            "name": "Dirt",
+            "value": 1.0,
+            "index": 4,
+            "isWaterLayer": false
+        }
+    ]
+}
