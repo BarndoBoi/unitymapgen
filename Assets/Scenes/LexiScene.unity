@@ -773,6 +773,19 @@ MonoBehaviour:
         minValue: 0.1
       JSON: {fileID: 4900000, guid: 57fabebd13caa70489cf0ab5a1e234ee, type: 3}
       UseJsonFile: 0
+    - NoiseParams:
+        noiseType: 3
+        frequency: 0.005
+        seed: 25
+        fractalType: 3
+        fractalLacunarity: 2
+        fractalGain: 0.5
+        weightedStrength: 1
+        fractalOctaves: 5
+        raisedPower: 4
+        minValue: 0.1
+      JSON: {fileID: 4900000, guid: 57fabebd13caa70489cf0ab5a1e234ee, type: 3}
+      UseJsonFile: 0
   moistureLayers:
     NoisePairs:
     - NoiseParams:
@@ -830,15 +843,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2072175655044974112, guid: 534c157e29fe0614c8510386e335d9d7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 11.24
       objectReference: {fileID: 0}
     - target: {fileID: 2072175655044974112, guid: 534c157e29fe0614c8510386e335d9d7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 63.12
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 2072175655044974112, guid: 534c157e29fe0614c8510386e335d9d7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 4.46
       objectReference: {fileID: 0}
     - target: {fileID: 2072175655044974112, guid: 534c157e29fe0614c8510386e335d9d7, type: 3}
       propertyPath: m_LocalRotation.w

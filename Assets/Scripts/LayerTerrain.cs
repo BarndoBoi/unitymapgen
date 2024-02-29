@@ -38,7 +38,7 @@ public class LayerTerrain : MonoBehaviour
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
 
-    private Dictionary<string,MapLayers> layersDict = new Dictionary<string, MapLayers>();
+    public Dictionary<string,MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
     float highest_e = -100;
     float lowest_e = 100;
@@ -79,11 +79,8 @@ public class LayerTerrain : MonoBehaviour
 
     public void GenerateTerrain()
     {
-        //Finals array likely doesn't need to exist here since we have the finalMap field
-        float[,] finals = new float[X, Y];
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
-        float minValue = 0;
-        float raisedPower = 0;
+
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -93,11 +90,11 @@ public class LayerTerrain : MonoBehaviour
             }
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
 
-            if (i == 0) { minValue = pair.NoiseParams.minValue; raisedPower = pair.NoiseParams.raisedPower; };
+            //if (i == 0) { minValue = pair.NoiseParams.minValue; raisedPower = pair.NoiseParams.raisedPower; };
 
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
         }
-        NormalizeFinalMap(LayersEnum.Elevation, minValue, raisedPower); //Make the final map only span from 0 to 1
+        NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
         doBiomeStuff();
         CreateTerrainFromHeightmap();
     }
