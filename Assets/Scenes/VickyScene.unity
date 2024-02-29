@@ -1081,18 +1081,33 @@ MonoBehaviour:
   elevationLayers:
     NoisePairs:
     - NoiseParams:
-        noiseType: 0
-        frequency: 0
-        seed: 0
-        fractalType: 0
-        fractalLacunarity: 0
-        fractalGain: 0
-        weightedStrength: 0
-        fractalOctaves: 0
-        raisedPower: 0
-        minValue: 0
+        noiseType: 3
+        frequency: 0.005
+        seed: 10
+        fractalType: 3
+        fractalLacunarity: 2
+        fractalGain: 0.5
+        weightedStrength: 1
+        fractalOctaves: 4
+        raisedPower: 5
+        minValue: 0.3
       JSON: {fileID: 4900000, guid: b2049fa6a92ff5544b122ad1f13f38b4, type: 3}
       UseJsonFile: 1
+    - NoiseParams:
+        noiseType: 3
+        frequency: 0.02
+        seed: 10
+        fractalType: 3
+        fractalLacunarity: 2
+        fractalGain: 0.5
+        weightedStrength: 1
+        fractalOctaves: 4
+        raisedPower: 15
+        minValue: 0
+      JSON: {fileID: 4900000, guid: 1af2f460c64201845ad39de8a368d877, type: 3}
+      UseJsonFile: 1
+  moistureLayers:
+    NoisePairs:
     - NoiseParams:
         noiseType: 0
         frequency: 0
@@ -1104,10 +1119,8 @@ MonoBehaviour:
         fractalOctaves: 0
         raisedPower: 0
         minValue: 0
-      JSON: {fileID: 4900000, guid: 1af2f460c64201845ad39de8a368d877, type: 3}
+      JSON: {fileID: 4900000, guid: 89120bbcd97e1af4a98e7e2bd4419e12, type: 3}
       UseJsonFile: 1
-  moistureLayers:
-    NoisePairs: []
   terrain: {fileID: 1904438394}
 --- !u!114 &1904438397
 MonoBehaviour:
@@ -1122,5 +1135,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllBiomes:
-    values: []
+    values:
+    - name: Water
+      value: 0.1
+      index: 0
+      isWaterLayer: 1
+    - name: Beach Sand
+      value: 0.2
+      index: 1
+      isWaterLayer: 0
+    - name: Grass
+      value: 0.6
+      index: 2
+      isWaterLayer: 0
+    - name: Snow
+      value: 1
+      index: 3
+      isWaterLayer: 0
+    - name: Dirt
+      value: 1
+      index: 4
+      isWaterLayer: 0
   JsonFile: {fileID: 4900000, guid: b60802b4b6df85a44aef82859e4dbb54, type: 3}
