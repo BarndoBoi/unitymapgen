@@ -80,6 +80,8 @@ public class LayerTerrain : MonoBehaviour
     public void GenerateTerrain()
     {
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
+        float minValue = 0;
+        float raisedPower = 0;
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -107,6 +109,8 @@ public class LayerTerrain : MonoBehaviour
 
         float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
 
+        float maxH = 0; //for printing later
+        float minH = .99f; 
         for (int y = 0; y < terrainData.alphamapWidth; y++)
         {
             for (int x = 0; x < terrainData.alphamapHeight; x++)
@@ -136,11 +140,17 @@ public class LayerTerrain : MonoBehaviour
 
                         splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; // else set to grass
                     };
+
                     if (height < allBiomes.AllBiomes[3].value) { splatWeights[allBiomes.AllBiomes[3].index] = 1.0f; return; }; //snow
+
+
+                        splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; // else set to grass
+                    };
+
                 }
 
 
-                /*// Sum of all textures weights must add to 1, so calculate normalization factor from sum of weights
+                // Sum of all textures weights must add to 1, so calculate normalization factor from sum of weights
                 float z = splatWeights.Sum();
 
                 // Loop through each terrain texture
@@ -151,7 +161,7 @@ public class LayerTerrain : MonoBehaviour
 
                     // Assign this point to the splatmap array
                     splatmapData[x, y, i] = splatWeights[i]; 
-                }*/
+                }
             }
         }
         terrainData.SetAlphamaps(0, 0, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
