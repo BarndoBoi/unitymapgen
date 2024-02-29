@@ -951,21 +951,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllBiomes:
-  - name: Water
-    value: 0
-    index: 0
-  - name: Beach Sand
-    value: 0.02
-    index: 1
-  - name: Grass
-    value: 0.6
-    index: 2
-  - name: Snow
-    value: 1
-    index: 3
-  - name: Dirt
-    value: 1
-    index: 4
+    values:
+    - name: Water
+      value: 0
+      index: 0
+      isWaterLayer: 1
+    - name: Beach Sand
+      value: 0.02
+      index: 1
+      isWaterLayer: 0
+    - name: Grass
+      value: 0.6
+      index: 2
+      isWaterLayer: 0
+    - name: Snow
+      value: 1
+      index: 3
+      isWaterLayer: 0
+    - name: Dirt
+      value: 1
+      index: 4
+      isWaterLayer: 0
+  JsonFile: {fileID: 4900000, guid: b60802b4b6df85a44aef82859e4dbb54, type: 3}
 --- !u!1 &2075582969
 GameObject:
   m_ObjectHideFlags: 0
