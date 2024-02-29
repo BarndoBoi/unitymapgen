@@ -80,8 +80,7 @@ public class LayerTerrain : MonoBehaviour
     public void GenerateTerrain()
     {
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
-        float minValue = 0;
-        float raisedPower = 0;
+
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -109,16 +108,12 @@ public class LayerTerrain : MonoBehaviour
 
         float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
 
-        float maxH = 0; //for printing later
-        float minH = .99f; 
         for (int y = 0; y < terrainData.alphamapWidth; y++)
         {
             for (int x = 0; x < terrainData.alphamapHeight; x++)
             {           
                 float height = finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
                 float biomeHeight = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture];
-                //if (height > maxH) { maxH = height; };
-                //if (height < minH) { minH = height; };
 
                 // Setup an array to record the mix of texture weights at this point
                 float[] splatWeights = new float[terrainData.alphamapLayers];
@@ -143,22 +138,13 @@ public class LayerTerrain : MonoBehaviour
 
                     if (height < allBiomes.AllBiomes[3].value) { splatWeights[allBiomes.AllBiomes[3].index] = 1.0f; return; }; //snow
 
-
-                        splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; // else set to grass
-                    };
+                    splatWeights[allBiomes.AllBiomes[2].index] = 1.0f; return; // else set to grass
 
                 }
-
-
-                // Sum of all textures weights must add to 1, so calculate normalization factor from sum of weights
-                float z = splatWeights.Sum();
 
                 // Loop through each terrain texture
                 for (int i = 0; i < terrainData.alphamapLayers; i++)
                 {
-                    // Normalize so that sum of all texture weights = 1
-                    splatWeights[i] /= z;
-
                     // Assign this point to the splatmap array
                     splatmapData[x, y, i] = splatWeights[i]; 
                 }
