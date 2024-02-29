@@ -13,5 +13,10 @@ public class LayerTerrainEditor : Editor
             LayerTerrain script = (LayerTerrain)target;
             script.SerializeNoiseParamsToJson();
         }
+        if (GUILayout.Button("Load Params From JSON"))
+        {
+            LayerTerrain script = (LayerTerrain)target;
+            script.LoadNoiseParamsFromJson();
+        }
     }
 }
