@@ -13,7 +13,7 @@ public class LayerTerrain : MonoBehaviour
     */
 
     [SerializeField]
-    private Biomes allBiomes;
+    private Biomes biomes;
 
     //Future TODO: Standardize these naming conventions between the ProcGenTiles library and our codebase
     [SerializeField]
@@ -29,7 +29,7 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private MapLayers elevationLayers;
     [SerializeField]
-    private MapLayers moistureLayers;
+    public MapLayers moistureLayers;
 
     [SerializeField]
     private FastNoiseLite noise;
@@ -38,7 +38,11 @@ public class LayerTerrain : MonoBehaviour
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
 
-    public Dictionary<string,MapLayers> layersDict = new Dictionary<string, MapLayers>();
+    public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
+
+    public Renderer targetRenderer;
+    //textures dict
+    public Dictionary<string, Texture2D> texturesDict;
 
     float highest_e = -100;
     float lowest_e = 100;
@@ -51,6 +55,8 @@ public class LayerTerrain : MonoBehaviour
 
     public void Awake()
     {
+        LoadTextures();
+
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
         
@@ -60,8 +66,10 @@ public class LayerTerrain : MonoBehaviour
         GenerateTerrain();
     }
 
-    public void doBiomeStuff()
-    {   
+    public void GenerateBiome()
+    {   // THIS IS ALL GETTING MOVED TO ITS OWN SCRIPT
+
+
         //finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
         {
@@ -95,7 +103,8 @@ public class LayerTerrain : MonoBehaviour
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
         }
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
-        doBiomeStuff();
+        GenerateBiome();
+        //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
     }
 
@@ -129,21 +138,21 @@ public class LayerTerrain : MonoBehaviour
                 void biome()
                 {
                     if (deform) Debug.Log($"Elevation: {elevation}");
-                    if (elevation <= allBiomes.AllBiomes.values[0].value) { splatWeights[allBiomes.AllBiomes.values[0].index] = 1.0f; if (deform) Debug.Log("elevation is water"); return; }; // set water (constant)
-                    if (elevation < allBiomes.AllBiomes.values[1].value) { splatWeights[allBiomes.AllBiomes.values[1].index] = 1.0f; return; }; // set beach sand (constant)
+                    if (elevation <= biomes.AllBiomes.values[0].value) { splatWeights[biomes.AllBiomes.values[0].index] = 1.0f; if (deform) Debug.Log("elevation is water"); return; }; // set water (constant)
+                    if (elevation < biomes.AllBiomes.values[1].value) { splatWeights[biomes.AllBiomes.values[1].index] = 1.0f; return; }; // set beach sand (constant)
 
-                    if (elevation < allBiomes.AllBiomes.values[2].value) //if in grass band
+                    if (elevation < biomes.AllBiomes.values[2].value) //if in grass band
                     {
                         if (moisture < .25f) //set to dirt
                         {
                             if (deform) Debug.Log($"should be dirt");
-                            splatWeights[allBiomes.AllBiomes.values[4].index] = 1.0f; return;
+                            splatWeights[biomes.AllBiomes.values[4].index] = 1.0f; return;
                         }
                         if (deform) Debug.Log($"should be grass");
-                        splatWeights[allBiomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
+                        splatWeights[biomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
                     };
 
-                    if (elevation < allBiomes.AllBiomes.values[3].value) { splatWeights[allBiomes.AllBiomes.values[3].index] = 1.0f; return; }; //snow
+                    if (elevation < biomes.AllBiomes.values[3].value) { splatWeights[biomes.AllBiomes.values[3].index] = 1.0f; return; }; //snow
 
                 }
 
@@ -213,7 +222,7 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    void NormalizeFinalMap(string layer, float minValue, float raisedPower)
+    public void NormalizeFinalMap(string layer, float minValue, float raisedPower)
     {
         float range = layersDict[layer].SumOfNoiseLayers();
         float lowest = 100;
@@ -299,4 +308,35 @@ public class LayerTerrain : MonoBehaviour
             }
         }
     }
+
+    public void LoadTextures()
+    {
+        texturesDict = new Dictionary<string, Texture2D>();
+
+        DirectoryInfo dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
+        FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
+
+        foreach (FileInfo f in info )
+        {
+            string fileName = Path.GetFileNameWithoutExtension(f.FullName);
+
+            // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
+            // The path here is Assets/Textures_and_Models/Resources/TerrainTextures/png/
+            // but it only needs the info after the Resources folder (Resources/)
+
+            string location_from_Resources_folder = "TerrainTextures/png/";
+            Texture2D texture = Resources.Load<Texture2D>(location_from_Resources_folder + fileName);
+            texturesDict.Add(fileName, texture);
+        }
+
+        // DEBUG
+        /*foreach (KeyValuePair<string, Texture2D> kvp in texturesDict)
+        {
+            Debug.Log($"Key = '{kvp.Key}'   value = '{kvp.Value}'");
+        }*/
+
+
+
+    }
+    
 }
