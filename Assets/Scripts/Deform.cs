@@ -28,7 +28,7 @@ public class Deform : MonoBehaviour
     float Change; //Change the layer's float value by this amount (use negative numbers to subtract from the layer, positive to add)
 
     private void Start()
-    {
+    {   
         map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
     }
 
@@ -41,6 +41,8 @@ public class Deform : MonoBehaviour
 
     public void DeformTerrain(Vector2 coords, string layer)
     {
+        map = terrain.finalMap; // grabbing new updated map
+
         //Store the impact coordinates so we know how far it is
         int sourceX = Mathf.RoundToInt(coords.x);
         int sourceY = Mathf.RoundToInt(coords.y);
