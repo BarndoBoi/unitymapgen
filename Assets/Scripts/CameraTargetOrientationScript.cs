@@ -67,7 +67,7 @@ public class CameraTargetOrientationScript : MonoBehaviour
 
             transform.position = Vector3.Slerp(transform.position, newPos, _smoothness);
             transform.LookAt(target);
-            ////////////////////
+            ///////////////////////
             Quaternion camAngle2 = Quaternion.AngleAxis(Input.GetAxis("Mouse Y") * rotationSpeedMouse, Vector3.back);
 
             Vector3 newPos2 = target.position + _cameraOffset;
