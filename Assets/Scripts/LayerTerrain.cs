@@ -42,7 +42,7 @@ public class LayerTerrain : MonoBehaviour
 
     public Renderer targetRenderer;
     //textures dict
-    public Dictionary<string, Texture2D> texturesDict;
+    public Dictionary<string, int> texturesDict;
 
     float highest_e = -100;
     float lowest_e = 100;
@@ -121,7 +121,7 @@ public class LayerTerrain : MonoBehaviour
     {
         TerrainData terrainData = terrain.terrainData;
         float[,,] splatmapData = new float[end_x-start_x, end_y-start_y, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
-
+        //Debug.Log("NUMBER OF LAYERS IS  "+terrainData.alphamapLayers);
         for (int y = start_y; y < end_y; y++)
         {
             for (int x = start_x; x < end_x; x++)
@@ -130,6 +130,7 @@ public class LayerTerrain : MonoBehaviour
                 float moisture = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture]; 
 
                 // Setup an array to record the mix of texture weights at this point
+                // TODO: see LoadTextures(), need to make TerrainLayer for each texture, so that it is added to the terrainData as a useable layer.
                 float[] splatWeights = new float[terrainData.alphamapLayers];
 
                 biome(); //sets the biome
@@ -137,23 +138,25 @@ public class LayerTerrain : MonoBehaviour
                 // Work in progress don't @ me
                 void biome()
                 {
-                    if (deform) Debug.Log($"Elevation: {elevation}");
-                    if (elevation <= biomes.AllBiomes.values[0].value) { splatWeights[biomes.AllBiomes.values[0].index] = 1.0f; if (deform) Debug.Log("elevation is water"); return; }; // set water (constant)
-                    if (elevation < biomes.AllBiomes.values[1].value) { splatWeights[biomes.AllBiomes.values[1].index] = 1.0f; return; }; // set beach sand (constant)
+
+                    if (elevation <= biomes.AllBiomes.values[0].value) { SetTexture("Water"); return; };
+                    if (elevation < biomes.AllBiomes.values[1].value) { SetTexture("Sand"); return; };
 
                     if (elevation < biomes.AllBiomes.values[2].value) //if in grass band
                     {
-                        if (moisture < .25f) //set to dirt
+                        if (moisture < .25f)
                         {
-                            if (deform) Debug.Log($"should be dirt");
-                            splatWeights[biomes.AllBiomes.values[4].index] = 1.0f; return;
+                            SetTexture("Dirt"); return;
                         }
-                        if (deform) Debug.Log($"should be grass");
-                        splatWeights[biomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
+                        SetTexture("Grass"); return; // else set to grass
                     };
 
-                    if (elevation < biomes.AllBiomes.values[3].value) { splatWeights[biomes.AllBiomes.values[3].index] = 1.0f; return; }; //snow
+                    if (elevation < biomes.AllBiomes.values[3].value) { SetTexture("Snow"); return; }; //snow
 
+                    void SetTexture(string name)
+                    {
+                        splatWeights[texturesDict[name]] = 1.0f;
+                    }
                 }
 
                 // Loop through each terrain texture
@@ -165,6 +168,9 @@ public class LayerTerrain : MonoBehaviour
             }
         }
         terrainData.SetAlphamaps(start_y, start_x, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
+
+        
+    
     }
        
     public void ReadNoiseParams(NoiseParams noiseParams)
@@ -308,29 +314,35 @@ public class LayerTerrain : MonoBehaviour
             }
         }
     }
+    
+    
 
     public void LoadTextures()
     {
-        texturesDict = new Dictionary<string, Texture2D>();
+        texturesDict = new Dictionary<string, int>();
 
         DirectoryInfo dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
         FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
-
-        foreach (FileInfo f in info )
+        int index = 0;
+        List<TerrainLayer> layers = new List<TerrainLayer>();
+        foreach (FileInfo file in info )
         {
-            string fileName = Path.GetFileNameWithoutExtension(f.FullName);
+            string fileName = Path.GetFileNameWithoutExtension(file.FullName);
 
             // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
             // The path here is Assets/Textures_and_Models/Resources/TerrainTextures/png/
             // but it only needs the info after the Resources folder (Resources/)
 
-            string location_from_Resources_folder = "TerrainTextures/png/";
-            Texture2D texture = Resources.Load<Texture2D>(location_from_Resources_folder + fileName);
-            texturesDict.Add(fileName, texture);
+            string location_from_Resources_folder = "TerrainTextures/layers/";
+            TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
+            layers.Add(texture);
+            texturesDict.Add(fileName, index);
+            index++;
         }
+        terrain.terrainData.terrainLayers = layers.ToArray();
 
         // DEBUG
-        /*foreach (KeyValuePair<string, Texture2D> kvp in texturesDict)
+       /* foreach (KeyValuePair<string, int> kvp in texturesDict)
         {
             Debug.Log($"Key = '{kvp.Key}'   value = '{kvp.Value}'");
         }*/
