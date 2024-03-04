@@ -13,7 +13,7 @@ public class LayerTerrain : MonoBehaviour
     */
 
     [SerializeField]
-    private Biomes allBiomes;
+    private Biomes biomes;
 
     //Future TODO: Standardize these naming conventions between the ProcGenTiles library and our codebase
     [SerializeField]
@@ -29,7 +29,7 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private MapLayers elevationLayers;
     [SerializeField]
-    private MapLayers moistureLayers;
+    public MapLayers moistureLayers;
 
     [SerializeField]
     private FastNoiseLite noise;
@@ -39,7 +39,11 @@ public class LayerTerrain : MonoBehaviour
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
 
-    public Dictionary<string,MapLayers> layersDict = new Dictionary<string, MapLayers>();
+    public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
+
+    public Renderer targetRenderer;
+    //textures dict
+    public Dictionary<string, int> texturesDict;
 
     float highest_e = -100;
     float lowest_e = 100;
@@ -52,6 +56,8 @@ public class LayerTerrain : MonoBehaviour
 
     public void Awake()
     {
+        LoadTextures();
+
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
         
@@ -62,8 +68,10 @@ public class LayerTerrain : MonoBehaviour
         GenerateTerrain();
     }
 
-    public void doBiomeStuff()
-    {   
+    public void GenerateBiome()
+    {   // THIS IS ALL GETTING MOVED TO ITS OWN SCRIPT
+
+
         //finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
         {
@@ -97,7 +105,8 @@ public class LayerTerrain : MonoBehaviour
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
         }
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
-        doBiomeStuff();
+        GenerateBiome();
+        //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
         pathfinding.LandWaterFloodfill(0, 0, allBiomes);
         pathfinding.MarkAllRegions();
@@ -114,54 +123,65 @@ public class LayerTerrain : MonoBehaviour
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.heightmapResolution = X + 1;
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        ApplyTextures(0,0,terrainData.alphamapHeight, terrainData.alphamapWidth, false);
+    }
 
-        float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
-
-        for (int y = 0; y < terrainData.alphamapWidth; y++)
+    public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
+    {
+        TerrainData terrainData = terrain.terrainData;
+        float[,,] splatmapData = new float[end_x-start_x, end_y-start_y, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
+        //Debug.Log("NUMBER OF LAYERS IS  "+terrainData.alphamapLayers);
+        for (int y = start_y; y < end_y; y++)
         {
-            for (int x = 0; x < terrainData.alphamapHeight; x++)
-            {           
-                float height = finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
-                float biomeHeight = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture];
+            for (int x = start_x; x < end_x; x++)
+            {
+                float elevation = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Elevation];
+                float moisture = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture]; 
 
                 // Setup an array to record the mix of texture weights at this point
+                // TODO: see LoadTextures(), need to make TerrainLayer for each texture, so that it is added to the terrainData as a useable layer.
                 float[] splatWeights = new float[terrainData.alphamapLayers];
-                
+
                 biome(); //sets the biome
 
                 // Work in progress don't @ me
                 void biome()
-                {   
-                    if (height <= allBiomes.AllBiomes.values[0].value) { splatWeights[allBiomes.AllBiomes.values[0].index] = 1.0f; return; }; // set water (constant)
-                    if (height < allBiomes.AllBiomes.values[1].value) { splatWeights[allBiomes.AllBiomes.values[1].index] = 1.0f; return; }; // set beach sand (constant)
+                {
 
-                    if (height < allBiomes.AllBiomes.values[2].value) //if in grass band
+                    if (elevation <= biomes.AllBiomes.values[0].value) { SetTexture("Water"); return; };
+                    if (elevation < biomes.AllBiomes.values[1].value) { SetTexture("Sand"); return; };
+
+                    if (elevation < biomes.AllBiomes.values[2].value) //if in grass band
                     {
-                        if (biomeHeight < .25f) //set to dirt
+                        if (moisture < .25f)
                         {
-                            splatWeights[allBiomes.AllBiomes.values[4].index] = 1.0f; return;
+                            SetTexture("Dirt"); return;
                         }
-
-                        splatWeights[allBiomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
+                        SetTexture("Grass"); return; // else set to grass
                     };
 
-                    if (height < allBiomes.AllBiomes.values[3].value) { splatWeights[allBiomes.AllBiomes.values[3].index] = 1.0f; return; }; //snow
+                    if (elevation < biomes.AllBiomes.values[3].value) { SetTexture("Snow"); return; }; //snow
 
-                    splatWeights[allBiomes.AllBiomes.values[2].index] = 1.0f; return; // else set to grass
-
+                    void SetTexture(string name)
+                    {
+                        splatWeights[texturesDict[name]] = 1.0f;
+                    }
                 }
 
                 // Loop through each terrain texture
                 for (int i = 0; i < terrainData.alphamapLayers; i++)
                 {
                     // Assign this point to the splatmap array
-                    splatmapData[x, y, i] = splatWeights[i]; 
+                    splatmapData[x-start_x, y-start_y, i] = splatWeights[i];
                 }
             }
         }
-        terrainData.SetAlphamaps(0, 0, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
-    }
+        terrainData.SetAlphamaps(start_y, start_x, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
 
+        
+    
+    }
+       
     public void ReadNoiseParams(NoiseParams noiseParams)
     {
         //Read the noise info from the MapLayer and set all of the FastNoiseLite fields here
@@ -217,7 +237,7 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    void NormalizeFinalMap(string layer, float minValue, float raisedPower)
+    public void NormalizeFinalMap(string layer, float minValue, float raisedPower)
     {
         float range = layersDict[layer].SumOfNoiseLayers();
         float lowest = 100;
@@ -303,4 +323,41 @@ public class LayerTerrain : MonoBehaviour
             }
         }
     }
+    
+    
+
+    public void LoadTextures()
+    {
+        texturesDict = new Dictionary<string, int>();
+
+        DirectoryInfo dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
+        FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
+        int index = 0;
+        List<TerrainLayer> layers = new List<TerrainLayer>();
+        foreach (FileInfo file in info )
+        {
+            string fileName = Path.GetFileNameWithoutExtension(file.FullName);
+
+            // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
+            // The path here is Assets/Textures_and_Models/Resources/TerrainTextures/png/
+            // but it only needs the info after the Resources folder (Resources/)
+
+            string location_from_Resources_folder = "TerrainTextures/layers/";
+            TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
+            layers.Add(texture);
+            texturesDict.Add(fileName, index);
+            index++;
+        }
+        terrain.terrainData.terrainLayers = layers.ToArray();
+
+        // DEBUG
+       /* foreach (KeyValuePair<string, int> kvp in texturesDict)
+        {
+            Debug.Log($"Key = '{kvp.Key}'   value = '{kvp.Value}'");
+        }*/
+
+
+
+    }
+    
 }
