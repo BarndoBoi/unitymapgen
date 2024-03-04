@@ -5705,12 +5705,12 @@ MonoBehaviour:
   X: 512
   Y: 512
   depth: 90
-  noiseScale: 0.7
+  noiseScale: 2
   elevationLayers:
     NoisePairs:
     - NoiseParams:
         noiseType: 3
-        frequency: 0.005
+        frequency: 0.001
         seed: 10
         fractalType: 3
         fractalLacunarity: 2
