@@ -5701,7 +5701,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1dd484041c424e469aa93e35a0bd60f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allBiomes: {fileID: 1904438398}
+  biomes: {fileID: 1904438398}
   X: 512
   Y: 512
   depth: 90
@@ -5762,6 +5762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 326352f9fa29adc45926374a532a02cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moistureLayers:
+    NoisePairs: []
   AllBiomes:
     values:
     - name: Water
