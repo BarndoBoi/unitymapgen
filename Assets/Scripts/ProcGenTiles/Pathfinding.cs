@@ -8,6 +8,7 @@ namespace ProcGenTiles
 		HashSet<(int x, int y)> visited = new HashSet<(int x, int y)>();
 		Queue<(int x, int y)> queue = new Queue<(int x, int y)>();
 		Map Map;
+		public Dictionary<int, int> regionSizes = new Dictionary<int, int>(); //Holds the region index and the number of tiles marked with it, for size checking
 
 		public Pathfinding(Map map)
 		{
@@ -70,7 +71,11 @@ namespace ProcGenTiles
 				frontier.Enqueue(values[0]);
 				visited.Add(values[0]);
 				Tile compare = Map.GetTile(values[0]); //For checking the Land value
-				
+				if (!regionSizes.ContainsKey(region))
+				{ //If there's no region entry for this, we should add it
+					regionSizes.Add(region, 0);
+				}
+
 				while (frontier.Count > 0)
 				{
 					(int x, int y) coords = frontier.Dequeue();
@@ -78,6 +83,7 @@ namespace ProcGenTiles
 					if (found.ValuesHere["Land"] == compare.ValuesHere["Land"])
 					{ //The neighbor matches the start value so assign them the same region
 						found.ValuesHere.TryAdd("Region", region);
+						regionSizes[region]++; //Increment the number of tiles in the region
 						values.Remove(coords); //Delete from values if region is marked
 						AddFourNeighbors(coords.x, coords.y, frontier);
 					}

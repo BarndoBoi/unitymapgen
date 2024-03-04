@@ -37,6 +37,7 @@ public class LayerTerrain : MonoBehaviour
     private Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
+    private Pathfinding pathfinding;
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
@@ -63,6 +64,7 @@ public class LayerTerrain : MonoBehaviour
         layersDict.Add(LayersEnum.Elevation, elevationLayers);
         layersDict.Add(LayersEnum.Moisture, moistureLayers);
 
+
         GenerateTerrain();
     }
 
@@ -88,7 +90,7 @@ public class LayerTerrain : MonoBehaviour
     public void GenerateTerrain()
     {
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
-
+        pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -106,6 +108,13 @@ public class LayerTerrain : MonoBehaviour
         GenerateBiome();
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
+        pathfinding.LandWaterFloodfill(0, 0, allBiomes);
+        pathfinding.MarkAllRegions();
+        Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
+        for (int i = 0; i < pathfinding.regionSizes.Count; i++)
+        {
+            Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
+        }
     }
 
     public void CreateTerrainFromHeightmap()
