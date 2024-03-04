@@ -15,12 +15,12 @@ namespace ProcGenTiles
 			Map = map;
 		}
 
-		public void LandWaterFloodfill(int x, int y, Biomes biomes)
+		/*public void LandWaterFloodfill(int x, int y, Biomes biomes)
 		{
 			LandWaterFloodfill((x, y), biomes);
-		}
+		}*/
 
-		public void LandWaterFloodfill((int x, int y) start, Biomes biomes)
+		/*public void LandWaterFloodfill((int x, int y) start, Biomes biomes)
 		{
 			queue.Clear();
 			queue.Enqueue(start);
@@ -47,7 +47,7 @@ namespace ProcGenTiles
 				
 				AddFourNeighbors(coords.x, coords.y, queue);
 			}
-		}
+		}*/
 		
 		public void MarkAllRegions()
 		{

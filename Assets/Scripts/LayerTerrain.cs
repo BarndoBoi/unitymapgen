@@ -108,13 +108,15 @@ public class LayerTerrain : MonoBehaviour
         GenerateBiome();
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
-        pathfinding.LandWaterFloodfill(0, 0, allBiomes);
+        //Example pathfinding stuff in here. Not used for right now
+
+        /*pathfinding.LandWaterFloodfill(0, 0, biomes);
         pathfinding.MarkAllRegions();
         Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
         for (int i = 0; i < pathfinding.regionSizes.Count; i++)
         {
             Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
-        }
+        }*/
     }
 
     public void CreateTerrainFromHeightmap()
@@ -239,12 +241,13 @@ public class LayerTerrain : MonoBehaviour
 
     public void NormalizeFinalMap(string layer, float minValue, float raisedPower)
     {
-        float range = layersDict[layer].SumOfNoiseLayers();
         float lowest = 100;
         float highest = -100;
 
         float lowest_after = 100;
         float highest_after = -100;
+
+        float waterLevel = biomes.GetWaterLayer().value; //Fetch whatever the water level value is tagged as
 
         for (int x = 0; x < X; x++)
         {
@@ -267,6 +270,12 @@ public class LayerTerrain : MonoBehaviour
                     finalTile.ValuesHere[layer] = Mathf.Max(0, finalTile.ValuesHere[layer] - minValue);
                 }
 
+                //Land water marking done here
+                if (finalTile.ValuesHere[layer] <= waterLevel)
+                    finalTile.ValuesHere.Add(LayersEnum.Land, 0); //Mark this as water, aka not land
+                else
+                    finalTile.ValuesHere.Add(LayersEnum.Land, 1); //Otherwise mark it as land
+
                 // just for debug
                 if (finalTile.ValuesHere[layer] < lowest_after) lowest_after = finalTile.ValuesHere[layer];
                 if (finalTile.ValuesHere[layer] > highest_after) highest_after = finalTile.ValuesHere[layer];
@@ -274,11 +283,11 @@ public class LayerTerrain : MonoBehaviour
             }
         }
         // uncomment for testing
-        if (print_debug)
+        /*if (print_debug)
         {
             Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
             Debug.Log($"Lowest value after normalizing was {lowest_after} and highest was {highest_after} on {layer} layer ");
-        }
+        }*/
     }
 
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap)
