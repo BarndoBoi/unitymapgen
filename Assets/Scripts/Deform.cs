@@ -41,8 +41,8 @@ public class Deform : MonoBehaviour
     private void Start()
     {   
         map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
-        nm_builder_object = GameObject.Find("navmesh_builder"); 
-    }
+        nm_builder_object = GameObject.Find("navmesh_builder");
+    }   
 
     public void SetDeformSettings(int radius, float change)
     { //Used for later when we need to read these values off of the projectile instead of setting them manually
@@ -97,10 +97,12 @@ public class Deform : MonoBehaviour
         terrain.ApplyTextures(sourceX-Radius,sourceY-Radius, sourceX+Radius, sourceY + Radius, true);
 
         // this is fucking terrible but works.... figure out why???
+        // TODO: only run this if the deform causes new water layer.
+        // Don't need to update navmesh if the side of a mountain is hit.
         nm_builder_object.GetComponent<LocalNavMeshBuilder>().UpdateNavMesh(false);
 
-        // This errors Null reference for some reason. 
-        // navmesh.UpdateNavMesh(false);
+        // This errors Null reference for some reason, but shouldn't... 
+        //navmesh.UpdateNavMesh(false);
 
     }
 }

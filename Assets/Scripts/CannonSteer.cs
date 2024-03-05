@@ -60,21 +60,21 @@ public class CannonSteer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float turnAngle = steerInput.x * turnRate;
-        float fireAngle = steerInput.y * turnRate;
+        //float turnAngle = steerInput.x * turnRate;
+        //float fireAngle = steerInput.y * turnRate;
 
         launchForce = launchForce + cannonPowerInput.y;
 
-        cannon_base.transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
-        cannon_tube.transform.Rotate(Vector3.left, fireAngle);
+        //cannon_base.transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
+        //cannon_tube.transform.Rotate(Vector3.left, fireAngle);
 
         SimulateTrajectory();
     }
 
-    void OnCannonMove(InputValue value)
+    /*void OnCannonMove(InputValue value)
     {
         steerInput = value.Get<Vector2>(); //Store the new vector any time the move vector changes
-    }
+    }*/
 
     void OnCannonPower(InputValue value)
     {
@@ -104,7 +104,6 @@ public class CannonSteer : MonoBehaviour
         LineRenderer.positionCount = Mathf.CeilToInt(LinePoints / timeIntervalInPoints) + 1;
         Vector3 startPosition = FirePoint.position;
         Vector3 startVelocity = launchForce * FirePoint.forward;
-        Vector3 HitPoint;
         int i = 0;
         LineRenderer.SetPosition(i, startPosition);
         for (float time = 0; time < LinePoints; time += timeIntervalInPoints)
