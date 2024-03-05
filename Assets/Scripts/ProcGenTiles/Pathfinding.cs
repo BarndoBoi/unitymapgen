@@ -5,50 +5,59 @@ namespace ProcGenTiles
 {
 	public class Pathfinding
 	{
-		HashSet<(int x, int y)> visited = new HashSet<(int x, int y)>();
-		Queue<(int x, int y)> queue = new Queue<(int x, int y)>();
-		Map Map;
+		//HashSet<(int x, int y)> visited = new HashSet<(int x, int y)>();
+		//Queue<(int x, int y)> queue = new Queue<(int x, int y)>();
+		readonly Map Map;
+		HashSet<Tile> visited = new HashSet<Tile>();
+		Queue<Tile> queue = new Queue<Tile>();
 		public Dictionary<int, int> regionSizes = new Dictionary<int, int>(); //Holds the region index and the number of tiles marked with it, for size checking
 
 		public Pathfinding(Map map)
 		{
 			Map = map;
 		}
-
-		/*public void LandWaterFloodfill(int x, int y, Biomes biomes)
+		
+		public void MarkAllRegions()
 		{
-			LandWaterFloodfill((x, y), biomes);
-		}*/
-
-		/*public void LandWaterFloodfill((int x, int y) start, Biomes biomes)
-		{
-			queue.Clear();
-			queue.Enqueue(start);
+			//Grab first tile and give it a region index
+			//Add it to visited and put its neighbors in the frontier as long as they don't have region codes
+			//
+			Tile start = Map.GetTile(0, 0);
+			int region = 0;
+			Queue<Tile> frontier = new Queue<Tile>();
 			visited.Clear();
-			visited.Add(start);
-
-			float waterElevation = biomes.GetWaterLayer().value; //Find the layer marked as water height and use it in the floodfill
-
+			queue.Enqueue(start);
+			AddFourNeighbors(0, 0, frontier);
 			while (queue.Count > 0)
 			{
-				(int x, int y) coords = queue.Dequeue();
-				Tile tile = Map.GetTile(coords); //Can always assume value is not null due to AddNeighborsToQueue
-
-				//Check the elevation layer, if it doesn't exist exit with an error
-				if (!tile.ValuesHere.ContainsKey("Elevation"))
+				Tile tile = queue.Dequeue();
+				tile.ValuesHere.Add(LayersEnum.Region, region);
+				while (frontier.Count > 0)
 				{
-					throw new InvalidOperationException("Cannot floodfill without elevation data");
+					Tile compare = frontier.Dequeue();
+					if (compare.ValuesHere.ContainsKey(LayersEnum.Region))
+						continue;
+					if (compare.ValuesHere[LayersEnum.Land] == tile.ValuesHere[LayersEnum.Land])
+					{
+						compare.ValuesHere.Add(LayersEnum.Region, region);
+						visited.Add(tile);
+					}
+					else
+					{
+
+					}
 				}
 
-				if (tile.ValuesHere["Elevation"] >= waterElevation)
-					tile.ValuesHere.Add("Land", 1); //Heck this only takes floats so we'll use positive 1 for true and 0 for false
-				else
-					tile.ValuesHere.Add("Land", 0);
-				
-				AddFourNeighbors(coords.x, coords.y, queue);
 			}
+			//start.ValuesHere.Add(LayersEnum.Region, region);
+
+
+		}
+
+		/*bool IsValidAndUnvisited(int x, int y)
+		{
 		}*/
-		
+
 		public void MarkAllRegions()
 		{
 			//Get a list of all tiles
@@ -113,7 +122,7 @@ namespace ProcGenTiles
 			}
 		}
 
-		private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q)
+		private void AddFourNeighbors(int x, int y, Queue<Tile> q)
 		{
 			AddNeighborToQueue(x - 1, y, q);
 			AddNeighborToQueue(x + 1, y, q);
@@ -121,7 +130,7 @@ namespace ProcGenTiles
 			AddNeighborToQueue(x, y + 1, q);
 		}
 		
-		private void AddEightNeighbors(int x, int y, Queue<(int x, int y)> q)
+		private void AddEightNeighbors(int x, int y, Queue<Tile> q)
 		{ //Stubbed just in case
 			AddFourNeighbors(x, y, q);
 			AddNeighborToQueue(x - 1, y - 1, q);
@@ -130,11 +139,13 @@ namespace ProcGenTiles
 			AddNeighborToQueue(x + 1, y + 1, q);
 		}
 
-		private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q)
+		private void AddNeighborToQueue(int x, int y, Queue<Tile> q)
 		{
-			if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y)))
-				q.Enqueue((x, y));
-				visited.Add((x, y));
+            Tile tile = Map.GetTile(x, y);
+            if (Map.IsValidTilePosition(x, y) && !visited.Contains(tile))
+			{
+				q.Enqueue(tile);
+			}
 		}
 	}
 }

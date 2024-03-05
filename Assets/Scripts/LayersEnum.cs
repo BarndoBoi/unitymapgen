@@ -4,4 +4,5 @@ public static class LayersEnum
     public const string Elevation = "Elevation";
     public const string Moisture = "Moisture";
     public const string Land = "Land";
+    public const string Region = "Region";
 }
