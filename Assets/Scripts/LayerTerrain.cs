@@ -138,7 +138,6 @@ public class LayerTerrain : MonoBehaviour
                 // Work in progress don't @ me
                 void biome()
                 {
-
                     if (elevation <= biomes.AllBiomes.values[0].value) { SetTexture("Water"); return; };
                     if (elevation < biomes.AllBiomes.values[1].value) { SetTexture("Sand"); return; };
 

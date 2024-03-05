@@ -36,12 +36,18 @@ public class BoatyMcBoatFace : MonoBehaviour
     {
         if(target != null)
         {
-            bool inRange = Vector3.Distance(transform.position, target.position) <= shootingDistance; 
-            if (inRange)
+            bool inRange = Vector3.Distance(transform.position, target.position) <= shootingDistance;
+            /*if (inRange)
             {
                 LookAtTarget();
                 
-            } else { UpdatePath(); }
+            } else { UpdatePath(); }*/
+
+           
+        LookAtTarget();
+        UpdatePath();
+            
+            
         }
     }
 
@@ -57,9 +63,9 @@ public class BoatyMcBoatFace : MonoBehaviour
     {
         if (Time.time >= pathUpdateDeadline)
         {
-            Debug.Log(" updating path");
             pathUpdateDeadline = Time.time + pathUpdateDelay;
             navMeshAgent.SetDestination(target.position);
+            //TODO: Looks like we can use navMeshAgent.path.corners, pass that into linerenderer to see path
         }
     }
 }

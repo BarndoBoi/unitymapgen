@@ -50,7 +50,8 @@ public class Biomes : MonoBehaviour
         return json;
     }
 
-    // Creates new noise map for moisture
+    // Creates new noise map for moisture\
+    // this does nothing yet
     public void GenerateBiomes()
     {
         for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)

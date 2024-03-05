@@ -123,6 +123,52 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: 266692b9df153994ca189c27dd222cb7, type: 2}
+--- !u!1 &167588796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 167588798}
+  - component: {fileID: 167588797}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &167588797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167588796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1dcaca4b7b39324ab15f54960c75e93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Tracked: {fileID: 167588798}
+  m_Size: {x: 600, y: 20, z: 600}
+--- !u!4 &167588798
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167588796}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 247, y: 0, z: 277}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -5627,6 +5673,7 @@ GameObject:
   - component: {fileID: 1904438393}
   - component: {fileID: 1904438397}
   - component: {fileID: 1904438398}
+  - component: {fileID: 1904438399}
   m_Layer: 3
   m_Name: Terrain
   m_TagString: Untagged
@@ -5793,6 +5840,18 @@ MonoBehaviour:
       index: 4
       isWaterLayer: 0
   JsonFile: {fileID: 4900000, guid: b60802b4b6df85a44aef82859e4dbb54, type: 3}
+--- !u!114 &1904438399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1904438391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f66160cebc08b214cb32c82808dd3d5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2075582969
 GameObject:
   m_ObjectHideFlags: 0
@@ -6001,6 +6060,10 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7762174202953124182, guid: 534c157e29fe0614c8510386e335d9d7, type: 3}
+      propertyPath: navmesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7762174202953124182, guid: 534c157e29fe0614c8510386e335d9d7, type: 3}
       propertyPath: terrain
       value: 
       objectReference: {fileID: 1904438397}
@@ -6020,8 +6083,8 @@ NavMeshAgent:
   m_GameObject: {fileID: 2072175655763472689}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3.5
+  m_Radius: 2
+  m_Speed: 15
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -6050,7 +6113,7 @@ PrefabInstance:
       objectReference: {fileID: 2072175655763472690}
     - target: {fileID: 3151222173643156154, guid: bc4875868d8189b47962c4b25c8e4e84, type: 3}
       propertyPath: shootingDistance
-      value: 100
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 3997713337153492400, guid: bc4875868d8189b47962c4b25c8e4e84, type: 3}
       propertyPath: m_Enabled

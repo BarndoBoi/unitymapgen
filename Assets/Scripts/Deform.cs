@@ -4,6 +4,7 @@ using UnityEngine;
 using ProcGenTiles;
 using UnityEngine.InputSystem;
 
+
 public class Deform : MonoBehaviour
 {
     /* Contains information on the deformation for the terrain
@@ -21,15 +22,26 @@ public class Deform : MonoBehaviour
     LayerTerrain terrain; //Does not support using TerrainFromTilemap, so don't try it Lexi
 
     Map map; //Fetched out of the terrain, but it would be wise to have a delegate this can listen for when the LayerTerrain has finished making the map (or move assignment to DeformTerrain)
-    
+
     [SerializeField]
     int Radius; //This is how many tiles (in a circle) the deform will affect
     [SerializeField]
     float Change; //Change the layer's float value by this amount (use negative numbers to subtract from the layer, positive to add)
 
+    GameObject nm_builder_object;
+
+    // for some reason, this is throwing a null reference when trying to access it in the Deform func
+    LocalNavMeshBuilder navmesh;
+
+    
+
+
+
+
     private void Start()
     {   
         map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
+        nm_builder_object = GameObject.Find("navmesh_builder"); 
     }
 
     public void SetDeformSettings(int radius, float change)
@@ -83,5 +95,12 @@ public class Deform : MonoBehaviour
         float[,] heights = map.FetchFloatValuesSlice(layer, 0, map.Width, 0, map.Height);
         terrain.UpdateTerrainHeightmap(0,0,heights);
         terrain.ApplyTextures(sourceX-Radius,sourceY-Radius, sourceX+Radius, sourceY + Radius, true);
+
+        // this is fucking terrible but works.... figure out why???
+        nm_builder_object.GetComponent<LocalNavMeshBuilder>().UpdateNavMesh(false);
+
+        // This errors Null reference for some reason. 
+        // navmesh.UpdateNavMesh(false);
+
     }
 }

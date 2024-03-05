@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Composites;
 
 public class CannonSteer : MonoBehaviour
 {
@@ -9,7 +10,13 @@ public class CannonSteer : MonoBehaviour
     [SerializeField]
     float turnRate = 0.7f;
 
+    [SerializeField]
+    float minPower ;
+    [SerializeField]
+    float maxPower;
+
     private Vector2 steerInput;
+    private Vector2 cannonPowerInput;
 
     public GameObject cannon_tube;
     public GameObject cannon_base;
@@ -22,9 +29,9 @@ public class CannonSteer : MonoBehaviour
     [SerializeField]
     private Transform FirePoint;
 
-    [SerializeField]
-    [Range(1, 100)]
-    private float launchForce = 15f;
+    /*[SerializeField]
+    [Range(1, 100)]*/
+    private float launchForce;
 
     [SerializeField]
     [Range(1, 10)]
@@ -56,6 +63,8 @@ public class CannonSteer : MonoBehaviour
         float turnAngle = steerInput.x * turnRate;
         float fireAngle = steerInput.y * turnRate;
 
+        launchForce = launchForce + cannonPowerInput.y;
+
         cannon_base.transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
         cannon_tube.transform.Rotate(Vector3.left, fireAngle);
 
@@ -65,6 +74,12 @@ public class CannonSteer : MonoBehaviour
     void OnCannonMove(InputValue value)
     {
         steerInput = value.Get<Vector2>(); //Store the new vector any time the move vector changes
+    }
+
+    void OnCannonPower(InputValue value)
+    {
+        launchForce += value.Get<float>();
+        launchForce = Mathf.Clamp(launchForce, minPower, maxPower);
     }
 
     void OnFire()
