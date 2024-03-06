@@ -1,0 +1,35 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+first-person, y-value on camera doesn't change, but can rotate around.
+
+You have a radar, but it can only be used 3 times. a "use" is a single circular rotation of the radar. 
+	If something is in your veryClose distance, it shows as a dot.
+	if far away, maybe a 90° highlight on the outside of the circular radar UI thingy? or maybe 1/3 of the circle?
+	and maybe that highlight is randomized, so it's TRULY "somewhere in that range there is SOMETHING...
+
+
+
+
+
+You have limited gas?
+	I really like the idea of having randomized depots, where you can refill gas/radar/fix boat?
+
+
+
+leveling to ubnlock new boats and shots and things
+
+quests to destroy X items, which gives XP to get new boats??
+
+coves to duck into as safe space against enemy

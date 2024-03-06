@@ -36,6 +36,11 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
 
+    [SerializeField]
+    private Transform waterMesh;
+    [SerializeField]
+    private Transform boundingQuad;
+
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
@@ -56,9 +61,13 @@ public class LayerTerrain : MonoBehaviour
     public void Awake()
     {
         LoadTextures();
+        LoadWaterShader();
+        LoadMapBoundingBox();
 
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
+
+        //waterMesh = terrain.GetComponent<GameObject>();
         
         layersDict.Add(LayersEnum.Elevation, elevationLayers);
         layersDict.Add(LayersEnum.Moisture, moistureLayers);
@@ -351,4 +360,26 @@ public class LayerTerrain : MonoBehaviour
 
     }
     
+
+    public void LoadWaterShader()
+    {
+        //waterMesh is 50x50
+        // has the origin in the center
+        float waterMeshSize = 50f;
+        float waterHeight = 3;
+        waterMesh.position = waterMesh.position + new Vector3(X/2, waterHeight, Y/2);
+        waterMesh.localScale = new Vector3(X/waterMeshSize, 1, Y/waterMeshSize);
+    }
+
+    public void LoadMapBoundingBox()
+    {
+        //Quad (vertical and flat square) is 1x1
+        // has the origin in the center of the square
+        // public static Object Instantiate(Object original, Vector3 position, Quaternion rotation, Transform parent);
+        boundingQuad.localScale = new Vector3(X, X, Y);
+        Instantiate(boundingQuad, boundingQuad.position + new Vector3(X/2, X/2, Y), new Quaternion(0, 0, 0, 0), terrain.transform);
+        Instantiate(boundingQuad, boundingQuad.position + new Vector3(X, X / 2, Y/2), Quaternion.Euler(new Vector3(0,90,0)), terrain.transform);
+        Instantiate(boundingQuad, boundingQuad.position + new Vector3(0, X / 2, Y/ 2), Quaternion.Euler(new Vector3(0, 90, 0)), terrain.transform);
+        boundingQuad.position = boundingQuad.position + new Vector3(X/2, X/2, 0);
+    }
 }

@@ -24,7 +24,7 @@ MonoBehaviour:
     linkText: 
     url: 
   - heading:
-    text: 'There's a ReflectionCamera prefab with a script for mirroring the main camera, bus doesn't looks good in all situations.'
+    text: 'Theres a ReflectionCamera prefab with a script for mirroring the main camera, bus doesnt looks good in all situations.'
     linkText: 
     url: 
   - heading:

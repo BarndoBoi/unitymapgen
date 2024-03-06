@@ -634,12 +634,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0.5
   turnRate: 0.7
+  minPower: 0
+  maxPower: 0
   cannon_tube: {fileID: 4612719083419958015}
   cannon_base: {fileID: 4612719083419974869}
   projectile: {fileID: 241221087600015630, guid: f66e3319244f7564eb06da48a97c7211, type: 3}
   LineRenderer: {fileID: 3997713336590252509}
   FirePoint: {fileID: 3997713336590252510}
-  launchForce: 15
   ExplosionDelay: 5
   LinePoints: 175
   timeIntervalInPoints: 0.1

@@ -54,7 +54,7 @@ public class CannonSteer : MonoBehaviour
 
     void Start()
     {
-        
+        launchForce = minPower;
     }
 
     // Update is called once per frame
@@ -78,8 +78,10 @@ public class CannonSteer : MonoBehaviour
 
     void OnCannonPower(InputValue value)
     {
+        
         launchForce += value.Get<float>();
-        launchForce = Mathf.Clamp(launchForce, minPower, maxPower);
+        //launchForce = Mathf.Clamp(launchForce, minPower, maxPower);
+        
     }
 
     void OnFire()

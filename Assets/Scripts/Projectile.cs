@@ -10,6 +10,10 @@ public class Projectile : MonoBehaviour
     
     private Deform deform;
 
+    private Transform projectile;
+
+    [SerializeField]
+    private TerrainCollider terrainCollider;
     
 
     // Start is called before the first frame update
@@ -17,6 +21,7 @@ public class Projectile : MonoBehaviour
     {
        // look up casting
        deform = (Deform)GameObject.FindObjectOfType(typeof(Deform));
+       terrainCollider = (TerrainCollider)GameObject.FindObjectOfType(typeof(TerrainCollider));
     }
 
     // Update is called once per frame
@@ -28,8 +33,18 @@ public class Projectile : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         Vector3 contact = collision.GetContact(0).point;
-        Debug.Log(contact.ToString());
-        deform.DeformTerrain(new Vector2(contact.z, contact.x), LayersEnum.Elevation);
+        //Debug.Log("got collision at: "+contact.ToString());
+        Collider objectHit = collision.GetContact(0).otherCollider;
+        Debug.Log("got collision with a: " + collision.GetContact(0).otherCollider.ToString());
+
+        // TODO: JESUS CHRIST
+        int waterLevel = 3;
+
+        if (contact.y > waterLevel & objectHit == terrainCollider) //and not bounding box
+        {
+            deform.DeformTerrain(new Vector2(contact.z, contact.x), LayersEnum.Elevation);
+        }
+
         GameObject.Destroy(this.gameObject);
     }
 }
