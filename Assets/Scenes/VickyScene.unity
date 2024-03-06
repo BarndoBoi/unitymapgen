@@ -738,7 +738,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -1037,7 +1038,7 @@ Terrain:
   m_DrawTreesAndFoliage: 1
   m_StaticShadowCaster: 0
   m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 10651, guid: 0000000000000000f000000000000000, type: 0}
+  m_MaterialTemplate: {fileID: 2100000, guid: 594ea882c5a793440b60ff72d896021e, type: 2}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -1073,7 +1074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1dd484041c424e469aa93e35a0bd60f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allBiomes: {fileID: 1904438397}
+  biomes: {fileID: 0}
   X: 513
   Y: 513
   depth: 40
@@ -1109,6 +1110,7 @@ MonoBehaviour:
   moistureLayers:
     NoisePairs: []
   terrain: {fileID: 1904438394}
+  targetRenderer: {fileID: 0}
 --- !u!114 &1904438397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1121,6 +1123,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 326352f9fa29adc45926374a532a02cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moistureLayers:
+    NoisePairs: []
   AllBiomes:
     values: []
   JsonFile: {fileID: 4900000, guid: b60802b4b6df85a44aef82859e4dbb54, type: 3}

@@ -254,7 +254,8 @@ public class LayerTerrain : MonoBehaviour
 
                     // TODO: do min-height stuff here, set anything below water level texture to water level.
                     //if (finalTile.ValuesHere[layer] < minValue) finalTile.ValuesHere[layer] = minValue;
-                    finalTile.ValuesHere[layer] = Mathf.Max(0, finalTile.ValuesHere[layer] - minValue);
+                    // commented out becuz URP
+                    //finalTile.ValuesHere[layer] = Mathf.Max(0, finalTile.ValuesHere[layer] - minValue);
                 }
 
                 // just for debug
