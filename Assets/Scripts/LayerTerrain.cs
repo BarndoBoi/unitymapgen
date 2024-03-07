@@ -133,8 +133,8 @@ public class LayerTerrain : MonoBehaviour
         GenerateBiome();
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
-        pathfinding.LandWaterFloodfill(0, 0, allBiomes);
-        pathfinding.MarkAllRegions();
+        //pathfinding.LandWaterFloodfill(0, 0, allBiomes);
+        //pathfinding.MarkAllRegions();
         Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
         for (int i = 0; i < pathfinding.regionSizes.Count; i++)
         {
