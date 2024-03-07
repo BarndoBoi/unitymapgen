@@ -81,6 +81,9 @@ public class LayerTerrain : MonoBehaviour
         LoadMapBoundingBox();
         LoadNavMeshBuilder();
 
+        LoadEnemyBoats();
+        LoadPlayerBoat();
+
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
 
@@ -419,9 +422,19 @@ public class LayerTerrain : MonoBehaviour
     {
         // idk this shit don't work
         
-        /*navMeshBuilder.transform.position = navMeshBuilder.transform.position + new Vector3(X / 2, 0, Y / 2);
-        navMeshBuilder.m_Size = new Vector3(X, 50.0f, Y);*/
-
+        navMeshBuilder.transform.position = navMeshBuilder.transform.position + new Vector3(X / 2, 0, Y / 2);
+        navMeshBuilder.m_Size = new Vector3(X, 50.0f, Y);
 
     }
+
+
+    public void LoadEnemyBoats()
+    {
+        
+    }
+    public void LoadPlayerBoat()
+    {
+        
+    }
+
 }

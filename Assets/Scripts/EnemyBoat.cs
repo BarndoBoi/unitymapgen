@@ -6,14 +6,6 @@ using UnityEngine.AI;
 public class EnemyBoat : MonoBehaviour
 {   
 
-    private enum State
-    {
-        Roaming,
-        Chase,
-        Fire,
-    }
-    private State state;
-
     private bool targetInRange;
 
 
@@ -32,11 +24,19 @@ public class EnemyBoat : MonoBehaviour
 
 
 
-/*    [SerializeField]
-    public float pathUpdateDelay = 0.2f;
+    /*    [SerializeField]
+        public float pathUpdateDelay = 0.2f;
 
-    [SerializeField]
-    private float pathUpdateDeadline;*/
+        [SerializeField]
+        private float pathUpdateDeadline;*/
+
+    private enum State
+    {
+        Roaming,
+        Chase,
+        Fire,
+    }
+    private State state;
 
     private void Awake()
     {
@@ -109,6 +109,5 @@ public class EnemyBoat : MonoBehaviour
     private void UpdatePath(Vector3 destination)
     {    
     navMeshAgent.SetDestination(destination);
-    
     }
 }
