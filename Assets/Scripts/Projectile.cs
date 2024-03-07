@@ -14,6 +14,8 @@ public class Projectile : MonoBehaviour
 
     [SerializeField]
     private TerrainCollider terrainCollider;
+
+    private LayerTerrain lt;
     
 
     // Start is called before the first frame update
@@ -37,10 +39,9 @@ public class Projectile : MonoBehaviour
         Collider objectHit = collision.GetContact(0).otherCollider;
         Debug.Log("got collision with a: " + collision.GetContact(0).otherCollider.ToString());
 
-        // TODO: JESUS CHRIST
-        int waterLevel = 3;
-
-        if (contact.y > waterLevel & objectHit == terrainCollider) //and not bounding box
+        float waterheight = 3;
+        
+        if (contact.y > waterheight & objectHit == terrainCollider) //and not bounding box
         {
             deform.DeformTerrain(new Vector2(contact.z, contact.x), LayersEnum.Elevation);
         }

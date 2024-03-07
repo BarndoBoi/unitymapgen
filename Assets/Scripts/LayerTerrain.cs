@@ -36,10 +36,22 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
 
+
+    
+    /// ////////////////////
+
     [SerializeField]
     private Transform waterMesh;
     [SerializeField]
+    private Transform waterMeshPlane;
+    [SerializeField]
     private Transform boundingQuad;
+    [SerializeField]
+    private LocalNavMeshBuilder navMeshBuilder;
+
+
+
+
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
 
@@ -52,6 +64,9 @@ public class LayerTerrain : MonoBehaviour
     float highest_e = -100;
     float lowest_e = 100;
 
+    [SerializeField]
+    public float waterHeight = 3f;
+
     // ----------------- DEBUG STUFF
     bool print_debug = false;
     
@@ -63,6 +78,7 @@ public class LayerTerrain : MonoBehaviour
         LoadTextures();
         LoadWaterShader();
         LoadMapBoundingBox();
+        LoadNavMeshBuilder();
 
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
@@ -369,6 +385,11 @@ public class LayerTerrain : MonoBehaviour
         float waterHeight = 3;
         waterMesh.position = waterMesh.position + new Vector3(X/2, waterHeight, Y/2);
         waterMesh.localScale = new Vector3(X/waterMeshSize, 1, Y/waterMeshSize);
+
+        //also load in the invisible plane at the water level, because that's what we're baking the navmesh on :)
+        //Plane is 10x10
+        waterMeshPlane.position = waterMeshPlane.position + new Vector3(X / 2, waterHeight, Y / 2);
+        waterMeshPlane.localScale = new Vector3(X/10, 1, Y/10);
     }
 
     public void LoadMapBoundingBox()
@@ -381,5 +402,15 @@ public class LayerTerrain : MonoBehaviour
         Instantiate(boundingQuad, boundingQuad.position + new Vector3(X, X / 2, Y/2), Quaternion.Euler(new Vector3(0,90,0)), terrain.transform);
         Instantiate(boundingQuad, boundingQuad.position + new Vector3(0, X / 2, Y/ 2), Quaternion.Euler(new Vector3(0, 90, 0)), terrain.transform);
         boundingQuad.position = boundingQuad.position + new Vector3(X/2, X/2, 0);
+    }
+
+    public void LoadNavMeshBuilder()
+    {
+        // idk this shit don't work
+        
+        /*navMeshBuilder.transform.position = navMeshBuilder.transform.position + new Vector3(X / 2, 0, Y / 2);
+        navMeshBuilder.m_Size = new Vector3(X, 50.0f, Y);*/
+
+
     }
 }
