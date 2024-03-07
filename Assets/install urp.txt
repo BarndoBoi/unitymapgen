@@ -1,0 +1,33 @@
+Window --> Package Manager --> Universal RP
+in assets folder, right click Rendering --> universal asset (with URP renderer)
+Edit --> project settings --> Graphics
+		Scriptable Render Pipeline Settings = universal asset we made
+Edit --> project settings --> Graphics
+		Render Pipeline Asset = universal asset we made
+
+Window --> Rendering --> Render Pipeline Converter
+	Initialize Converters (make sure everything is checked)
+	Convert Assets
+
+Window --> Package Manager --> Simple Water Shader URP (install bring into porject)
+https://assetstore.unity.com/packages/2d/textures-materials/water/simple-water-shader-urp-191449
+
+------
+
+in LayerTerrain.NormalizeFinalMap comment out minValue line (  finalTile.ValuesHere[layer] = Mathf.Max(0, finalTile.ValuesHere[layer] - minValue);  )
+
+
+in All biomes where we set elevation band values, set water to 0 and beach sand to 0.1 
+(at this point, you should see no water and just have the beach extend down to the sea floor)
+
+IgniteCoders --> Simple Water Shader --> Prefabs --> place WaterBlock_50m in the scene as child of Terrain object,
+							scale to the size of the map, (we will be doing this programatically later)
+							set position Y Value to water level (mines at 3) 
+
+
+
+
+
+
+
+
