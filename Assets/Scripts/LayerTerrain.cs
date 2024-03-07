@@ -37,7 +37,7 @@ public class LayerTerrain : MonoBehaviour
     private Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
 
     [SerializeField]
-    private Transform waterMesh;
+    private GameObject waterPrefab;
     [SerializeField]
     private Transform boundingQuad;
 
@@ -367,6 +367,8 @@ public class LayerTerrain : MonoBehaviour
         // has the origin in the center
         float waterMeshSize = 50f;
         float waterHeight = 3;
+        GameObject prefab = GameObject.Instantiate(waterPrefab);
+        Transform waterMesh = prefab.GetComponent<Transform>();
         waterMesh.position = waterMesh.position + new Vector3(X/2, waterHeight, Y/2);
         waterMesh.localScale = new Vector3(X/waterMeshSize, 1, Y/waterMeshSize);
     }

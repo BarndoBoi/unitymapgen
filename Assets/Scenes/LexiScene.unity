@@ -202,7 +202,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1904438395}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!64 &682259153
 MeshCollider:
@@ -5943,7 +5943,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1507636619539437000}
   - {fileID: 682259152}
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -6009,7 +6008,7 @@ MonoBehaviour:
       JSON: {fileID: 4900000, guid: 57fabebd13caa70489cf0ab5a1e234ee, type: 3}
       UseJsonFile: 0
   terrain: {fileID: 1904438394}
-  waterMesh: {fileID: 1507636619539437000}
+  waterPrefab: {fileID: 4183297480243235525, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
   boundingQuad: {fileID: 682259152}
   targetRenderer: {fileID: 0}
 --- !u!114 &1904438398
@@ -6247,11 +6246,6 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
---- !u!4 &1507636619539437000 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-  m_PrefabInstance: {fileID: 3378330154847412080}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2072175655660589691
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6911,63 +6905,6 @@ PrefabInstance:
       objectReference: {fileID: 1904438397}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bc4875868d8189b47962c4b25c8e4e84, type: 3}
---- !u!1001 &3378330154847412080
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 1904438395}
-    m_Modifications:
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235512, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183297480243235525, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
-      propertyPath: m_Name
-      value: WaterBlock_50m
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
 --- !u!23 &7762174202321240599
 MeshRenderer:
   m_ObjectHideFlags: 0
