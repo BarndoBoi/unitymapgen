@@ -41,7 +41,7 @@ public class LayerTerrain : MonoBehaviour
     /// ////////////////////
 
     [SerializeField]
-    private Transform waterMesh;
+    private GameObject waterPrefab;
     [SerializeField]
     private Transform waterMeshPlane;
     [SerializeField]
@@ -54,6 +54,7 @@ public class LayerTerrain : MonoBehaviour
 
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
+    private Pathfinding pathfinding;
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
@@ -88,6 +89,7 @@ public class LayerTerrain : MonoBehaviour
         layersDict.Add(LayersEnum.Elevation, elevationLayers);
         layersDict.Add(LayersEnum.Moisture, moistureLayers);
 
+
         GenerateTerrain();
     }
 
@@ -113,7 +115,7 @@ public class LayerTerrain : MonoBehaviour
     public void GenerateTerrain()
     {
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
-
+        pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -131,6 +133,13 @@ public class LayerTerrain : MonoBehaviour
         GenerateBiome();
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
+        pathfinding.LandWaterFloodfill(0, 0, allBiomes);
+        pathfinding.MarkAllRegions();
+        Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
+        for (int i = 0; i < pathfinding.regionSizes.Count; i++)
+        {
+            Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
+        }
     }
 
     public void CreateTerrainFromHeightmap()
@@ -383,6 +392,8 @@ public class LayerTerrain : MonoBehaviour
         // has the origin in the center
         float waterMeshSize = 50f;
         float waterHeight = 3;
+        GameObject prefab = GameObject.Instantiate(waterPrefab);
+        Transform waterMesh = prefab.GetComponent<Transform>();
         waterMesh.position = waterMesh.position + new Vector3(X/2, waterHeight, Y/2);
         waterMesh.localScale = new Vector3(X/waterMeshSize, 1, Y/waterMeshSize);
 
