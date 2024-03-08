@@ -24,12 +24,9 @@ public class LocalNavMeshBuilder : MonoBehaviour
 
     // we don't need this to run constantly, just when we deform
     IEnumerator Start()
-    {
-        
-        
-                UpdateNavMesh(true);
-                yield return m_Operation;
-        
+    {   
+    UpdateNavMesh(true);
+    yield return m_Operation;  
     }
 
     void OnEnable()

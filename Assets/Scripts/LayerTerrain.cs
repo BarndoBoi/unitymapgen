@@ -43,7 +43,7 @@ public class LayerTerrain : MonoBehaviour
     private Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
 
     [SerializeField]
-    public Game game;
+    public GameManager gameManager;
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
@@ -160,7 +160,7 @@ public class LayerTerrain : MonoBehaviour
 
                     void SetTexture(string name)
                     {
-                        splatWeights[game.texturesDict[name]] = 1.0f;
+                        splatWeights[gameManager.texturesDict[name]] = 1.0f;
                     }
                 }
 

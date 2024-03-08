@@ -183,7 +183,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 375718139}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -6108,9 +6108,8 @@ MonoBehaviour:
       JSON: {fileID: 4900000, guid: 57fabebd13caa70489cf0ab5a1e234ee, type: 3}
       UseJsonFile: 0
   terrain: {fileID: 1904438394}
-  game: {fileID: 1904438401}
+  gameManager: {fileID: 1904438401}
   targetRenderer: {fileID: 0}
-  waterHeight: 3
 --- !u!114 &1904438398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6188,12 +6187,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8be7fa4cb950364880de08ad5d69e67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lt: {fileID: 1904438397}
   terrain: {fileID: 1904438394}
   waterPrefab: {fileID: 236233829}
   waterMeshPlane: {fileID: 1204811853}
   boundingQuad: {fileID: 375718140}
   navMeshBuilder: {fileID: 7921581519218162253, guid: 8c7283f74c2cf1841b220e5cf5f37fc2, type: 3}
-  numberOfEnemies: 10
+  numberOfEnemies: 5
   enemyBoat: {fileID: 723540474}
   enemy: {fileID: 723540476}
   waterHeight: 3
@@ -6462,6 +6462,8 @@ MonoBehaviour:
   ProjectileCollisionMask:
     serializedVersion: 2
     m_Bits: 8
+  ForceRatio: 0
+  MaxThrowForce: 25
 --- !u!120 &2072175656209073213
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -7032,6 +7034,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4183297480243235525, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4183297480243235526, guid: 635edc6b6e5d7d246a7f53168b7de60c, type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

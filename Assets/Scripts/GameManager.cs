@@ -5,7 +5,7 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine.AI;
 
-public class Game : MonoBehaviour
+public class GameManager: MonoBehaviour
 {
     [SerializeField]
     private LayerTerrain lt;

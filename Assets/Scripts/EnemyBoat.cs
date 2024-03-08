@@ -6,7 +6,8 @@ using UnityEngine.AI;
 public class EnemyBoat : MonoBehaviour
 {   
 
-    private bool targetInRange;
+    private bool targetInSightRange;
+    private bool targetInShootingRange;
 
 
     public Transform target;
@@ -14,15 +15,14 @@ public class EnemyBoat : MonoBehaviour
     public NavMeshAgent navMeshAgent;
     public Animator animator;
 
-
     [SerializeField]
-    private float shootingDistance; //how far from the boat before we "notice it" and try to collide with it
-                                    // this will obvs be the distance where it will start shooting us in the future lol
+    private float sightDistance;
+    [SerializeField]
+    private float shootingDistance;
+    
 
     [SerializeField]
     private float randomPathDistance; // The Radius of the circle that we will pick a point from
-
-
 
     /*    [SerializeField]
         public float pathUpdateDelay = 0.2f;
@@ -53,7 +53,8 @@ public class EnemyBoat : MonoBehaviour
 
     private void Update()
     {
-        targetInRange = Vector3.Distance(transform.position, target.position) <= shootingDistance;
+        targetInSightRange = Vector3.Distance(transform.position, target.position) <= sightDistance;
+        targetInShootingRange = Vector3.Distance(transform.position, target.position) <= shootingDistance;
 
         switch (state)
         {
@@ -73,14 +74,22 @@ public class EnemyBoat : MonoBehaviour
                 // fire at player
                 break;
         }
-        if (targetInRange & state == State.Roaming)
+         // if searching and see target, start chasing
+        if (targetInSightRange & state == State.Roaming)
         {
         state = State.Chase;
         }
 
-        if (!targetInRange & state == State.Chase)
+        // if target gets out of sight, go back to searching
+        if (!targetInSightRange & state == State.Chase)
         {
             state = State.Roaming;
+        }
+
+        // should always be chasing to close distance before firing
+        if (targetInShootingRange & state == State.Chase)
+        {
+            state = State.Fire;
         }
     }
 
