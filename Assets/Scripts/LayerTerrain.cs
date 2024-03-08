@@ -3,6 +3,7 @@ using ProcGenTiles;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
 public class LayerTerrain : MonoBehaviour
 {
@@ -48,6 +49,16 @@ public class LayerTerrain : MonoBehaviour
     private Transform boundingQuad;
     [SerializeField]
     private LocalNavMeshBuilder navMeshBuilder;
+
+    [SerializeField]
+    private int numberOfEnemies;
+    public static List<Vector3> enemyBoatLoadPositions = new List<Vector3>();
+
+    [SerializeField]
+    public GameObject enemyBoat;
+
+    public EnemyBoat enemy;
+
 
 
 
@@ -421,17 +432,45 @@ public class LayerTerrain : MonoBehaviour
     public void LoadNavMeshBuilder()
     {
         // idk this shit don't work
-        
-        navMeshBuilder.transform.position = navMeshBuilder.transform.position + new Vector3(X / 2, 0, Y / 2);
+        Instantiate(navMeshBuilder, terrain.transform.position + new Vector3(X / 2, 0, Y / 2), new Quaternion(0, 0, 0, 0), terrain.transform);
+        //navMeshBuilder.transform.position = navMeshBuilder.transform.position + new Vector3(X / 2, 0, Y / 2);
         navMeshBuilder.m_Size = new Vector3(X, 50.0f, Y);
 
     }
 
-
+    
     public void LoadEnemyBoats()
-    {
+    {   
+        // This is how far from the origin point that SamplePosition will give a valid hit point
+        float acceptableDistanceFromLand = 10f;
+
+        /*
+         There's a list up top called enemyBoatLoadPositions
+        We keep trying random points with NavMesh.SamplePosition() until we have X (numberOfEnemies) amount of Vector3 points for boats in the list
+         After we have the right amount, we instantiate them all.
         
+        
+         */
+        while (enemyBoatLoadPositions.Count < numberOfEnemies)
+        {
+            Vector3 randomPoint = new Vector3(Random.Range(0, X), 4, Random.Range(0, Y));
+            NavMeshHit hit;
+
+            if (NavMesh.SamplePosition(randomPoint, out hit, acceptableDistanceFromLand, 1)) //returns true and sets hit of the nearest navmesh point
+            {
+                  
+                Debug.Log($"got good pos at  " + hit.position);
+                enemyBoatLoadPositions.Add(hit.position);
+            }
+        }
+
+        for (int i = 0; i < enemyBoatLoadPositions.Count; i++)
+        {
+            Instantiate(enemyBoat, enemyBoatLoadPositions[i], new Quaternion(0, 0, 0, 0), terrain.transform);
+        }
     }
+
+
     public void LoadPlayerBoat()
     {
         

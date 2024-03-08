@@ -40,7 +40,7 @@ public class Deform : MonoBehaviour
 
     private void Start()
     {   
-        map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check
+        map = terrain.finalMap; //Need to grab a reference to the finalMap before trying to deform. This needs to be moved into DeformTerrain with a null check        
         nm_builder_object = GameObject.Find("navmesh_builder");
     }   
 
@@ -100,7 +100,7 @@ public class Deform : MonoBehaviour
         // TODO: only run this if the deform causes new water layer.
         // Don't need to update navmesh if the side of a mountain is hit.
         nm_builder_object.GetComponent<LocalNavMeshBuilder>().UpdateNavMesh(false);
-
+        //navmesh.UpdateNavMesh(false);
         // This errors Null reference for some reason, but shouldn't... 
         //navmesh.UpdateNavMesh(false);
 
