@@ -11,16 +11,21 @@ public class LayerTerrain : MonoBehaviour
     // I'll use the same method of putting the heights in an "Elevation" layer and using that to put the islands together.
     // Then I'll likely want to check my Pathfinding code and see if I can check for regions that arent reachable and start marking them.
     // It would be cool to add canals or valleys between the water regions so everything is accessable by boat. :3
-    */
+    
+     generate terrain
+    create terrain from heightmap
+    readnoisparams
+    generate heightmap
+     */
 
     [SerializeField]
     private Biomes biomes;
 
     //Future TODO: Standardize these naming conventions between the ProcGenTiles library and our codebase
     [SerializeField]
-    private int X;
+    public int X;
     [SerializeField]
-    private int Y;
+    public int Y;
     [SerializeField]
     private int depth; //Maybe rename to height instead? depth is kinda lame
     [SerializeField]
@@ -28,7 +33,7 @@ public class LayerTerrain : MonoBehaviour
 
     //Assign layers from the inspector. In the future I either want ScriptableObjects that can be dragged in or JSON serialization so these don't get lost on a reset
     [SerializeField]
-    private MapLayers elevationLayers;
+    public MapLayers elevationLayers;
     [SerializeField]
     public MapLayers moistureLayers;
 
@@ -37,32 +42,8 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
 
-
-    
-    /// ////////////////////
-
     [SerializeField]
-    private GameObject waterPrefab;
-    [SerializeField]
-    private Transform waterMeshPlane;
-    [SerializeField]
-    private Transform boundingQuad;
-    [SerializeField]
-    private LocalNavMeshBuilder navMeshBuilder;
-
-    [SerializeField]
-    private int numberOfEnemies;
-    public static List<Vector3> enemyBoatLoadPositions = new List<Vector3>();
-
-    [SerializeField]
-    public GameObject enemyBoat;
-
-    public EnemyBoat enemy;
-
-
-
-
-
+    public Game game;
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
@@ -70,14 +51,9 @@ public class LayerTerrain : MonoBehaviour
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
     public Renderer targetRenderer;
-    //textures dict
-    public Dictionary<string, int> texturesDict;
 
     float highest_e = -100;
     float lowest_e = 100;
-
-    [SerializeField]
-    public float waterHeight = 3f;
 
     // ----------------- DEBUG STUFF
     bool print_debug = false;
@@ -87,32 +63,13 @@ public class LayerTerrain : MonoBehaviour
 
     public void Awake()
     {
-        LoadTextures();
-        LoadWaterShader();
-        LoadMapBoundingBox();
-        LoadNavMeshBuilder();
-
-        LoadEnemyBoats();
-        LoadPlayerBoat();
-
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
-
-        //waterMesh = terrain.GetComponent<GameObject>();
-        
-        layersDict.Add(LayersEnum.Elevation, elevationLayers);
-        layersDict.Add(LayersEnum.Moisture, moistureLayers);
-
-
-        GenerateTerrain();
     }
 
-    public void GenerateBiome()
-    {   // THIS IS ALL GETTING MOVED TO ITS OWN SCRIPT
-
-
-        //finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
-        for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
+    public void GenerateBiome() // MOVE
+    {   
+     for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = moistureLayers.NoisePairs[i];
             if (pair.UseJsonFile)
@@ -126,6 +83,7 @@ public class LayerTerrain : MonoBehaviour
         //CreateTerrainFromHeightmap();
     }
 
+    //stays
     public void GenerateTerrain()
     {
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
@@ -202,7 +160,7 @@ public class LayerTerrain : MonoBehaviour
 
                     void SetTexture(string name)
                     {
-                        splatWeights[texturesDict[name]] = 1.0f;
+                        splatWeights[game.texturesDict[name]] = 1.0f;
                     }
                 }
 
@@ -220,7 +178,7 @@ public class LayerTerrain : MonoBehaviour
     
     }
        
-    public void ReadNoiseParams(NoiseParams noiseParams)
+    public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
     {
         //Read the noise info from the MapLayer and set all of the FastNoiseLite fields here
         if (noise == null)
@@ -236,7 +194,7 @@ public class LayerTerrain : MonoBehaviour
         noise.SetFractalWeightedStrength(noiseParams.weightedStrength);
     }
 
-    public void GenerateHeightmap(MapNoisePair noisePair, string layer)
+    public void GenerateHeightmap(MapNoisePair noisePair, string layer) //STAYS
     {
         highest_e = -100;
         lowest_e = 100;
@@ -275,9 +233,9 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    public void NormalizeFinalMap(string layer, float minValue, float raisedPower)
+    public void NormalizeFinalMap(string layer, float minValue, float raisedPower) //STAYS
     {
-        float range = layersDict[layer].SumOfNoiseLayers();
+        //float range = layersDict[layer].SumOfNoiseLayers();
         float lowest = 100;
         float highest = -100;
 
@@ -312,7 +270,6 @@ public class LayerTerrain : MonoBehaviour
 
             }
         }
-        // uncomment for testing
         if (print_debug)
         {
             Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
@@ -320,14 +277,14 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap)
+    public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap) //MOVE?
     { //This might need work to instead mark the terrain as dirty until all deform operations are done, and THEN we set the heights
         terrain.terrainData.SetHeights(xBase, yBase, heightmap); //Fuck you SetHeights, why do you pretend like I can update regions with the xBase and yBase when you actually suck?
                                                                  
                                                                  //Because fuck you, that's why! >:)
     }
 
-    public void SerializeNoiseParamsToJson()
+    public void SerializeNoiseParamsToJson() //MOVE
     { //For each NoiseParam in our layers we serialize them with the naming convention of layer + index in list
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
@@ -351,7 +308,7 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    public void LoadNoiseParamsFromJson()
+    public void LoadNoiseParamsFromJson() //MOVE
     {
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
@@ -361,119 +318,6 @@ public class LayerTerrain : MonoBehaviour
                 pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
             }
         }
-    }
-    
-    
-
-    public void LoadTextures()
-    {
-        texturesDict = new Dictionary<string, int>();
-
-        DirectoryInfo dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
-        FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
-        int index = 0;
-        List<TerrainLayer> layers = new List<TerrainLayer>();
-        foreach (FileInfo file in info )
-        {
-            string fileName = Path.GetFileNameWithoutExtension(file.FullName);
-
-            // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
-            // The path here is Assets/Textures_and_Models/Resources/TerrainTextures/png/
-            // but it only needs the info after the Resources folder (Resources/)
-
-            string location_from_Resources_folder = "TerrainTextures/layers/";
-            TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
-            layers.Add(texture);
-            texturesDict.Add(fileName, index);
-            index++;
-        }
-        terrain.terrainData.terrainLayers = layers.ToArray();
-
-        // DEBUG
-       /* foreach (KeyValuePair<string, int> kvp in texturesDict)
-        {
-            Debug.Log($"Key = '{kvp.Key}'   value = '{kvp.Value}'");
-        }*/
-
-
-
-    }
-    
-
-    public void LoadWaterShader()
-    {
-        //waterMesh is 50x50
-        // has the origin in the center
-        float waterMeshSize = 50f;
-        float waterHeight = 3;
-        GameObject prefab = GameObject.Instantiate(waterPrefab);
-        Transform waterMesh = prefab.GetComponent<Transform>();
-        waterMesh.position = waterMesh.position + new Vector3(X/2, waterHeight, Y/2);
-        waterMesh.localScale = new Vector3(X/waterMeshSize, 1, Y/waterMeshSize);
-
-        //also load in the invisible plane at the water level, because that's what we're baking the navmesh on :)
-        //Plane is 10x10
-        waterMeshPlane.position = waterMeshPlane.position + new Vector3(X / 2, waterHeight, Y / 2);
-        waterMeshPlane.localScale = new Vector3(X/10, 1, Y/10);
-    }
-
-    public void LoadMapBoundingBox()
-    {
-        //Quad (vertical and flat square) is 1x1
-        // has the origin in the center of the square
-        // public static Object Instantiate(Object original, Vector3 position, Quaternion rotation, Transform parent);
-        boundingQuad.localScale = new Vector3(X, X, Y);
-        Instantiate(boundingQuad, boundingQuad.position + new Vector3(X/2, X/2, Y), new Quaternion(0, 0, 0, 0), terrain.transform);
-        Instantiate(boundingQuad, boundingQuad.position + new Vector3(X, X / 2, Y/2), Quaternion.Euler(new Vector3(0,90,0)), terrain.transform);
-        Instantiate(boundingQuad, boundingQuad.position + new Vector3(0, X / 2, Y/ 2), Quaternion.Euler(new Vector3(0, 90, 0)), terrain.transform);
-        boundingQuad.position = boundingQuad.position + new Vector3(X/2, X/2, 0);
-    }
-
-    public void LoadNavMeshBuilder()
-    {
-        // idk this shit don't work
-        Instantiate(navMeshBuilder, terrain.transform.position + new Vector3(X / 2, 0, Y / 2), new Quaternion(0, 0, 0, 0), terrain.transform);
-        //navMeshBuilder.transform.position = navMeshBuilder.transform.position + new Vector3(X / 2, 0, Y / 2);
-        navMeshBuilder.m_Size = new Vector3(X, 50.0f, Y);
-
-    }
-
-    
-    public void LoadEnemyBoats()
-    {   
-        // This is how far from the origin point that SamplePosition will give a valid hit point
-        float acceptableDistanceFromLand = 10f;
-
-        /*
-         There's a list up top called enemyBoatLoadPositions
-        We keep trying random points with NavMesh.SamplePosition() until we have X (numberOfEnemies) amount of Vector3 points for boats in the list
-         After we have the right amount, we instantiate them all.
-        
-        
-         */
-        while (enemyBoatLoadPositions.Count < numberOfEnemies)
-        {
-            Vector3 randomPoint = new Vector3(Random.Range(0, X), 4, Random.Range(0, Y));
-            NavMeshHit hit;
-
-            if (NavMesh.SamplePosition(randomPoint, out hit, acceptableDistanceFromLand, 1)) //returns true and sets hit of the nearest navmesh point
-            {
-                  
-                Debug.Log($"got good pos at  " + hit.position);
-                enemyBoatLoadPositions.Add(hit.position);
-            }
-        }
-
-        for (int i = 0; i < enemyBoatLoadPositions.Count; i++)
-        {
-            Instantiate(enemyBoat, enemyBoatLoadPositions[i], new Quaternion(0, 0, 0, 0), terrain.transform);
-        }
-    }
-
-
-    public void LoadPlayerBoat()
-    {
-        
     }
 
 }
