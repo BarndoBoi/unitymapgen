@@ -8,7 +8,7 @@ using UnityEngine.AI;
 public class GameManager: MonoBehaviour
 {
     [SerializeField]
-    private LayerTerrain lt;
+    private LayerTerrain layerTerrain;
 
     private int X;
     private int Y;
@@ -48,13 +48,13 @@ public class GameManager: MonoBehaviour
 
         LoadTextures();
 
-        lt.layersDict.Add(LayersEnum.Elevation, lt.elevationLayers);
-        lt.layersDict.Add(LayersEnum.Moisture, lt.moistureLayers);
+        layerTerrain.layersDict.Add(LayersEnum.Elevation, layerTerrain.elevationLayers);
+        layerTerrain.layersDict.Add(LayersEnum.Moisture, layerTerrain.moistureLayers);
 
-        lt.GenerateTerrain();
+        layerTerrain.GenerateTerrain();
         
-        X = lt.X;
-        Y = lt.Y;
+        X = layerTerrain.X;
+        Y = layerTerrain.Y;
 
         //LoadTextures();
         LoadWaterShader();
@@ -91,14 +91,6 @@ public class GameManager: MonoBehaviour
         }
         terrain.terrainData.terrainLayers = layers.ToArray();
 
-        // DEBUG
-        /* foreach (KeyValuePair<string, int> kvp in texturesDict)
-         {
-             Debug.Log($"Key = '{kvp.Key}'   value = '{kvp.Value}'");
-         }*/
-
-
-
     }
 
 
@@ -125,8 +117,7 @@ public class GameManager: MonoBehaviour
         // has the origin in the center of the square
         // public static Object Instantiate(Object original, Vector3 position, Quaternion rotation, Transform parent);
 
-        Debug.Log(boundingQuad);
-        boundingQuad.localScale = new Vector3(lt.X, lt.X, lt.Y);
+        boundingQuad.localScale = new Vector3(layerTerrain.X, layerTerrain.X, layerTerrain.Y);
         Instantiate(boundingQuad, boundingQuad.position + new Vector3(X / 2, X / 2, Y), new Quaternion(0, 0, 0, 0), terrain.transform);
         Instantiate(boundingQuad, boundingQuad.position + new Vector3(X, X / 2, Y / 2), Quaternion.Euler(new Vector3(0, 90, 0)), terrain.transform);
         Instantiate(boundingQuad, boundingQuad.position + new Vector3(0, X / 2, Y / 2), Quaternion.Euler(new Vector3(0, 90, 0)), terrain.transform);
@@ -135,11 +126,8 @@ public class GameManager: MonoBehaviour
 
     public void LoadNavMeshBuilder()
     {
-        // idk this shit don't work
         Instantiate(navMeshBuilder, terrain.transform.position + new Vector3(X / 2, 0, Y / 2), new Quaternion(0, 0, 0, 0), terrain.transform);
-        //navMeshBuilder.transform.position = navMeshBuilder.transform.position + new Vector3(X / 2, 0, Y / 2);
         navMeshBuilder.m_Size = new Vector3(X, 50.0f, Y);
-
     }
 
 
@@ -149,11 +137,9 @@ public class GameManager: MonoBehaviour
         float acceptableDistanceFromLand = 10f;
 
         /*
-         There's a list up top called enemyBoatLoadPositions
+         There's a list enemyBoatLoadPositions
         We keep trying random points with NavMesh.SamplePosition() until we have X (numberOfEnemies) amount of Vector3 points for boats in the list
          After we have the right amount, we instantiate them all.
-        
-        
          */
         while (enemyBoatLoadPositions.Count < numberOfEnemies)
         {

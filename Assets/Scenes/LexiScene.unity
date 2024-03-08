@@ -362,6 +362,26 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1852255567708418750, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
   m_PrefabInstance: {fileID: 3342338643106475319}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &723540483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 723540474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af3d72654d0e254e89b0994e50e7257, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 2072175656984039800}
+  ForceRatio: 0
+  MaxThrowForce: 25
+  AttackDelay: 5
+  UseMovementPrediction: 0
+  MovementPredictionMode: 0
+  HistoricalTime: 1
+  HistoricalResolution: 10
 --- !u!1 &813269096
 GameObject:
   m_ObjectHideFlags: 0
@@ -6187,7 +6207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8be7fa4cb950364880de08ad5d69e67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lt: {fileID: 1904438397}
+  layerTerrain: {fileID: 1904438397}
   terrain: {fileID: 1904438394}
   waterPrefab: {fileID: 236233829}
   waterMeshPlane: {fileID: 1204811853}
@@ -6462,8 +6482,6 @@ MonoBehaviour:
   ProjectileCollisionMask:
     serializedVersion: 2
     m_Bits: 8
-  ForceRatio: 0
-  MaxThrowForce: 25
 --- !u!120 &2072175656209073213
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -6785,7 +6803,7 @@ GameObject:
   - component: {fileID: 2072175656984039807}
   - component: {fileID: 2072175656984039805}
   - component: {fileID: 2072175656984039808}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BoatyMcPewPew
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6912,12 +6930,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 1904438395}
     m_Modifications:
     - target: {fileID: 393308948147795100, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
+      propertyPath: maffs
+      value: 
+      objectReference: {fileID: 723540483}
+    - target: {fileID: 393308948147795100, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
       propertyPath: target
       value: 
       objectReference: {fileID: 2072175656984039800}
     - target: {fileID: 393308948147795100, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
+      propertyPath: projectile
+      value: 
+      objectReference: {fileID: 241221087600015630, guid: f66e3319244f7564eb06da48a97c7211, type: 3}
+    - target: {fileID: 393308948147795100, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
+      propertyPath: sightDistance
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 393308948147795100, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
       propertyPath: shootingDistance
-      value: 25
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 393308948147795100, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
       propertyPath: randomPathDistance
@@ -6926,6 +6956,10 @@ PrefabInstance:
     - target: {fileID: 1852255567707926174, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
       propertyPath: m_Name
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 1852255567707926174, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1852255567708418750, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
       propertyPath: m_RootOrder

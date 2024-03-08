@@ -37,7 +37,8 @@ public class Projectile : MonoBehaviour
         Vector3 contact = collision.GetContact(0).point;
         //Debug.Log("got collision at: "+contact.ToString());
         Collider objectHit = collision.GetContact(0).otherCollider;
-        Debug.Log("got collision with a: " + collision.GetContact(0).otherCollider.ToString());
+        //Debug.Log("got collision with a: " + collision.GetContact(0).otherCollider.ToString());
+        Debug.Log(collision.gameObject.name);
 
         float waterheight = 3;
         
