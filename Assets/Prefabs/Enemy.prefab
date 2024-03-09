@@ -178,11 +178,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 842591785bedd7242afb70c9fe0050b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maffs: {fileID: 0}
   target: {fileID: 0}
   navMeshAgent: {fileID: 1852255567707926173}
   animator: {fileID: 0}
+  sightDistance: 0
   shootingDistance: 250
+  projectile: {fileID: 0}
   randomPathDistance: 0
+  AttackDelay: 5
 --- !u!195 &1852255567707926173
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -580,3 +584,4 @@ MonoBehaviour:
   terrain: {fileID: 0}
   Radius: 5
   Change: -0.2
+  nm_builder_object: {fileID: 7921581519218162252, guid: 8c7283f74c2cf1841b220e5cf5f37fc2, type: 3}

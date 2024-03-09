@@ -28,6 +28,7 @@ public class Deform : MonoBehaviour
     [SerializeField]
     float Change; //Change the layer's float value by this amount (use negative numbers to subtract from the layer, positive to add)
 
+    [SerializeField]
     GameObject nm_builder_object;
 
     // for some reason, this is throwing a null reference when trying to access it in the Deform func

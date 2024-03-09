@@ -29,6 +29,11 @@ public class EnemyBoat : MonoBehaviour
     [SerializeField]
     private float randomPathDistance; // The Radius of the circle that we will pick a point from
 
+    private float LastAttackTime;
+    
+    [SerializeField]
+    private float AttackDelay = 5f;
+
     /*    [SerializeField]
         public float pathUpdateDelay = 0.2f;
 
@@ -52,26 +57,48 @@ public class EnemyBoat : MonoBehaviour
 
     private void Start()
     {
-
+        LastAttackTime = Random.Range(0, 5);
 
     }
 
     private void Update()
     {
-
+        Vector3 raycastOrigin = transform.position + new Vector3(0, 4, 0);
+        
         targetInSightRange = Vector3.Distance(transform.position, target.position) <= sightDistance;
 
         if (targetInSightRange)
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.position - target.position, out hit))
+            if (Physics.Raycast(raycastOrigin, target.position - raycastOrigin, out hit))
             {
                 // probs wanna compare using the type of collider? idk
-                if (hit.point == target.position) haveLineOfSight = true;
-            }
-        }
+                //Debug.Log(hit.collider.gameObject.name);
+                //if (hit.collider.gameObject.name == "Player")
 
-        targetInShootingRange = Vector3.Distance(transform.position, target.position) <= shootingDistance;
+                if (hit.collider.gameObject.name == "Player")
+                {
+                    if (!haveLineOfSight)
+                    {
+                        haveLineOfSight = true;
+
+                    }
+                }else if (haveLineOfSight & hit.collider.gameObject.name != "Player")
+                {
+                    haveLineOfSight = false; 
+                }
+
+                
+            }
+            if (haveLineOfSight) 
+            { 
+                Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.green); 
+            } else Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.red);
+
+            targetInShootingRange = Vector3.Distance(transform.position, target.position) <= shootingDistance;
+
+        } else Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.white);
+
 
         switch (state)
         {
@@ -89,21 +116,12 @@ public class EnemyBoat : MonoBehaviour
 
             case State.Fire:
                 //get maffs
-                if (target.position != transform.position) {
+                if (target.position != transform.position & Time.time > LastAttackTime + AttackDelay) {
                     TrajectoryMaffs.ThrowData data = maffs.CalculateThrowData(target.position, transform.position);
-                    Debug.Log(data.ThrowVelocity);
+                    //Debug.Log(data.ThrowVelocity);
                     Fire(data);
+                    LastAttackTime = Time.time;
                 }
-                /*
-
-            ThrowVelocity = initialVelocity,
-            Angle = angle,
-            DeltaXZ = deltaXZ,
-            DeltaY = deltaY
-        };*/
-                //use maffs
-
-
                 break;
         }
         // if searching AND in view range AND can see them:    start chasing
@@ -127,10 +145,16 @@ public class EnemyBoat : MonoBehaviour
         }
 
         // should always be chasing to close distance before firing
-        if (targetInShootingRange & state == State.Chase)
+        if (state == State.Chase & targetInShootingRange & haveLineOfSight)
         {
-            state = State.Fire;
+            //state = State.Fire;
+            state = State.Chase;
         }
+        if (state == State.Fire & !targetInShootingRange & haveLineOfSight)
+        {
+            state = State.Chase;
+        }
+
     }
 
 

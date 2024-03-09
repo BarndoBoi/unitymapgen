@@ -55,8 +55,7 @@ public class GameManager: MonoBehaviour
         
         X = layerTerrain.X;
         Y = layerTerrain.Y;
-
-        //LoadTextures();
+        
         LoadWaterShader();
         LoadMapBoundingBox();
         LoadNavMeshBuilder();
@@ -69,8 +68,6 @@ public class GameManager: MonoBehaviour
 
     public void LoadTextures()
     {
-        //texturesDict = new Dictionary<string, int>();
-
         DirectoryInfo dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
         FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
         int index = 0;
@@ -80,9 +77,6 @@ public class GameManager: MonoBehaviour
             string fileName = Path.GetFileNameWithoutExtension(file.FullName);
 
             // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
-            // The path here is Assets/Textures_and_Models/Resources/TerrainTextures/png/
-            // but it only needs the info after the Resources folder (Resources/)
-
             string location_from_Resources_folder = "TerrainTextures/layers/";
             TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
             layers.Add(texture);
@@ -96,7 +90,7 @@ public class GameManager: MonoBehaviour
 
     public void LoadWaterShader()
     {
-        //waterMesh is 50x50
+        //waterMesh prefab is 50x50
         // has the origin in the center
         float waterMeshSize = 50f;
         float waterHeight = 3;
@@ -115,8 +109,6 @@ public class GameManager: MonoBehaviour
     {
         //Quad (vertical and flat square) is 1x1
         // has the origin in the center of the square
-        // public static Object Instantiate(Object original, Vector3 position, Quaternion rotation, Transform parent);
-
         boundingQuad.localScale = new Vector3(layerTerrain.X, layerTerrain.X, layerTerrain.Y);
         Instantiate(boundingQuad, boundingQuad.position + new Vector3(X / 2, X / 2, Y), new Quaternion(0, 0, 0, 0), terrain.transform);
         Instantiate(boundingQuad, boundingQuad.position + new Vector3(X, X / 2, Y / 2), Quaternion.Euler(new Vector3(0, 90, 0)), terrain.transform);
@@ -136,21 +128,38 @@ public class GameManager: MonoBehaviour
         // This is how far from the origin point that SamplePosition will give a valid hit point
         float acceptableDistanceFromLand = 10f;
 
-        /*
-         There's a list enemyBoatLoadPositions
-        We keep trying random points with NavMesh.SamplePosition() until we have X (numberOfEnemies) amount of Vector3 points for boats in the list
-         After we have the right amount, we instantiate them all.
-         */
+        int count = 0;
+        string output = " ";
+        // keep trying random points with NavMesh.SamplePosition() 
+        // until we have X (numberOfEnemies) amount of Vector3 points for boats in the enemyBoatLoadPositions list
         while (enemyBoatLoadPositions.Count < numberOfEnemies)
         {
-            Vector3 randomPoint = new Vector3(Random.Range(0, X), 4, Random.Range(0, Y));
+            int randomX = Random.Range(0, X);
+            int randomY = Random.Range(0, Y);
+            Vector3 randomPoint = new Vector3(randomX, 0, randomY);
             NavMeshHit hit;
 
-            if (NavMesh.SamplePosition(randomPoint, out hit, acceptableDistanceFromLand, 1)) //returns true and sets hit of the nearest navmesh point
+            if (count < 25) Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation]);
+            count ++;
+
+            if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation] == 0f)
             {
-                enemyBoatLoadPositions.Add(hit.position);
+                enemyBoatLoadPositions.Add(randomPoint);
             }
+
+
+
+            /*if (NavMesh.SamplePosition(randomPoint, out hit, acceptableDistanceFromLand, 1)) //returns true and sets hit of the nearest navmesh point
+            {
+                if (layerTerrain.finalMap.GetTile((int)hit.position.x, (int)hit.position.z).ValuesHere[LayersEnum.Elevation] <= 0.01f) 
+                {
+                    Vector3 onTopWater = hit.position + new Vector3(0, waterHeight, 0);
+                    enemyBoatLoadPositions.Add(onTopWater);
+                }
+                
+            }*/
         }
+        Debug.Log($"{count} iterations to get all points");
 
         for (int i = 0; i < enemyBoatLoadPositions.Count; i++)
         {
