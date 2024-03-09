@@ -142,8 +142,11 @@ public class GameManager: MonoBehaviour
             if (count < 25) Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation]);
             count ++;
 
-            if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation] == 0f)
+
+
+            if ((layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation] * layerTerrain.depth) < .05f) //use layerTerrain.highest_e
             {
+                Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation] * layerTerrain.depth);
                 enemyBoatLoadPositions.Add(randomPoint);
             }
 
@@ -160,6 +163,7 @@ public class GameManager: MonoBehaviour
             }*/
         }
         Debug.Log($"{count} iterations to get all points");
+        Debug.Log("highest elevation is "+layerTerrain.depth);
 
         for (int i = 0; i < enemyBoatLoadPositions.Count; i++)
         {

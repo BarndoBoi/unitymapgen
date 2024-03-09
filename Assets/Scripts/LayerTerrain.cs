@@ -27,7 +27,7 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     public int Y;
     [SerializeField]
-    private int depth; //Maybe rename to height instead? depth is kinda lame
+    public int depth; //Maybe rename to height instead? depth is kinda lame
     [SerializeField]
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
 
@@ -52,8 +52,8 @@ public class LayerTerrain : MonoBehaviour
 
     public Renderer targetRenderer;
 
-    float highest_e = -100;
-    float lowest_e = 100;
+    public float highest_e = -100;
+    public float lowest_e = 100;
 
     // ----------------- DEBUG STUFF
     bool print_debug = false;
