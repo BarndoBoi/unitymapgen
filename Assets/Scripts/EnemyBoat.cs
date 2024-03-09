@@ -147,8 +147,8 @@ public class EnemyBoat : MonoBehaviour
         // should always be chasing to close distance before firing
         if (state == State.Chase & targetInShootingRange & haveLineOfSight)
         {
-            //state = State.Fire;
-            state = State.Chase;
+            state = State.Fire;
+
         }
         if (state == State.Fire & !targetInShootingRange & haveLineOfSight)
         {

@@ -10,6 +10,9 @@ public class GameManager: MonoBehaviour
     [SerializeField]
     private LayerTerrain layerTerrain;
 
+    [SerializeField]
+    private Biomes biomes;
+
     private int X;
     private int Y;
   
@@ -36,15 +39,13 @@ public class GameManager: MonoBehaviour
 
     public EnemyBoat enemy;
 
-
-    [SerializeField]
-    public float waterHeight = 3f;
-
+    public float waterHeight;
 
     public void Awake()
     {
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
+        waterHeight = biomes.GetWaterLayer().value * layerTerrain.depth;
 
         LoadTextures();
 
@@ -93,7 +94,7 @@ public class GameManager: MonoBehaviour
         //waterMesh prefab is 50x50
         // has the origin in the center
         float waterMeshSize = 50f;
-        float waterHeight = 3;
+        
         GameObject prefab = GameObject.Instantiate(waterPrefab);
         Transform waterMesh = prefab.GetComponent<Transform>();
         waterMesh.position = waterMesh.position + new Vector3(X / 2, waterHeight, Y / 2);
@@ -125,45 +126,27 @@ public class GameManager: MonoBehaviour
 
     public void LoadEnemyBoats()
     {
-        // This is how far from the origin point that SamplePosition will give a valid hit point
-        float acceptableDistanceFromLand = 10f;
 
         int count = 0;
-        string output = " ";
-        // keep trying random points with NavMesh.SamplePosition() 
+        // keep trying random points 
         // until we have X (numberOfEnemies) amount of Vector3 points for boats in the enemyBoatLoadPositions list
         while (enemyBoatLoadPositions.Count < numberOfEnemies)
         {
             int randomX = Random.Range(0, X);
             int randomY = Random.Range(0, Y);
-            Vector3 randomPoint = new Vector3(randomX, 0, randomY);
-            NavMeshHit hit;
+            Vector3 randomPoint = new Vector3(randomY, 0, randomX);
 
-            if (count < 25) Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation]);
+            if (count < 25) Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"]);
             count ++;
 
+            if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"] == 0)
 
-
-            if ((layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation] * layerTerrain.depth) < .05f) //use layerTerrain.highest_e
             {
-                Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation] * layerTerrain.depth);
+                Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation]);
                 enemyBoatLoadPositions.Add(randomPoint);
             }
 
-
-
-            /*if (NavMesh.SamplePosition(randomPoint, out hit, acceptableDistanceFromLand, 1)) //returns true and sets hit of the nearest navmesh point
-            {
-                if (layerTerrain.finalMap.GetTile((int)hit.position.x, (int)hit.position.z).ValuesHere[LayersEnum.Elevation] <= 0.01f) 
-                {
-                    Vector3 onTopWater = hit.position + new Vector3(0, waterHeight, 0);
-                    enemyBoatLoadPositions.Add(onTopWater);
-                }
-                
-            }*/
         }
-        Debug.Log($"{count} iterations to get all points");
-        Debug.Log("highest elevation is "+layerTerrain.depth);
 
         for (int i = 0; i < enemyBoatLoadPositions.Count; i++)
         {

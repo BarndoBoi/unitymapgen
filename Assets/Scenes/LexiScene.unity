@@ -5784,6 +5784,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   layerTerrain: {fileID: 1904438397}
+  biomes: {fileID: 1904438398}
   terrain: {fileID: 1904438394}
   waterPrefab: {fileID: 236233829}
   waterMeshPlane: {fileID: 1204811853}
@@ -6366,7 +6367,7 @@ MonoBehaviour:
   AllBiomes:
     values:
     - name: Water
-      value: 0
+      value: 0.05
       index: 0
       isWaterLayer: 1
     - name: Beach Sand

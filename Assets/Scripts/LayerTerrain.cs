@@ -21,6 +21,8 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private Biomes biomes;
 
+   
+
     //Future TODO: Standardize these naming conventions between the ProcGenTiles library and our codebase
     [SerializeField]
     public int X;
@@ -52,11 +54,11 @@ public class LayerTerrain : MonoBehaviour
 
     public Renderer targetRenderer;
 
-    public float highest_e = -100;
-    public float lowest_e = 100;
+    private float highest_e = -100;
+    private float lowest_e = 100;
 
     // ----------------- DEBUG STUFF
-    bool print_debug = false;
+    bool print_debug = true;
     
 
     
@@ -105,8 +107,8 @@ public class LayerTerrain : MonoBehaviour
         GenerateBiome();
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
-        //pathfinding.LandWaterFloodfill(0, 0, allBiomes);
-        //pathfinding.MarkAllRegions();
+        pathfinding.LandWaterFloodfill(0, 0, biomes);
+        pathfinding.MarkAllRegions();
         Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
         for (int i = 0; i < pathfinding.regionSizes.Count; i++)
         {
@@ -144,7 +146,7 @@ public class LayerTerrain : MonoBehaviour
                 // Work in progress don't @ me
                 void biome()
                 {
-                    if (elevation <= biomes.AllBiomes.values[0].value) { SetTexture("Water"); return; };
+                    //if (elevation <= biomes.AllBiomes.values[0].value) { SetTexture("Water"); return; };
                     if (elevation < biomes.AllBiomes.values[1].value) { SetTexture("Sand"); return; };
 
                     if (elevation < biomes.AllBiomes.values[2].value) //if in grass band
@@ -226,6 +228,7 @@ public class LayerTerrain : MonoBehaviour
                     finalTile.ValuesHere.Add(layer, noiseValue); //Create the entry and assign the first layer's value
                 }
 
+
                 //track highest lowest values for later
                 if (finalTile.ValuesHere[layer] < lowest_e) { lowest_e = finalTile.ValuesHere[layer]; };
                 if (finalTile.ValuesHere[layer] > highest_e) { highest_e = finalTile.ValuesHere[layer]; };
@@ -270,6 +273,9 @@ public class LayerTerrain : MonoBehaviour
 
             }
         }
+
+        
+
         if (print_debug)
         {
             Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
