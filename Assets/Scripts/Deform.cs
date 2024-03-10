@@ -24,7 +24,7 @@ public class Deform : MonoBehaviour
     Map map; //Fetched out of the terrain, but it would be wise to have a delegate this can listen for when the LayerTerrain has finished making the map (or move assignment to DeformTerrain)
 
     [SerializeField]
-    int Radius; //This is how many tiles (in a circle) the deform will affect
+    int Radius; //This is how many tiles (in a circle) the deform will affect 
     [SerializeField]
     float Change; //Change the layer's float value by this amount (use negative numbers to subtract from the layer, positive to add)
 
