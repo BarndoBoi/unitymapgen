@@ -52,7 +52,7 @@ namespace ProcGenTiles
 		
 		public void MarkAllRegions()
 		{
-			/*//Get a list of all tiles
+			//Get a list of all tiles
 			List<(int x, int y)> values = new List<(int x, int y)>();
 			
 			for (int x = 0; x < Map.Width; x++)
@@ -94,7 +94,7 @@ namespace ProcGenTiles
 				visited.Clear();
 			}
 			//Mark until frontier is empty, removing values from the list
-			//increment region and pop first item from list until list is empty*/
+			//increment region and pop first item from list until list is empty
 		}
 
 		public void BFS((int x, int y) start)

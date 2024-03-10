@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 6882644294299832098}
   - component: {fileID: 322725379030402410}
   - component: {fileID: -3875775074865920806}
-  - component: {fileID: -1469691969892171587}
   m_Layer: 6
   m_Name: projectile
   m_TagString: Untagged
@@ -128,23 +127,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03c6b742b1bc7f74fb5c0a7970b5e93e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-1469691969892171587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 241221087600015630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2af3d72654d0e254e89b0994e50e7257, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Target: {fileID: 0}
-  ForceRatio: 0
-  MaxThrowForce: 25
-  AttackDelay: 5
-  UseMovementPrediction: 0
-  MovementPredictionMode: 0
-  HistoricalTime: 1
-  HistoricalResolution: 10

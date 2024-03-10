@@ -93,6 +93,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1852255567708418750}
+  - component: {fileID: 1852255567708418745}
+  - component: {fileID: 1852255567708418747}
   - component: {fileID: 393308948147795100}
   - component: {fileID: 1852255567707926173}
   m_Layer: 0
@@ -119,6 +121,51 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1852255567708418745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1852255567707926174}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7248306027cef54097d172a8caa1542, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 0.5
+  turnRate: 0.7
+  minimumInput: 0.01
+--- !u!114 &1852255567708418747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1852255567707926174}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 841dbe60f23cc9047981be0e84ec31b9, type: 3}
+  m_NotificationBehavior: 1
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Gameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!114 &393308948147795100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,15 +178,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 842591785bedd7242afb70c9fe0050b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 0
-  maxHealth: 1
-  maffs: {fileID: -1469691969892171587, guid: f66e3319244f7564eb06da48a97c7211, type: 3}
-  target: {fileID: 450943444966142036, guid: e365c8aeae9d7134c9b062c484ef1990, type: 3}
+  maffs: {fileID: 0}
+  target: {fileID: 0}
   navMeshAgent: {fileID: 1852255567707926173}
   animator: {fileID: 0}
   sightDistance: 0
   shootingDistance: 250
-  projectile: {fileID: 241221087600015630, guid: f66e3319244f7564eb06da48a97c7211, type: 3}
+  projectile: {fileID: 0}
   randomPathDistance: 0
   AttackDelay: 5
 --- !u!195 &1852255567707926173

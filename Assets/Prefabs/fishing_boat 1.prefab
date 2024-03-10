@@ -615,13 +615,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0.5
   turnRate: 0.7
-  minPower: 0
-  maxPower: 0
   cannon_tube: {fileID: 7762174202953388103}
   cannon_base: {fileID: 7762174202953340525}
   projectile: {fileID: 241221087600015630, guid: f66e3319244f7564eb06da48a97c7211, type: 3}
   LineRenderer: {fileID: 2072175655748375397}
   FirePoint: {fileID: 2072175655748375398}
+  launchForce: 15
   ExplosionDelay: 5
   LinePoints: 175
   timeIntervalInPoints: 0.1
@@ -643,4 +642,3 @@ MonoBehaviour:
   terrain: {fileID: 0}
   Radius: 5
   Change: -0.2
-  nm_builder_object: {fileID: 0}
