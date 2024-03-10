@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 
 
-    public class SimpleCameraController : MonoBehaviour
-    {
-        class CameraState
+public class SimpleCameraController : MonoBehaviour
+{
+
+
+    class CameraState
         {
+            public SimpleCameraController cam;
             public float yaw;
             public float pitch;
             public float roll;
@@ -12,7 +15,9 @@
             public float y;
             public float z;
 
-            public void SetFromTransform(Transform t)
+        
+
+        public void SetFromTransform(Transform t)
             {
                 pitch = t.eulerAngles.x;
                 yaw = t.eulerAngles.y;
@@ -20,6 +25,7 @@
                 x = t.position.x;
                 y = t.position.y;
                 z = t.position.z;
+
             }
 
             public void Translate(Vector3 translation)
@@ -159,14 +165,18 @@
             boost += Input.mouseScrollDelta.y * 0.2f;
             translation *= Mathf.Pow(2.0f, boost);
 
+            // Don't translate
             m_TargetCameraState.Translate(translation);
 
             // Framerate-independent interpolation
             // Calculate the lerp amount, such that we get 99% of the way to our target in the specified time
             var positionLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / positionLerpTime) * Time.unscaledDeltaTime);
             var rotationLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / rotationLerpTime) * Time.unscaledDeltaTime);
+            
             m_InterpolatingCameraState.LerpTowards(m_TargetCameraState, positionLerpPct, rotationLerpPct);
 
-            m_InterpolatingCameraState.UpdateTransform(transform);
+        m_InterpolatingCameraState.UpdateTransform(transform);
+        //m_InterpolatingCameraState.UpdateTransform(camera_loc);
+
         }
     }
