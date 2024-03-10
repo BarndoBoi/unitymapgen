@@ -32,12 +32,16 @@ public class GameManager: MonoBehaviour
 
     [SerializeField]
     private int numberOfEnemies;
+
     public static List<Vector3> enemyBoatLoadPositions = new List<Vector3>();
+    public static List<Vector3> playerBoatLoadPositions = new List<Vector3>();
 
     [SerializeField]
     public GameObject enemyBoat;
-
     public EnemyBoat enemy;
+
+    [SerializeField]
+    public GameObject playerBoat;
 
     public float waterHeight;
 
@@ -60,9 +64,10 @@ public class GameManager: MonoBehaviour
         LoadWaterShader();
         LoadMapBoundingBox();
         LoadNavMeshBuilder();
-
+        
+        //LoadPlayerBoat();
         LoadEnemyBoats();
-        LoadPlayerBoat();
+        
 
         
     }
@@ -127,24 +132,21 @@ public class GameManager: MonoBehaviour
     public void LoadEnemyBoats()
     {
 
-        int count = 0;
+
         // keep trying random points 
         // until we have X (numberOfEnemies) amount of Vector3 points for boats in the enemyBoatLoadPositions list
-        while (enemyBoatLoadPositions.Count < numberOfEnemies)
+        while (enemyBoatLoadPositions.Count < numberOfEnemies) // TODO: will need to handle for multiple players
         {
             int randomX = Random.Range(0, X);
             int randomY = Random.Range(0, Y);
-            Vector3 randomPoint = new Vector3(randomY, 0, randomX);
-
-            //if (count < 25) Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"]);
-            count ++;
-
-            if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"] == 0)
-
+            Vector3 randomPoint = new Vector3(randomY, waterHeight, randomX);
+            if (!playerBoatLoadPositions.Contains(randomPoint))
             {
-                enemyBoatLoadPositions.Add(randomPoint);
+                if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"] == 0)
+                {
+                    enemyBoatLoadPositions.Add(randomPoint);
+                }
             }
-
         }
 
         for (int i = 0; i < enemyBoatLoadPositions.Count; i++)
@@ -156,7 +158,29 @@ public class GameManager: MonoBehaviour
 
     public void LoadPlayerBoat()
     {
+        int randomX;
+        int randomY;
+        Vector3 randomPoint = new Vector3(0, 0, 0);
+        int num_of_players = 1; //TODO: will need to handle for multiple players
+        while (playerBoatLoadPositions.Count < num_of_players)
+        {
+            randomX = Random.Range(0, X);
+            randomY = Random.Range(0, Y);
+            randomPoint = new Vector3(randomY, waterHeight, randomX);
+            if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"] == 0)
+            {
+                playerBoatLoadPositions.Add(randomPoint);
+            }
+        }
+        //randomPoint.y += waterHeight;
+        for (int i = 0; i < playerBoatLoadPositions.Count; i++)
+        {
+            //Debug.Log(playerBoat.transform.position);
+            //Debug.Log(playerBoat.transform.position + randomPoint);
 
+            //Instantiate(playerBoat, playerBoatLoadPositions[i], new Quaternion(0, 0, 0, 0), terrain.transform);
+            playerBoat.transform.position = terrain.transform.position + randomPoint;
+        }
     }
 
 }
