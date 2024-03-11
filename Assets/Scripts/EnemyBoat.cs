@@ -70,15 +70,10 @@ public class EnemyBoat : MonoBehaviour
 
         if (targetInSightRange)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(raycastOrigin, target.position - raycastOrigin, out hit))
+            
+            if (Physics.Raycast(raycastOrigin, target.position - raycastOrigin, out RaycastHit hit))
             {
-                // probs wanna compare using the type of collider? idk
-                //Debug.Log(hit.collider.gameObject.name);
-                //if (hit.collider.gameObject.name == "Player")
-                
-                
-                // almost
+                              
                 if (hit.collider.gameObject.name == "mesh")
                 {
                     GameObject meshParentGameObject = hit.collider.gameObject.transform.parent.gameObject;
@@ -92,27 +87,13 @@ public class EnemyBoat : MonoBehaviour
                         }
 
                     }
-                } else if (haveLineOfSight & hit.collider.gameObject.name == "Terrain") 
-                    {
+                } 
+                else if (haveLineOfSight & hit.collider.gameObject.name == "Terrain") //just lost line of sight
+                {
                     haveLineOfSight = false;
-                    }
-
-
-
-                /*    if (hit.collider.gameObject.name == "Player")
-                {
-                    if (!haveLineOfSight)
-                    {
-                        haveLineOfSight = true;
-
-                    }
-                }else if (haveLineOfSight & hit.collider.gameObject.name != "Player")
-                {
-                    haveLineOfSight = false; 
-                }*/
-
-                
+                }
             }
+
             if (haveLineOfSight) 
             { 
                 Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.green); 
@@ -134,7 +115,20 @@ public class EnemyBoat : MonoBehaviour
                 break;
 
             case State.Chase:
-                UpdatePath(target.position);
+                // get a point that's between the max shooting distance
+                // and some arbitrary point within that distance
+                float min_shootingDistance = shootingDistance / 2; //whatever man for now just halfway between the player and the outer shooting range
+                float randomShootingDistanceFromTarget = Random.Range(shootingDistance, min_shootingDistance);
+                Vector3 direction = (transform.position - target.position);
+                Vector3 randomPointInShootingRange = target.position + Vector3.ClampMagnitude(direction,randomShootingDistanceFromTarget);
+
+                // TODO: I still need to check if point is on water...  
+                // currently I think the NavMeshAgent will, when given a land point,
+                // set its destination to the furthest point on the path it CAN reach.
+                // it definitely works, but it's not correct lol
+                // but at least no more clusterfuck of enemies
+                // trying to get inside the player xD
+                UpdatePath(randomPointInShootingRange);
                 break;
 
             case State.Fire:
@@ -148,6 +142,7 @@ public class EnemyBoat : MonoBehaviour
                 }
                 break;
         }
+
         // if searching AND in view range AND can see them:    start chasing
         //if (state == State.Roaming & targetInSightRange & haveLineOfSight)
         if (state == State.Roaming & targetInSightRange)
@@ -156,7 +151,6 @@ public class EnemyBoat : MonoBehaviour
         }
 
         // if target gets out of sight, go back to searching
-
         // TODO: if target goes around corner breaking LOS,
         //       go to last seen coordinate
         //       try to reestablish sight.
