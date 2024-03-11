@@ -6,9 +6,6 @@ using UnityEngine.AI;
 public class EnemyBoat : MonoBehaviour
 {
 
-    [SerializeField]
-    int health, maxHealth = 1;
-
     private bool targetInSightRange;
     private bool targetInShootingRange;
     private bool haveLineOfSight;
@@ -61,7 +58,6 @@ public class EnemyBoat : MonoBehaviour
     private void Start()
     {
         LastAttackTime = Random.Range(0, 5);
-        health = maxHealth;
 
     }
 
@@ -78,23 +74,20 @@ public class EnemyBoat : MonoBehaviour
             {
                 // probs wanna compare using the type of collider? idk
                 //Debug.Log(hit.collider.gameObject.name);
-                if (hit.collider.gameObject.name == "mesh")
-                {   GameObject meshParentGameObject = hit.collider.gameObject.transform.parent.gameObject;
-                    string meshParentGameObject_name = hit.collider.gameObject.transform.parent.name;
-                    
-                    if (meshParentGameObject_name == "Player")
-                    {
-                        if (!haveLineOfSight)
-                        {
-                            haveLineOfSight = true;
+                //if (hit.collider.gameObject.name == "Player")
 
-                        }
-                    }
-                    else if (haveLineOfSight & meshParentGameObject_name != "Player")
+                if (hit.collider.gameObject.name == "Player")
+                {
+                    if (!haveLineOfSight)
                     {
-                        haveLineOfSight = false;
+                        haveLineOfSight = true;
+
                     }
-            }
+                }else if (haveLineOfSight & hit.collider.gameObject.name != "Player")
+                {
+                    haveLineOfSight = false; 
+                }
+
                 
             }
             if (haveLineOfSight) 
@@ -154,9 +147,9 @@ public class EnemyBoat : MonoBehaviour
         // should always be chasing to close distance before firing
         if (state == State.Chase & targetInShootingRange & haveLineOfSight)
         {
-            state = State.Fire; // comment this out if you don't want them to fire lol
-        }
+            state = State.Fire;
 
+        }
         if (state == State.Fire & !targetInShootingRange & haveLineOfSight)
         {
             state = State.Chase;
@@ -164,19 +157,6 @@ public class EnemyBoat : MonoBehaviour
 
     }
 
-    public void TakeDamage(int damageAmount)
-    {
-        // TODO need to setup Events so that we can track
-        // when an enemy dies in the GameManager
-        // and display how many are left and stuff
-
-        health -= damageAmount;
-
-        if (health <= 0)
-        {
-            Destroy(gameObject);
-        }
-    }
 
     public Vector3 RandomNavmeshLocation(float radius)
     {

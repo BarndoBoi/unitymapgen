@@ -40,7 +40,6 @@ namespace ProcGenTiles
 					throw new InvalidOperationException("Cannot floodfill without elevation data");
 				}
 
-				// TODO: Babes why are we doing this land-check here, and not when terrain is generated? 
                 if (tile.ValuesHere["Elevation"] >= waterElevation)
                     tile.ValuesHere.Add("Land", 1); //Heck this only takes floats so we'll use positive 1 for true and 0 for false
                 else
@@ -54,7 +53,6 @@ namespace ProcGenTiles
 		{
 			//Get a list of all tiles
 			List<(int x, int y)> values = new List<(int x, int y)>();
-			
 			for (int x = 0; x < Map.Width; x++)
 			{
 				for (int y = 0; y < Map.Height; y++)

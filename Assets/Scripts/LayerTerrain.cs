@@ -58,7 +58,7 @@ public class LayerTerrain : MonoBehaviour
     private float lowest_e = 100;
 
     // ----------------- DEBUG STUFF
-    bool print_debug = false;
+    bool print_debug = true;
     
 
     
@@ -107,17 +107,13 @@ public class LayerTerrain : MonoBehaviour
         GenerateBiome();
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
-
-
         pathfinding.LandWaterFloodfill(0, 0, biomes);
         pathfinding.MarkAllRegions();
-
-
-        /*Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
+        Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
         for (int i = 0; i < pathfinding.regionSizes.Count; i++)
         {
             Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
-        }*/
+        }
     }
 
     public void CreateTerrainFromHeightmap()
