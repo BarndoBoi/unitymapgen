@@ -27,6 +27,8 @@ public class CannonSteer : MonoBehaviour
     [SerializeField]
     public LineRenderer LineRenderer;
     [SerializeField]
+    public Material LineRendererMaterial;
+    [SerializeField]
     private Transform FirePoint;
 
     /*[SerializeField]
@@ -58,10 +60,12 @@ public class CannonSteer : MonoBehaviour
     void Start()
     {
         launchForce = minPower;
-    }
+        LineRenderer.material = LineRendererMaterial;
 
-    // Update is called once per frame
-    void Update()
+}
+
+// Update is called once per frame
+void Update()
     {
         //float turnAngle = steerInput.x * turnRate;
         //float fireAngle = steerInput.y * turnRate;

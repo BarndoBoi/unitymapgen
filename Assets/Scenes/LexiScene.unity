@@ -477,6 +477,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 813269096}
   m_CullTransparentMesh: 1
+--- !u!1 &818626160
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 818626161}
+  m_Layer: 0
+  m_Name: temporary_camera_look_point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &818626161
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 818626160}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 11, z: -3.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2072175656984039800}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &847197815
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -558,6 +589,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1852255567708418750, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1852255568529660420, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7984205013556411848, guid: d3563054e418c194eae645bd73fb21c5, type: 3}
@@ -6713,6 +6748,7 @@ MonoBehaviour:
   cannon_base: {fileID: 7762174202322993461}
   projectile: {fileID: 241221087600015630, guid: f66e3319244f7564eb06da48a97c7211, type: 3}
   LineRenderer: {fileID: 2072175656209073213}
+  LineRendererMaterial: {fileID: 2100000, guid: 3edd373b8a72ef24094998288826502f, type: 2}
   FirePoint: {fileID: 2072175656209073214}
   ExplosionDelay: 5
   LinePoints: 175
@@ -6913,7 +6949,6 @@ GameObject:
   - component: {fileID: 2072175656789108823}
   - component: {fileID: 2072175656789108816}
   - component: {fileID: 2072175656789108817}
-  - component: {fileID: 2072175656789108824}
   - component: {fileID: 2072175656789108825}
   - component: {fileID: 2072175656789108826}
   m_Layer: 0
@@ -6930,56 +6965,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2072175656789108818}
-  m_LocalRotation: {x: 0.14834228, y: 0.40350294, z: -0.066476054, w: 0.90042263}
-  m_LocalPosition: {x: -5.355, y: 4.46, z: -1.8}
+  m_LocalRotation: {x: 0.13052616, y: 0, z: 0, w: 0.9914449}
+  m_LocalPosition: {x: 0, y: 15.65, z: -23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1221971441}
   m_Father: {fileID: 2072175656984039800}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 18.711, y: 48.277, z: 0}
---- !u!114 &2072175656789108824
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2072175656789108818}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ef9108316eade6438bf14349810a3e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsRMBRequired: 1
-  boost: 3.5
-  positionLerpTime: 0.2
-  mouseSensitivityCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.5
-      inSlope: 0
-      outSlope: 5
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 2.5
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  rotationLerpTime: 0.01
-  invertY: 0
+  m_LocalEulerAnglesHint: {x: 15, y: 0, z: 0}
 --- !u!114 &2072175656789108825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7026,7 +7020,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableRotation: 1
-  target: {fileID: 7762174202323213839}
+  target: {fileID: 818626161}
   rotationSpeedMouse: 5
   zoomSpeedMouse: 10
   rotationSpeedTouch: 5
@@ -7135,6 +7129,7 @@ Transform:
   - {fileID: 2072175656789108823}
   - {fileID: 2072175656984039806}
   - {fileID: 7762174202323213839}
+  - {fileID: 818626161}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
