@@ -40,12 +40,12 @@ namespace ProcGenTiles
 					throw new InvalidOperationException("Cannot floodfill without elevation data");
 				}
 
-				if (tile.ValuesHere["Elevation"] >= waterElevation)
-					tile.ValuesHere.Add("Land", 1); //Heck this only takes floats so we'll use positive 1 for true and 0 for false
-				else
-					tile.ValuesHere.Add("Land", 0);
-				
-				AddFourNeighbors(coords.x, coords.y, queue);
+                if (tile.ValuesHere["Elevation"] >= waterElevation)
+                    tile.ValuesHere.Add("Land", 1); //Heck this only takes floats so we'll use positive 1 for true and 0 for false
+                else
+                    tile.ValuesHere.Add("Land", 0);
+
+                AddFourNeighbors(coords.x, coords.y, queue);
 			}
 		}
 		
