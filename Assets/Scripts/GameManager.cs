@@ -85,7 +85,6 @@ public class GameManager: MonoBehaviour
             index++;
         }
         terrain.terrainData.terrainLayers = layers.ToArray();
-
     }
 
 
@@ -126,8 +125,6 @@ public class GameManager: MonoBehaviour
 
     public void LoadEnemyBoats()
     {
-
-        int count = 0;
         // keep trying random points 
         // until we have X (numberOfEnemies) amount of Vector3 points for boats in the enemyBoatLoadPositions list
         while (enemyBoatLoadPositions.Count < numberOfEnemies)
@@ -136,13 +133,8 @@ public class GameManager: MonoBehaviour
             int randomY = Random.Range(0, Y);
             Vector3 randomPoint = new Vector3(randomY, 0, randomX);
 
-            if (count < 25) Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"]);
-            count ++;
-
             if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"] == 0)
-
             {
-                Debug.Log(layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere[LayersEnum.Elevation]);
                 enemyBoatLoadPositions.Add(randomPoint);
             }
 

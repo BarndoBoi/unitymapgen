@@ -27,7 +27,9 @@ public class Projectile : MonoBehaviour
         // look up casting
         deform = (Deform)GameObject.FindObjectOfType(typeof(Deform));
         terrainCollider = (TerrainCollider)GameObject.FindObjectOfType(typeof(TerrainCollider));
-        
+        biomes = (Biomes)GameObject.FindObjectOfType(typeof(Biomes));
+        layerTerrain = (LayerTerrain)GameObject.FindObjectOfType(typeof(LayerTerrain));
+
     }
 
     private void Start()

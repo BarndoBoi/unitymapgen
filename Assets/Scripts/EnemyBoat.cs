@@ -140,8 +140,9 @@ public class EnemyBoat : MonoBehaviour
             case State.Fire:
                 //get maffs
                 if (target.position != transform.position & Time.time > LastAttackTime + AttackDelay) {
-                    TrajectoryMaffs.ThrowData data = maffs.CalculateThrowData(target.position, transform.position);
-                    //Debug.Log(data.ThrowVelocity);
+                    //TODO: this will be fixed when we have the cannons working, for now need to instantiate above boat so it doesn't instantiate inside itself
+                    Vector3 boatTop = transform.position + new Vector3(0, 4, 0);
+                    TrajectoryMaffs.ThrowData data = maffs.CalculateThrowData(target.position, boatTop); // need to instantiate ABOVE the boat so it doesn't hit it.
                     Fire(data);
                     LastAttackTime = Time.time;
                 }
@@ -209,7 +210,9 @@ public class EnemyBoat : MonoBehaviour
 
     private void Fire(TrajectoryMaffs.ThrowData data)
     {
-        Rigidbody projectile_rb = Instantiate(projectile, transform.position, transform.rotation).GetComponent<Rigidbody>();
+        //TODO: this will be fixed when we have the cannons working, for now need to instantiate above boat so it doesn't instantiate inside itself
+        Vector3 boatTop = transform.position + new Vector3(0, 4, 0);
+        Rigidbody projectile_rb = Instantiate(projectile, boatTop, transform.rotation).GetComponent<Rigidbody>();
 
         projectile_rb.AddForce(data.ThrowVelocity, ForceMode.Impulse);
 

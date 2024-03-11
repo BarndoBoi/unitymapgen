@@ -58,7 +58,7 @@ public class LayerTerrain : MonoBehaviour
     private float lowest_e = 100;
 
     // ----------------- DEBUG STUFF
-    bool print_debug = true;
+    bool print_debug = false;
     
 
     
@@ -108,12 +108,18 @@ public class LayerTerrain : MonoBehaviour
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
         pathfinding.LandWaterFloodfill(0, 0, biomes);
-        //pathfinding.MarkAllRegions();
-        Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
-        for (int i = 0; i < pathfinding.regionSizes.Count; i++)
+        
+        //pathfinding.MarkAllRegions(); // turned off until optimized
+        
+        if (print_debug)
         {
-            Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
+            Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
+            for (int i = 0; i < pathfinding.regionSizes.Count; i++)
+            {
+                Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
+            }
         }
+        
     }
 
     public void CreateTerrainFromHeightmap()
@@ -129,7 +135,6 @@ public class LayerTerrain : MonoBehaviour
     {
         TerrainData terrainData = terrain.terrainData;
         float[,,] splatmapData = new float[end_x-start_x, end_y-start_y, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
-        //Debug.Log("NUMBER OF LAYERS IS  "+terrainData.alphamapLayers);
         for (int y = start_y; y < end_y; y++)
         {
             for (int x = start_x; x < end_x; x++)
