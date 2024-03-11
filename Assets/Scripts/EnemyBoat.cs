@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class EnemyBoat : MonoBehaviour
 {
+    private int health, maxHealth = 1;
 
     private bool targetInSightRange;
     private bool targetInShootingRange;
@@ -58,13 +59,13 @@ public class EnemyBoat : MonoBehaviour
     private void Start()
     {
         LastAttackTime = Random.Range(0, 5);
+        health = maxHealth;
 
     }
 
     private void Update()
     {
-        Vector3 raycastOrigin = transform.position + new Vector3(0, 4, 0);
-        
+        Vector3 raycastOrigin = transform.position + new Vector3(0, 5, 0);
         targetInSightRange = Vector3.Distance(transform.position, target.position) <= sightDistance;
 
         if (targetInSightRange)
@@ -191,5 +192,14 @@ public class EnemyBoat : MonoBehaviour
         projectile_rb.AddForce(data.ThrowVelocity, ForceMode.Impulse);
 
         //SimulateTrajectory();
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 }

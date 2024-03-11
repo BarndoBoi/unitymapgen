@@ -53,6 +53,17 @@ public class Projectile : MonoBehaviour
             deform.DeformTerrain(new Vector2(contact.z, contact.x), LayersEnum.Elevation);
         }
 
+        if (collision.gameObject.name == "mesh")
+        {
+            GameObject meshParentGameObject = collision.gameObject.transform.parent.gameObject;
+            string meshPArentGameObject_name = collision.gameObject.transform.parent.name;
+
+            if (meshPArentGameObject_name == "Enemy" || meshPArentGameObject_name == "Enemy(Clone)")
+            {
+                meshParentGameObject.GetComponent<EnemyBoat>().TakeDamage(1);
+            }
+        }
+
         GameObject.Destroy(this.gameObject);
     }
 }
