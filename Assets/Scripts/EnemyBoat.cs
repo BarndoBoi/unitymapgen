@@ -76,8 +76,30 @@ public class EnemyBoat : MonoBehaviour
                 // probs wanna compare using the type of collider? idk
                 //Debug.Log(hit.collider.gameObject.name);
                 //if (hit.collider.gameObject.name == "Player")
+                
+                
+                // almost
+                if (hit.collider.gameObject.name == "mesh")
+                {
+                    GameObject meshParentGameObject = hit.collider.gameObject.transform.parent.gameObject;
+                    string meshParentGameObject_name = hit.collider.gameObject.transform.parent.name;
 
-                if (hit.collider.gameObject.name == "Player")
+                    if (meshParentGameObject_name == "Player" || meshParentGameObject_name == "Player(Clone)")
+                    {
+                        if (!haveLineOfSight)
+                        {
+                            haveLineOfSight = true;
+                        }
+
+                    }
+                } else if (haveLineOfSight & hit.collider.gameObject.name == "Terrain") 
+                    {
+                    haveLineOfSight = false;
+                    }
+
+
+
+                /*    if (hit.collider.gameObject.name == "Player")
                 {
                     if (!haveLineOfSight)
                     {
@@ -87,7 +109,7 @@ public class EnemyBoat : MonoBehaviour
                 }else if (haveLineOfSight & hit.collider.gameObject.name != "Player")
                 {
                     haveLineOfSight = false; 
-                }
+                }*/
 
                 
             }
