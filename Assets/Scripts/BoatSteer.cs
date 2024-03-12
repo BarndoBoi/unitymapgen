@@ -25,11 +25,11 @@ public class BoatSteer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //float turnAngle = steerInput.x * turnRate;
-        float turnAngle = steerInput.x / throttle;
-        transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received 
-        
 
+        float turnAngle = Mathf.Clamp(steerInput.x * (.75f / speed),-.5f, .5f); //this needs to be edited to be better but it works
+        transform.Rotate(Vector3.up, turnAngle);
+        
+        //TODO: these can all be simplified down, I made things verbose for debugging
         if (throttle > 0)
         {   if (speed <= throttle) speed += acceleration * throttle * Time.deltaTime; else speed -= acceleration * throttle * Time.deltaTime;
             transform.position += transform.forward * (speed * .05f);
@@ -43,17 +43,10 @@ public class BoatSteer : MonoBehaviour
 
         if (throttle == 0)
         {
-            if (speed > throttle) speed -= acceleration * Time.deltaTime; else speed += acceleration * Time.deltaTime;
+            if (speed > throttle) speed -= acceleration * Time.deltaTime;
+            if (speed < throttle) speed += acceleration * Time.deltaTime;
             transform.position += transform.forward * (speed * .05f);
         }
-
-
-     /*   if (speed < throttle)
-        {
-            speed += acceleration * Time.deltaTime;
-        }
-        if (throttle != 0) transform.position += transform.forward * (throttle * speed * .05f);*/
-
 
     }
 
@@ -64,7 +57,7 @@ public class BoatSteer : MonoBehaviour
         steerInput = value.Get<Vector2>();
         throttle = Mathf.Clamp(throttle + (int)steerInput.y, -1 ,4 );
         
-        if (oldThrottle != throttle) Debug.Log(throttle);
+        //if (oldThrottle != throttle) Debug.Log(throttle);
 
     }
 
