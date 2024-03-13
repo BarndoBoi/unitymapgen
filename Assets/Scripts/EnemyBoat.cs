@@ -12,7 +12,7 @@ public class EnemyBoat : MonoBehaviour
     [SerializeField]
     bool showAgentLOS = false;
 
-    //fuggin debug stuff
+    //to show in editor
     [SerializeField]
     State currentState;
     [SerializeField]
@@ -58,11 +58,6 @@ public class EnemyBoat : MonoBehaviour
     [SerializeField]
     private float AttackDelay = 5f;
 
-    /*    [SerializeField]
-        public float pathUpdateDelay = 0.2f;
-
-        [SerializeField]
-        private float pathUpdateDeadline;*/
 
     private enum State
     {
@@ -77,8 +72,6 @@ public class EnemyBoat : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         line = GetComponent<LineRenderer>();
-        //layerTerrain = (LayerTerrain)GameObject.FindObjectOfType(typeof(LayerTerrain));
-
     }
 
     private void Start()
@@ -97,7 +90,7 @@ public class EnemyBoat : MonoBehaviour
 
         if (targetInSightRange)
         {
-            
+ 
             if (Physics.Raycast(raycastOrigin, target.position - raycastOrigin, out RaycastHit hit))
             {
                               
@@ -130,6 +123,19 @@ public class EnemyBoat : MonoBehaviour
 
         } else if (showAgentLOS) Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.white);
 
+        if (showAgentPath && navMeshAgent.hasPath)
+        {
+            line.SetPosition(0, transform.position); //set the line's origin
+            var path = navMeshAgent.path;
+
+            if (path.corners.Length < 2)
+            { //if the path has 1 or no corners, there is no need
+                return;                 
+            }
+
+            line.positionCount = path.corners.Length; //set the array of positions to the amount of corners
+            line.SetPositions(path.corners); //go through each corner and set that to the line renderer's position
+        }
 
         switch (state)
         {
@@ -213,7 +219,8 @@ public class EnemyBoat : MonoBehaviour
         }*/
 
         currentState = state;
-    }
+    
+    } // End of Update() --------------------------------------------------------------
 
 
     public Vector3 RandomNavmeshLocation(float radius)
@@ -270,35 +277,7 @@ public class EnemyBoat : MonoBehaviour
     private void UpdatePath(Vector3 destination)
     {
         navMeshAgent.SetDestination(destination);
-
         if (navMeshAgent.hasPath || navMeshAgent.pathPending) goingTo = destination;
-        
-        if (showAgentPath)
-        {
-            line.positionCount = 0; //try resetting? 
-
-            line.SetPosition(0, transform.position); //set the line's origin
-
-            var path = navMeshAgent.path;
-
-            /*if (path.corners.Length < 2)
-            { //if the path has 1 or no corners, there is no need
-                //Debug.Log("path is too short, not doing line render?");
-                return;                 
-            }*/
-
-            line.positionCount = path.corners.Length; //set the array of positions to the amount of corners
-            //line.SetPositions(path.corners); //go through each corner and set that to the line renderer's position
-
-            for (int i = 0; i < path.corners.Length; i++)
-            {
-                Debug.Log(path.corners.Length + "  " + i);
-                line.SetPosition(i,path.corners[i]);
-            }
-        }
-
-
-
     }
 
     private void Fire(TrajectoryMaffs.ThrowData data)
