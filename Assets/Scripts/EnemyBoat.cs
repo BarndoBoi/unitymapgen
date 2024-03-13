@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+
 public class EnemyBoat : MonoBehaviour
 {
     [SerializeField]
@@ -10,6 +11,19 @@ public class EnemyBoat : MonoBehaviour
 
     [SerializeField]
     bool showAgentLOS = false;
+
+    //fuggin debug stuff
+    [SerializeField]
+    State currentState;
+    [SerializeField]
+    Vector3 currentPos;
+    [SerializeField]
+    Vector3 goingTo;
+    [SerializeField]
+    int pathNumPoints;
+
+
+
 
     private int health, maxHealth = 1;
 
@@ -33,6 +47,8 @@ public class EnemyBoat : MonoBehaviour
     [SerializeField]
     private GameObject projectile;
 
+    [SerializeField]
+    private LayerTerrain layerTerrain;
 
     [SerializeField]
     private float randomPathDistance; // The Radius of the circle that we will pick a point from
@@ -61,7 +77,8 @@ public class EnemyBoat : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         line = GetComponent<LineRenderer>();
-        
+        //layerTerrain = (LayerTerrain)GameObject.FindObjectOfType(typeof(LayerTerrain));
+
     }
 
     private void Start()
@@ -73,6 +90,8 @@ public class EnemyBoat : MonoBehaviour
 
     private void Update()
     {
+        currentPos = transform.position;
+
         Vector3 raycastOrigin = transform.position + new Vector3(0, 5, 0);
         targetInSightRange = Vector3.Distance(transform.position, target.position) <= sightDistance;
 
@@ -116,10 +135,10 @@ public class EnemyBoat : MonoBehaviour
         {
             default:
             case State.Roaming:
-                if (!navMeshAgent.hasPath) // if we don't have a current path, set a new one!
+                if (!navMeshAgent.hasPath && !navMeshAgent.pathPending) // if we don't have a current path, set a new one!
                 {
-                    //Debug.Log("doesn't have path");
-                    UpdatePath(RandomNavmeshLocation(randomPathDistance));
+                    Vector3 next_roaming_point = RandomNavmeshLocation(randomPathDistance);
+                    UpdatePath(next_roaming_point);
                 }
                 break;
 
@@ -172,7 +191,7 @@ public class EnemyBoat : MonoBehaviour
         }
 
         // should always be chasing to close distance before firing
-        /*if (state == State.Chase & targetInShootingRange & haveLineOfSight)
+        if (state == State.Chase & targetInShootingRange & haveLineOfSight)
         {
             //state = State.Fire;
 
@@ -180,9 +199,9 @@ public class EnemyBoat : MonoBehaviour
         if (state == State.Fire & !targetInShootingRange & haveLineOfSight)
         {
             state = State.Chase;
-        }*/
+        }
 
-        // temp not using LOS because not working rn
+        /*// temp not using LOS because not working rn
         if (state == State.Chase & targetInShootingRange)
         {
             //state = State.Fire;
@@ -191,23 +210,53 @@ public class EnemyBoat : MonoBehaviour
         if (state == State.Fire & !targetInShootingRange)
         {
             state = State.Chase;
-        }
+        }*/
 
-        Debug.Log(state);
+        currentState = state;
     }
 
 
     public Vector3 RandomNavmeshLocation(float radius)
     {
-        Vector3 randomDirection = Random.insideUnitSphere * radius;
-        randomDirection += transform.position;
-        NavMeshHit hit;
-        Vector3 finalPosition = Vector3.zero;
-        if (NavMesh.SamplePosition(randomDirection, out hit, radius, 1))
+        bool foundPosition = false;
+        Vector3 randomPointInCircle = Vector3.zero;
+
+        while (!foundPosition)
         {
-            finalPosition = hit.position;
+
+            randomPointInCircle = Random.insideUnitSphere * radius; // specifying unityengine because using System temporarily
+            randomPointInCircle = transform.position + randomPointInCircle;
+
+            //make sure value is on the map, and set Y to water level
+            randomPointInCircle.x = Mathf.Clamp(randomPointInCircle.x, 0, layerTerrain.X - 1);
+            randomPointInCircle.y = layerTerrain.waterheight_int;
+            randomPointInCircle.z = Mathf.Clamp(randomPointInCircle.z, 0, layerTerrain.Y - 1);
+            try //temp in try catch
+            {
+                if (layerTerrain.finalMap.GetTile((int)randomPointInCircle.z, (int)randomPointInCircle.x).ValuesHere["Land"] == 0)
+                {
+                    foundPosition = true;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log("GetTile() failed to get tile:  "+(int)randomPointInCircle.z+ "  /  " + (int)randomPointInCircle.x);
+                Debug.Log(e);
+            }
         }
+
+        
+
+        // now we run that point through the navmesh point finder to get a point ON the navmesh, and that should fix the problem?
+        //NavMeshHit hit;
+        Vector3 finalPosition = Vector3.zero;
+        if (NavMesh.SamplePosition(randomPointInCircle, out NavMeshHit hit, 5, 1))
+        {
+            finalPosition += hit.position;
+        } else Debug.Log("Bad Navmesh Point " + randomPointInCircle + "  (This Error Should Never Be Seen!!)");
         return finalPosition;
+
+        //return randomPointInCircle;
     }
 
     private void LookAtTarget()
@@ -220,23 +269,33 @@ public class EnemyBoat : MonoBehaviour
 
     private void UpdatePath(Vector3 destination)
     {
-        
-        if (navMeshAgent.SetDestination(destination))
-        {
-            //Debug.Log("path successfully updated to    " + destination);
-        }
+        navMeshAgent.SetDestination(destination);
 
-        /*if (showAgentPath)
+        if (navMeshAgent.hasPath || navMeshAgent.pathPending) goingTo = destination;
+        
+        if (showAgentPath)
         {
+            line.positionCount = 0; //try resetting? 
+
             line.SetPosition(0, transform.position); //set the line's origin
-            
+
             var path = navMeshAgent.path;
-            if (path.corners.Length < 2) //if the path has 1 or no corners,
-                return;                  //there is no need
+
+            /*if (path.corners.Length < 2)
+            { //if the path has 1 or no corners, there is no need
+                //Debug.Log("path is too short, not doing line render?");
+                return;                 
+            }*/
 
             line.positionCount = path.corners.Length; //set the array of positions to the amount of corners
-            line.SetPositions(path.corners); //go through each corner and set that to the line renderer's position
-        }*/
+            //line.SetPositions(path.corners); //go through each corner and set that to the line renderer's position
+
+            for (int i = 0; i < path.corners.Length; i++)
+            {
+                Debug.Log(path.corners.Length + "  " + i);
+                line.SetPosition(i,path.corners[i]);
+            }
+        }
 
 
 
