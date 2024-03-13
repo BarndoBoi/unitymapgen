@@ -199,7 +199,7 @@ public class EnemyBoat : MonoBehaviour
         // should always be chasing to close distance before firing
         if (state == State.Chase & targetInShootingRange & haveLineOfSight)
         {
-            //state = State.Fire;
+            state = State.Fire;
 
         }
         if (state == State.Fire & !targetInShootingRange & haveLineOfSight)
@@ -207,16 +207,6 @@ public class EnemyBoat : MonoBehaviour
             state = State.Chase;
         }
 
-        /*// temp not using LOS because not working rn
-        if (state == State.Chase & targetInShootingRange)
-        {
-            //state = State.Fire;
-
-        }
-        if (state == State.Fire & !targetInShootingRange)
-        {
-            state = State.Chase;
-        }*/
 
         currentState = state;
     

@@ -5,10 +5,12 @@ using UnityEngine.InputSystem;
 
 public class BoatSteer : MonoBehaviour
 {
-
     [SerializeField]
-    float acceleration = 0.05f;
-    
+
+    float acceleration = 0.20f;
+    [SerializeField]
+    float speed = 0.0f;
+
     [SerializeField]
     float turnRate = 0.05f;
 
@@ -21,14 +23,6 @@ public class BoatSteer : MonoBehaviour
 
     private Vector2 steerInput;
 
-    private Rigidbody playerBoat_RB;
-
-    [SerializeField]
-    private Transform front_of_boat;
-
-    [SerializeField]
-    private Transform rear_of_boat;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -39,13 +33,13 @@ public class BoatSteer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        float turnAngle = Mathf.Clamp(steerInput.x * (.75f / speed),-.5f, .5f); //this needs to be edited to be better but it works
-        transform.Rotate(Vector3.up, turnAngle); 
+        float turnAngle = Mathf.Clamp(steerInput.x * (.75f / speed), -.5f, .5f); //this needs to be edited to be better but it works
+        transform.Rotate(Vector3.up, turnAngle);
 
         //TODO: these can all be simplified down, I made things verbose for debugging
         if (throttle > 0)
-        {   if (speed <= throttle) speed += acceleration * throttle * Time.deltaTime; else speed -= acceleration * throttle * Time.deltaTime;
+        {
+            if (speed <= throttle) speed += acceleration * throttle * Time.deltaTime; else speed -= acceleration * throttle * Time.deltaTime;
             transform.position += transform.forward * (speed * .05f);
         }
 
@@ -66,13 +60,8 @@ public class BoatSteer : MonoBehaviour
 
     void OnMove(InputValue value)
     {
-        int oldThrottle = throttle;
-
         steerInput = value.Get<Vector2>();
-        throttle = Mathf.Clamp(throttle + (int)steerInput.y, -1 ,4 );
-        
-        if (oldThrottle != throttle) Debug.Log(throttle);
-
+        throttle = Mathf.Clamp(throttle + (int)steerInput.y, -1, 4);
     }
 
     void OnChangeCamera(InputValue value)
