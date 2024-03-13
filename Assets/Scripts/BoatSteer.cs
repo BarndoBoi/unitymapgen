@@ -6,25 +6,29 @@ using UnityEngine.InputSystem;
 public class BoatSteer : MonoBehaviour
 {
     [SerializeField]
+
     float acceleration = 0.20f;
     [SerializeField]
     float speed = 0.0f;
+
     [SerializeField]
-    float turnRate = 0.8f;
-    [SerializeField]
-    float minimumInput = 0.01f; //Can't go slower than this
+    float turnRate = 0.05f;
 
     [SerializeField]
     [Range(-1, 4)]
     int throttle = 0;
 
-    private Vector2 steerInput;
+    [SerializeField]
+    float speed = 0.0f;
 
+    private Vector2 steerInput;
 
     // Start is called before the first frame update
     void Start()
     {
+        playerBoat_RB = GetComponent<Rigidbody>();
     }
+    
 
     // Update is called once per frame
     void Update()
@@ -56,13 +60,8 @@ public class BoatSteer : MonoBehaviour
 
     void OnMove(InputValue value)
     {
-        int oldThrottle = throttle;
-
         steerInput = value.Get<Vector2>();
         throttle = Mathf.Clamp(throttle + (int)steerInput.y, -1, 4);
-
-        if (oldThrottle != throttle) Debug.Log(throttle);
-
     }
 
     void OnChangeCamera(InputValue value)
