@@ -57,6 +57,8 @@ public class LayerTerrain : MonoBehaviour
     private float highest_e = -100;
     private float lowest_e = 100;
 
+    public float waterheight_int;
+
     // ----------------- DEBUG STUFF
     bool print_debug = false;
     
@@ -67,6 +69,7 @@ public class LayerTerrain : MonoBehaviour
     {
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
+        waterheight_int = biomes.GetWaterLayer().value * depth;
     }
 
     public void GenerateBiome() // MOVE

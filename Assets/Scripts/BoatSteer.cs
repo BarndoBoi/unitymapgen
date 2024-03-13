@@ -30,7 +30,7 @@ public class BoatSteer : MonoBehaviour
         float turnAngle = steerInput.x / throttle;
         transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received 
         transform.position += transform.forward * ((float)throttle * .1f);
-        Debug.Log(throttle);
+        //Debug.Log(throttle);
 
     }
 
