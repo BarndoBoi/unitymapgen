@@ -15,8 +15,6 @@ public class BoatSteer : MonoBehaviour
     int throttle = 0;
     float speed = 0.0f;
 
-    [Range(-1, 4)]
-    int throttle = 0;
 
     private Vector2 steerInput;
 
