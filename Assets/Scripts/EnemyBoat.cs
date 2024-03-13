@@ -5,6 +5,12 @@ using UnityEngine.AI;
 
 public class EnemyBoat : MonoBehaviour
 {
+    [SerializeField]
+    bool showAgentPath = true;
+
+    [SerializeField]
+    bool showAgentLOS = false;
+
     private int health, maxHealth = 1;
 
     private bool targetInSightRange;
@@ -17,6 +23,7 @@ public class EnemyBoat : MonoBehaviour
 
     public NavMeshAgent navMeshAgent;
     public Animator animator;
+    public LineRenderer line;
 
     [SerializeField]
     private float sightDistance;
@@ -53,14 +60,15 @@ public class EnemyBoat : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        state = State.Roaming;
+        line = GetComponent<LineRenderer>();
+        
     }
 
     private void Start()
     {
         LastAttackTime = Random.Range(0, 5);
         health = maxHealth;
-
+        state = State.Roaming;
     }
 
     private void Update()
@@ -94,14 +102,14 @@ public class EnemyBoat : MonoBehaviour
                 }
             }
 
-            if (haveLineOfSight) 
-            { 
+            if (haveLineOfSight & showAgentLOS) 
+            {
                 Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.green); 
-            } else Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.red);
+            } else if (showAgentLOS) Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.red);
 
             targetInShootingRange = Vector3.Distance(transform.position, target.position) <= shootingDistance;
 
-        } else Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.white);
+        } else if (showAgentLOS) Debug.DrawRay(raycastOrigin, target.position - raycastOrigin, Color.white);
 
 
         switch (state)
@@ -110,6 +118,7 @@ public class EnemyBoat : MonoBehaviour
             case State.Roaming:
                 if (!navMeshAgent.hasPath) // if we don't have a current path, set a new one!
                 {
+                    //Debug.Log("doesn't have path");
                     UpdatePath(RandomNavmeshLocation(randomPathDistance));
                 }
                 break;
@@ -163,16 +172,28 @@ public class EnemyBoat : MonoBehaviour
         }
 
         // should always be chasing to close distance before firing
-        if (state == State.Chase & targetInShootingRange & haveLineOfSight)
+        /*if (state == State.Chase & targetInShootingRange & haveLineOfSight)
         {
-            state = State.Fire;
+            //state = State.Fire;
 
         }
         if (state == State.Fire & !targetInShootingRange & haveLineOfSight)
         {
             state = State.Chase;
+        }*/
+
+        // temp not using LOS because not working rn
+        if (state == State.Chase & targetInShootingRange)
+        {
+            //state = State.Fire;
+
+        }
+        if (state == State.Fire & !targetInShootingRange)
+        {
+            state = State.Chase;
         }
 
+        Debug.Log(state);
     }
 
 
@@ -199,7 +220,26 @@ public class EnemyBoat : MonoBehaviour
 
     private void UpdatePath(Vector3 destination)
     {
-        navMeshAgent.SetDestination(destination);
+        
+        if (navMeshAgent.SetDestination(destination))
+        {
+            //Debug.Log("path successfully updated to    " + destination);
+        }
+
+        /*if (showAgentPath)
+        {
+            line.SetPosition(0, transform.position); //set the line's origin
+            
+            var path = navMeshAgent.path;
+            if (path.corners.Length < 2) //if the path has 1 or no corners,
+                return;                  //there is no need
+
+            line.positionCount = path.corners.Length; //set the array of positions to the amount of corners
+            line.SetPositions(path.corners); //go through each corner and set that to the line renderer's position
+        }*/
+
+
+
     }
 
     private void Fire(TrajectoryMaffs.ThrowData data)
