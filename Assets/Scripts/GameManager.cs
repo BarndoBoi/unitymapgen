@@ -131,7 +131,7 @@ public class GameManager: MonoBehaviour
         {
             int randomX = Random.Range(0, X);
             int randomY = Random.Range(0, Y);
-            Vector3 randomPoint = new Vector3(randomY, 0, randomX);
+            Vector3 randomPoint = new Vector3(randomY, waterHeight, randomX);
 
             if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"] == 0)
             {
