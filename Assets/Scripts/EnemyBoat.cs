@@ -117,7 +117,7 @@ public class EnemyBoat : MonoBehaviour
             case State.Chase:
                 // get a point that's between the max shooting distance
                 // and some arbitrary point within that distance
-                float min_shootingDistance = shootingDistance / 2;
+                float min_shootingDistance = shootingDistance / 2; //whatever man for now just halfway between the player and the outer shooting range
                 float randomShootingDistanceFromTarget = Random.Range(shootingDistance, min_shootingDistance);
                 Vector3 direction = (transform.position - target.position);
                 Vector3 randomPointInShootingRange = target.position + Vector3.ClampMagnitude(direction,randomShootingDistanceFromTarget);
