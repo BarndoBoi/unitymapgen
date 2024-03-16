@@ -5,35 +5,63 @@ using UnityEngine.InputSystem;
 
 public class BoatSteer : MonoBehaviour
 {
+    [SerializeField]
+
+    float acceleration = 0.20f;
+    [SerializeField]
+    float speed = 0.0f;
 
     [SerializeField]
-    float speed = 0.5f;
+    float turnRate = 0.05f;
+
     [SerializeField]
-    float turnRate = 0.7f;
+    [Range(-1, 4)]
+    int throttle = 0;
+
     [SerializeField]
-    float minimumInput = 0.01f; //Can't go slower than this
+    float speed = 0.0f;
 
     private Vector2 steerInput;
 
     // Start is called before the first frame update
     void Start()
     {
+        playerBoat_RB = GetComponent<Rigidbody>();
     }
+    
 
     // Update is called once per frame
     void Update()
     {
-        float turnAngle = steerInput.x * turnRate;
-        transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received 
-        //transform.position += transform.forward * Mathf.Clamp(steerInput.y, minimumInput, float.MaxValue) * speed; //Can't sit still
-        transform.position += transform.forward * Mathf.Clamp(steerInput.y, 0, float.MaxValue) * speed; //Can't sit still
+        float turnAngle = Mathf.Clamp(steerInput.x * (.75f / speed), -.5f, .5f); //this needs to be edited to be better but it works
+        transform.Rotate(Vector3.up, turnAngle);
 
-       
+        //TODO: these can all be simplified down, I made things verbose for debugging
+        if (throttle > 0)
+        {
+            if (speed <= throttle) speed += acceleration * throttle * Time.deltaTime; else speed -= acceleration * throttle * Time.deltaTime;
+            transform.position += transform.forward * (speed * .05f);
+        }
+
+        if (throttle < 0)
+        {
+            if (speed <= throttle) speed -= acceleration * throttle * Time.deltaTime; else speed += acceleration * throttle * Time.deltaTime;
+            transform.position += transform.forward * (speed * .05f);
+        }
+
+        if (throttle == 0)
+        {
+            if (speed > throttle) speed -= acceleration * Time.deltaTime;
+            if (speed < throttle) speed += acceleration * Time.deltaTime;
+            transform.position += transform.forward * (speed * .05f);
+        }
+
     }
 
     void OnMove(InputValue value)
     {
-        steerInput = value.Get<Vector2>(); //Store the new vector any time the move vector changes
+        steerInput = value.Get<Vector2>();
+        throttle = Mathf.Clamp(throttle + (int)steerInput.y, -1, 4);
     }
 
     void OnChangeCamera(InputValue value)

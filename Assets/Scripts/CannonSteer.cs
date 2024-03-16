@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Composites;
 
 public class CannonSteer : MonoBehaviour
 {
@@ -9,7 +10,13 @@ public class CannonSteer : MonoBehaviour
     [SerializeField]
     float turnRate = 0.7f;
 
+    [SerializeField]
+    float minPower ;
+    [SerializeField]
+    float maxPower;
+
     private Vector2 steerInput;
+    private Vector2 cannonPowerInput;
 
     public GameObject cannon_tube;
     public GameObject cannon_base;
@@ -20,11 +27,13 @@ public class CannonSteer : MonoBehaviour
     [SerializeField]
     public LineRenderer LineRenderer;
     [SerializeField]
+    public Material LineRendererMaterial;
+    [SerializeField]
     private Transform FirePoint;
 
-    [SerializeField]
-    [Range(1, 100)]
-    private float launchForce = 15f;
+    /*[SerializeField]
+    [Range(1, 100)]*/
+    private float launchForce;
 
     [SerializeField]
     [Range(1, 10)]
@@ -45,26 +54,41 @@ public class CannonSteer : MonoBehaviour
     [SerializeField]
     private LayerMask ProjectileCollisionMask;
 
+
+
+
     void Start()
     {
-        
-    }
+        launchForce = minPower;
+        LineRenderer.material = LineRendererMaterial;
 
-    // Update is called once per frame
-    void Update()
+}
+
+// Update is called once per frame
+void Update()
     {
-        float turnAngle = steerInput.x * turnRate;
-        float fireAngle = steerInput.y * turnRate;
+        //float turnAngle = steerInput.x * turnRate;
+        //float fireAngle = steerInput.y * turnRate;
 
-        cannon_base.transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
-        cannon_tube.transform.Rotate(Vector3.left, fireAngle);
+        launchForce = launchForce + cannonPowerInput.y;
+
+        //cannon_base.transform.Rotate(Vector3.up, turnAngle); //Turn the ship based on the horizontal input received
+        //cannon_tube.transform.Rotate(Vector3.left, fireAngle);
 
         SimulateTrajectory();
     }
 
-    void OnCannonMove(InputValue value)
+    /*void OnCannonMove(InputValue value)
     {
         steerInput = value.Get<Vector2>(); //Store the new vector any time the move vector changes
+    }*/
+
+    void OnCannonPower(InputValue value)
+    {
+        
+        launchForce += value.Get<float>();
+        //launchForce = Mathf.Clamp(launchForce, minPower, maxPower);
+        
     }
 
     void OnFire()
@@ -89,7 +113,6 @@ public class CannonSteer : MonoBehaviour
         LineRenderer.positionCount = Mathf.CeilToInt(LinePoints / timeIntervalInPoints) + 1;
         Vector3 startPosition = FirePoint.position;
         Vector3 startVelocity = launchForce * FirePoint.forward;
-        Vector3 HitPoint;
         int i = 0;
         LineRenderer.SetPosition(i, startPosition);
         for (float time = 0; time < LinePoints; time += timeIntervalInPoints)
