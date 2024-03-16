@@ -1,140 +1,92 @@
 using System.Collections.Generic;
-using System;
+using UnityEngine;
 
 namespace ProcGenTiles
 {
-	public class Pathfinding
+	public static class Pathfinding
 	{
-		HashSet<(int x, int y)> visited = new HashSet<(int x, int y)>();
-		Queue<(int x, int y)> queue = new Queue<(int x, int y)>();
-		Map Map;
-		public Dictionary<int, int> regionSizes = new Dictionary<int, int>(); //Holds the region index and the number of tiles marked with it, for size checking
+		static Dictionary<int, List<Tile>> regions = new Dictionary<int, List<Tile>>();
 
-		public Pathfinding(Map map)
+		public static Dictionary<int, List<Tile>> GetRegions() { return regions; }
+
+		public static Dictionary<int, List<Tile>> GetIsolatedWaterRegions()
 		{
-			Map = map;
-		}
-
-		public void LandWaterFloodfill(int x, int y, Biomes biomes)
-		{
-			LandWaterFloodfill((x, y), biomes);
-		}
-
-		public void LandWaterFloodfill((int x, int y) start, Biomes biomes)
-		{
-			queue.Clear();
-			queue.Enqueue(start);
-			visited.Clear();
-			visited.Add(start);
-
-			float waterElevation = biomes.GetWaterLayer().value; //Find the layer marked as water height and use it in the floodfill
-
-			while (queue.Count > 0)
+			int largest = 0;
+			int largestIndex = 0;
+			//Find the largest water region to exclude, along with any marked as land
+			foreach (var region in regions)
 			{
-				(int x, int y) coords = queue.Dequeue();
-				Tile tile = Map.GetTile(coords); //Can always assume value is not null due to AddNeighborsToQueue
-
-				//Check the elevation layer, if it doesn't exist exit with an error
-				if (!tile.ValuesHere.ContainsKey("Elevation"))
+				if (region.Value.Count > largest)
 				{
-					throw new InvalidOperationException("Cannot floodfill without elevation data");
-				}
-
-                if (tile.ValuesHere["Elevation"] >= waterElevation)
-                    tile.ValuesHere.Add("Land", 1); //Heck this only takes floats so we'll use positive 1 for true and 0 for false
-                else
-                    tile.ValuesHere.Add("Land", 0);
-
-                AddFourNeighbors(coords.x, coords.y, queue);
-			}
-		}
-		
-		public void MarkAllRegions()
-		{
-			//Get a list of all tiles
-			List<(int x, int y)> values = new List<(int x, int y)>();
-			for (int x = 0; x < Map.Width; x++)
-			{
-				for (int y = 0; y < Map.Height; y++)
-				{
-					values.Add((x, y));
+					largestIndex = region.Key;
+					largest = region.Value.Count;
 				}
 			}
-			//Move first tile from list to frontier
-			Queue<(int x, int y)> frontier = new Queue<(int x, int y)>();
-			visited.Clear();
-			int region = 0; //Track which region we're marking
-			//Add neighbors to frontier if Land values match
-			
-			while (values.Count > 0)
-			{ //Loop for all tiles
-				frontier.Enqueue(values[0]);
-				visited.Add(values[0]);
-				Tile compare = Map.GetTile(values[0]); //For checking the Land value
-				if (!regionSizes.ContainsKey(region))
-				{ //If there's no region entry for this, we should add it
-					regionSizes.Add(region, 0);
-				}
 
-				while (frontier.Count > 0)
+			//Now create a new dictionary only containing the smaller water regions
+			Dictionary<int, List<Tile>> isolatedWater = new Dictionary<int, List<Tile>>();
+
+			foreach(var region in regions)
+			{ //One more loop to build the dictionary
+				if (region.Key != largestIndex && region.Value[0].ValuesHere[LayersEnum.Land] == 0)
+				{ //This isn't the largest region, and it is marked as water, so we add it to the new dictionary
+					isolatedWater.Add(region.Key, region.Value);
+				}
+			}
+			return isolatedWater; //Dictionary is built! :DD
+		}
+
+		public static void MarkRegions(Map map)
+		{
+			int regionNumber = 0;
+
+			for (int x = 0; x < map.Width; x++)
+			{
+				for (int y = 0; y < map.Height; y++)
 				{
-					(int x, int y) coords = frontier.Dequeue();
-					Tile found = Map.GetTile(coords);
-					if (found.ValuesHere["Land"] == compare.ValuesHere["Land"])
-					{ //The neighbor matches the start value so assign them the same region
-						found.ValuesHere.TryAdd("Region", region);
-						regionSizes[region]++; //Increment the number of tiles in the region
-						values.Remove(coords); //Delete from values if region is marked
-						AddFourNeighbors(coords.x, coords.y, frontier);
+					if (!map.GetTile(x, y).ValuesHere.ContainsKey(LayersEnum.Region))
+					{ //No region has been assigned to this tile, so it's time to floodfill
+						FloodFill(map, x, y, regionNumber);
+						regionNumber++; //Increment the region after the Floodfill has bubbled all the way back up the call stack
 					}
 				}
-				region++; //On to the next one if the frontier ran out
-				visited.Clear();
-			}
-			//Mark until frontier is empty, removing values from the list
-			//increment region and pop first item from list until list is empty
-		}
-
-		public void BFS((int x, int y) start)
-		{
-
-			visited.Add(start);
-			queue.Enqueue(start);
-
-			while (queue.Count > 0)
-			{
-				var current = queue.Dequeue();
-
-				// Add neighboring tiles to the queue if not visited for 4 dir pathfinding: diamonds
-				AddFourNeighbors(current.x, current.y, queue);
-
-				//Thinking about running a Func<> through the params to determine what to do with the found tiles
-
 			}
 		}
 
-		private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q)
+		static void FloodFill(Map map, int x, int y, int regionNumber)
 		{
-			AddNeighborToQueue(x - 1, y, q);
-			AddNeighborToQueue(x + 1, y, q);
-			AddNeighborToQueue(x, y - 1, q);
-			AddNeighborToQueue(x, y + 1, q);
-		}
-		
-		private void AddEightNeighbors(int x, int y, Queue<(int x, int y)> q)
-		{ //Stubbed just in case
-			AddFourNeighbors(x, y, q);
-			AddNeighborToQueue(x - 1, y - 1, q);
-			AddNeighborToQueue(x + 1, y - 1, q);
-			AddNeighborToQueue(x - 1, y + 1, q);
-			AddNeighborToQueue(x + 1, y + 1, q);
-		}
+			if (!map.IsValidTilePosition(x, y))
+				return; //Not a valid tile, so exit function
 
-		private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q)
-		{
-			if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y)))
-				q.Enqueue((x, y));
-				visited.Add((x, y));
+			Tile tile = map.GetTile(x, y); //Fetch the valid tile from the map for comparing later, unless it's a new region
+
+			if (!regions.ContainsKey(regionNumber))
+			{ //This is the first time we're marking this region, so set up the dictionary
+				List<Tile> tiles = new List<Tile>() { tile }; //Make a new list containing the first tile we've grabbed for this region
+				regions.Add(regionNumber, tiles); //Add the list with the first tile
+				tile.ValuesHere.Add(LayersEnum.Region, regionNumber); //Mark this tile with the region and floodfill recursively
+				FloodFill(map, x + 1, y, regionNumber); //Right
+				FloodFill(map, x - 1, y, regionNumber); //Left
+				FloodFill(map, x, y + 1, regionNumber); //Up
+				FloodFill(map, x, y - 1, regionNumber); //Down
+			}
+			else
+			{ //The region exists, so we must compare land codes unless the tile already has a region 
+				if (tile.ValuesHere.ContainsKey(LayersEnum.Region))
+					return; //This tile has already been marked, so we skip it by returning
+
+				Tile compare = regions[regionNumber][0]; //Nab the first tile from the region list to compare our found tile with
+
+				if (FloatExtensions.Approximately(tile.ValuesHere[LayersEnum.Land], compare.ValuesHere[LayersEnum.Land]))
+				{ //Values match within float imprecision tolerance so this tile is in the region
+					regions[regionNumber].Add(tile);
+					tile.ValuesHere.Add(LayersEnum.Region, regionNumber); //Mark the region and recursively floodfill
+					FloodFill(map, x + 1, y, regionNumber); //Right
+					FloodFill(map, x - 1, y, regionNumber); //Left
+					FloodFill(map, x, y + 1, regionNumber); //Up
+					FloodFill(map, x, y - 1, regionNumber); //Down
+				}
+			}
 		}
-	}
+    }
 }

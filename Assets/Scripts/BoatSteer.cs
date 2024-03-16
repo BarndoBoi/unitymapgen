@@ -18,16 +18,7 @@ public class BoatSteer : MonoBehaviour
     [Range(-1, 4)]
     int throttle = 0;
 
-    [SerializeField]
-    float speed = 0.0f;
-
     private Vector2 steerInput;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        playerBoat_RB = GetComponent<Rigidbody>();
-    }
     
 
     // Update is called once per frame

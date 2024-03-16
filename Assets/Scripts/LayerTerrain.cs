@@ -48,11 +48,10 @@ public class LayerTerrain : MonoBehaviour
     public GameManager gameManager;
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
-    private Pathfinding pathfinding;
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
-    public Renderer targetRenderer;
+    public Renderer targetRenderer; //This doesn't seem to be used anywhere? Probably needs to be removed
 
     private float highest_e = -100;
     private float lowest_e = 100;
@@ -91,8 +90,7 @@ public class LayerTerrain : MonoBehaviour
     //stays
     public void GenerateTerrain()
     {
-        finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
-        pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
+        finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbage collected each time, and there's no reason
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -108,18 +106,34 @@ public class LayerTerrain : MonoBehaviour
         }
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
         GenerateBiome();
+        //Now that Land codes are assigned in NormalizeFinalMap we can run the Pathfinding floodfill
+        Pathfinding.MarkRegions(finalMap);
+        //Now we eliminate all water regions excluding the largest one
+        var isolatedWater = Pathfinding.GetIsolatedWaterRegions();
+        float waterLevel = biomes.GetWaterLayer().value; //Nab the water level for elevation correction
+
+        foreach(var region in isolatedWater)
+        {   //All of these regions are disconnected chunks of water, so we should change their elevations and remark their land code
+            //Sadly this means we'll have to floodfill again to mark regions correctly, but I'll be skipping that for now since we aren't using the regions yet
+
+            foreach (Tile tile in region.Value)
+            { //Loop through all of the tiles in the region and correct their elevation and land code
+                tile.ValuesHere[LayersEnum.Elevation] = waterLevel; //Consider adding some noise to this as well maybe? Test and see
+                tile.ValuesHere[LayersEnum.Land] = 1; //Mark this as land instead of water
+            }
+            //That's all folks! No more disconnected water
+        }
+
         //biomes.GenerateBiomes();
-        CreateTerrainFromHeightmap();
-        pathfinding.LandWaterFloodfill(0, 0, biomes);
-        
-        //pathfinding.MarkAllRegions(); // turned off until optimized
+        CreateTerrainFromHeightmap(); //Now we pass the normalized and corrected map to be created
         
         if (print_debug)
         {
-            Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
-            for (int i = 0; i < pathfinding.regionSizes.Count; i++)
+            Dictionary<int, List<Tile>> regions = Pathfinding.GetRegions();
+            Debug.Log($"Number of regions marked: {regions.Keys.Count}");
+            for (int i = 0; i < regions.Keys.Count; i++)
             {
-                Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
+                Debug.Log($"Region {i} has {regions[i].Count} tiles and has Land code of {regions[i][0].ValuesHere[LayersEnum.Land]}"); //Output info
             }
         }
         
@@ -253,6 +267,8 @@ public class LayerTerrain : MonoBehaviour
         float lowest_after = 100;
         float highest_after = -100;
 
+        float waterLevel = biomes.GetWaterLayer().value; //Store the global water level for land/water marking
+
         for (int x = 0; x < X; x++)
         {
             for (int y = 0; y < Y; y++)
@@ -274,6 +290,12 @@ public class LayerTerrain : MonoBehaviour
                     // commented out becuz URP
                     //finalTile.ValuesHere[layer] = Mathf.Max(0, finalTile.ValuesHere[layer] - minValue);
                 }
+
+                //Land water marking done here
+                if (finalTile.ValuesHere[layer] <= waterLevel)
+                    finalTile.ValuesHere.Add(LayersEnum.Land, 0); //Mark this as water, aka not land
+                else
+                    finalTile.ValuesHere.Add(LayersEnum.Land, 1); //Otherwise mark it as land
 
                 // just for debug
                 if (finalTile.ValuesHere[layer] < lowest_after) lowest_after = finalTile.ValuesHere[layer];
