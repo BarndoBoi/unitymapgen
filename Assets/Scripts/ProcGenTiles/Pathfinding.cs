@@ -53,40 +53,44 @@ namespace ProcGenTiles
 			}
 		}
 
-		static void FloodFill(Map map, int x, int y, int regionNumber)
-		{
-			if (!map.IsValidTilePosition(x, y))
-				return; //Not a valid tile, so exit function
+        static void FloodFill(Map map, int x, int y, int regionNumber)
+        {
+            if (!map.IsValidTilePosition(x, y))
+                return; //Not a valid tile, so exit function
 
-			Tile tile = map.GetTile(x, y); //Fetch the valid tile from the map for comparing later, unless it's a new region
+            Tile tile = map.GetTile(x, y); //Fetch the valid tile from the map for comparing later, unless it's a new region
 
-			if (!regions.ContainsKey(regionNumber))
-			{ //This is the first time we're marking this region, so set up the dictionary
-				List<Tile> tiles = new List<Tile>() { tile }; //Make a new list containing the first tile we've grabbed for this region
-				regions.Add(regionNumber, tiles); //Add the list with the first tile
-				tile.ValuesHere.Add(LayersEnum.Region, regionNumber); //Mark this tile with the region and floodfill recursively
-				FloodFill(map, x + 1, y, regionNumber); //Right
-				FloodFill(map, x - 1, y, regionNumber); //Left
-				FloodFill(map, x, y + 1, regionNumber); //Up
-				FloodFill(map, x, y - 1, regionNumber); //Down
-			}
-			else
-			{ //The region exists, so we must compare land codes unless the tile already has a region 
-				if (tile.ValuesHere.ContainsKey(LayersEnum.Region))
-					return; //This tile has already been marked, so we skip it by returning
+            if (tile.ValuesHere.ContainsKey(LayersEnum.Region))
+                return; //This tile has already been marked, so we skip it by returning
 
-				Tile compare = regions[regionNumber][0]; //Nab the first tile from the region list to compare our found tile with
+            if (!regions.ContainsKey(regionNumber))
+            { //This is the first time we're marking this region, so set up the dictionary
+                List<Tile> tiles = new List<Tile>() { tile }; //Make a new list containing the first tile we've grabbed for this region
+                regions.Add(regionNumber, tiles); //Add the list with the first tile
+                tile.ValuesHere.Add(LayersEnum.Region, regionNumber); //Mark this tile with the region
+            }
+            else
+            { //The region exists, so we must compare land codes to determine if the tile belongs to the region
+                Tile compare = regions[regionNumber][0]; //Nab the first tile from the region list to compare our found tile with
 
-				if (FloatExtensions.Approximately(tile.ValuesHere[LayersEnum.Land], compare.ValuesHere[LayersEnum.Land]))
-				{ //Values match within float imprecision tolerance so this tile is in the region
-					regions[regionNumber].Add(tile);
-					tile.ValuesHere.Add(LayersEnum.Region, regionNumber); //Mark the region and recursively floodfill
-					FloodFill(map, x + 1, y, regionNumber); //Right
-					FloodFill(map, x - 1, y, regionNumber); //Left
-					FloodFill(map, x, y + 1, regionNumber); //Up
-					FloodFill(map, x, y - 1, regionNumber); //Down
-				}
-			}
-		}
+                if (FloatExtensions.Approximately(tile.ValuesHere[LayersEnum.Land], compare.ValuesHere[LayersEnum.Land]))
+                { //Values match within float imprecision tolerance so this tile is in the region
+                    regions[regionNumber].Add(tile);
+                    tile.ValuesHere.Add(LayersEnum.Region, regionNumber); //Mark the region
+                }
+                else
+                {
+                    return; //Tile does not belong to the region, so exit the function
+                }
+            }
+
+			//Debug.Log($"Marked tile at {x},{y} with region {regionNumber}");
+
+            // Recursively flood fill neighboring tiles
+            FloodFill(map, x + 1, y, regionNumber); //Right
+            FloodFill(map, x - 1, y, regionNumber); //Left
+            FloodFill(map, x, y + 1, regionNumber); //Up
+            FloodFill(map, x, y - 1, regionNumber); //Down
+        }
     }
 }

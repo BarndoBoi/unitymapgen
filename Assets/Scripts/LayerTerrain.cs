@@ -59,6 +59,7 @@ public class LayerTerrain : MonoBehaviour
     public float waterheight_int;
 
     // ----------------- DEBUG STUFF
+    [SerializeField]
     bool print_debug = false;
     
 
@@ -285,17 +286,17 @@ public class LayerTerrain : MonoBehaviour
                     // TODO: do power stuff here not in GenTerrain()
                     finalTile.ValuesHere[layer] = Mathf.Pow(finalTile.ValuesHere[layer], raisedPower);
 
+                    //Land water marking done here
+                    if (finalTile.ValuesHere[layer] <= waterLevel)
+                        finalTile.ValuesHere.Add(LayersEnum.Land, 0); //Mark this as water, aka not land
+                    else
+                        finalTile.ValuesHere.Add(LayersEnum.Land, 1); //Otherwise mark it as land
+
                     // TODO: do min-height stuff here, set anything below water level texture to water level.
                     //if (finalTile.ValuesHere[layer] < minValue) finalTile.ValuesHere[layer] = minValue;
                     // commented out becuz URP
                     //finalTile.ValuesHere[layer] = Mathf.Max(0, finalTile.ValuesHere[layer] - minValue);
                 }
-
-                //Land water marking done here
-                if (finalTile.ValuesHere[layer] <= waterLevel)
-                    finalTile.ValuesHere.Add(LayersEnum.Land, 0); //Mark this as water, aka not land
-                else
-                    finalTile.ValuesHere.Add(LayersEnum.Land, 1); //Otherwise mark it as land
 
                 // just for debug
                 if (finalTile.ValuesHere[layer] < lowest_after) lowest_after = finalTile.ValuesHere[layer];
